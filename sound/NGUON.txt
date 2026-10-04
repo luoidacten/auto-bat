@@ -1,0 +1,87 @@
+Âm thanh đã được sắp xếp lại (tên gốc → tên mới). Giữ file này để ghi công tác giả.
+
+music/ — nhạc nền (lặp)
+  menu_fantasy_quest.mp3      ← alex-morgan-fantasy-adventure-quest-537478.mp3        (menu chính)
+  hub_gaming.mp3              ← kiravale-gaming-music-593659.mp3                      (trung tâm HLV / bản đồ)
+  tour_heroic_orchestra.mp3   ← echoes_of_lumen-battle-cinematic-heroic-orchestra-586988.mp3 (nhánh đấu, chung kết, Đại Hội Võ Thần)
+  battle_epic.mp3             ← kulakovka-battle-epic-274997.mp3                      (trong trận)
+  battle_kingdom.mp3          ← u_98673jp944-battle-for-the-kingdom-392556.mp3        (trong trận)
+
+sfx/ — hiệu ứng
+  slash_light.mp3   ← chém2.mp3                     (chém nhẹ: đòn A)
+  slash_heavy.mp3   ← chém1.mp3                     (chém nặng: đòn kết liễu)
+  sword_cut.mp3     ← cyberwave-orchestra-fantasy-game-sword-cut-sound-effect-...-339824.mp3
+  sword_clash.mp3   ← dragon-studio-sword-clashhit-393837.mp3   (đỡ đòn, phản đòn, khiên)
+  armor_hit.mp3     ← dragon-studio-armor-impact-from-sword-393843.mp3 (đòn đánh văng cực mạnh)
+  impact.mp3        ← universfield-combat-impact-352458.mp3     (đấm, húc, đập tường)
+  flesh_hit.mp3     ← u_xjrmmgxfru-flesh-impact-266316.mp3      (cào, đòn tay không)
+  splat.mp3         ← universfield-cartoon-wet-splat-352447.mp3 (Xé Toạc / chảy máu)
+  bow_shoot.mp3     ← bow_shoot.mp3                             (cung, nỏ)
+  gun_shot.mp3      ← lục.mp3                                   (súng lục, lục ổ xoay, song lục — đã giảm âm lượng)
+  shotgun.mp3       ← 49053354-shotgun-307467.mp3               (súng săn của Clint, Dragon's Breath)
+  gun_reload.mp3    ← reaload_smallsgun.mp3                     (nạp đạn)
+  boom_small.mp3    ← freesound_community-small-explosion-106769.mp3 (cầu lửa, đạn nổ)
+  explosion.mp3     ← u_b32baquv5u-explosion-9-340460.mp3       (vụ nổ vừa, KO)
+  boom_big.mp3      ← dragon-studio-boom-356126.mp3             (Thiên Thạch, tự hủy T-Zero, Khai Thiên)
+  magic_spell.mp3   ← universfield-magic-spell-02-250240.mp3    (phép, dịch chuyển, dấu ấn)
+  magic_burst.mp3   ← humordome-magic-burst-452852.mp3          (tung Nộ)
+  note_1..4.mp3     ← freesound_gamestudio-skill-attack-combo-music-note-1..4-*.mp3 (nốt nhạc Aria, combo Katana)
+  spin.mp3          ← freesound_community-cartoon-spin-7120.mp3 (đòn xoay vòng)
+  robot.mp3         ← freesound_community-robotgobang-80863.mp3 (T-Zero, ụ pháo)
+  applause.mp3      ← pwlpl-applause-sound-effect-521104.mp3    (thắng trận, vô địch)
+  boss_sting.mp3    ← chuanluo5110-boss-572015.mp3              (trùm cuối xuất hiện)
+
+ui/
+  select.mp3        ← emilianodleon-select-button-ui-395763.mp3 (bấm nút)
+
+voice/
+  fight.mp3         ← voicebosch-fight-deep-voice-172194.mp3    ("FIGHT!" khi vào trận)
+
+_trung_lap/ — bản sao trùng 100% (có thể xóa)
+
+--- Bổ sung (04/10) ---
+music/ — nhạc nền giờ phát theo DANH SÁCH: mỗi nhóm có nhiều bài, hết bài tự chuyển bài khác (không lặp bài vừa nghe)
+  menu_celestial_kingdom.mp3   ← openmindaudio-epic-fantasy-background-music-celestial-kingdom-459785.mp3 (menu)
+  menu_fantasy_paulyudin.mp3   ← paulyudin-fantasy-164804.mp3                              (menu)
+  hub_wonderland_melody.mp3    ← nguyengianga2-wonderland-melody-222493.mp3                (trung tâm HLV)
+  hub_sitar_bottles.mp3        ← nourishedbymusic-ten-green-bottles-sitar-version-117263.mp3 (trung tâm HLV)
+  tour_imperial_march.mp3      ← openmindaudio-epic-legendary-cinematic-imperial-march-end-time-475838.mp3 (nhánh đấu / trùm)
+  tour_cinematic_flair.mp3     ← desifreemusic-epic-cinematic-flair-326753.mp3             (nhánh đấu / trùm)
+  tour_last_beacon.mp3         ← openmindaudio-fantasy-trailer-music-valor-of-the-last-beacon-preview-502966.mp3 (nhánh đấu / trùm)
+  battle_alexgrohl.mp3         ← alexgrohl-battle-535023.mp3                               (trong trận)
+  battle_warrior_drums.mp3     ← hitslab-battle-warrior-fighting-drums-430819.mp3          (trong trận)
+  battle_drums.mp3             ← jonasblakewood-battle-drums-battle-drums-music-322011.mp3 (trong trận)
+sfx/
+  crow_caw.mp3      ← dragon-studio-crow-caw-with-echoing-reverb-472375.mp3 (quạ Oca của Raven)
+  target_lock.mp3   ← soundshelfstudio-ui-target-locked-beep-535369.mp3     (Oca đánh dấu, Zero khóa mục tiêu)
+  magic_strike.mp3  ← freesound_community-magic-strike-5856.mp3            (ảo ảnh của Alice nổ)
+  wind_magic.mp3    ← yodguard-wind-magic-5-378630.mp3                     (Alice dịch chuyển / hoán đổi)
+  sniper.mp3        ← gun-Sniper.mp3                                       (bắn tỉa của Raven)
+  rifle_burst.mp3   ← Ar_gun.mp3                                           (loạt 3 viên của Raven)
+  reload_big.mp3    ← reload_bigGun.mp3                                    (Raven nạp băng tỉa)
+  flame.mp3         ← alex_jauk-flamethrower-sound-effect-421402.mp3       (T-Zero phun lửa, Dragon's Breath)
+  gatling.mp3       ← galling.mp3                                          (Trận Địa Nỏ của Percy)
+
+--- Bổ sung 2026-10-04 (đợt 2) ---
+music/
+  tour_boss_fight.mp3         ← alex-morgan-battle-boss-fight-game-music-583276.mp3
+  tour_epic_trailer.mp3       ← alexgrohl-epic-trailer-546214.mp3
+  tour_deception_epic.mp3     ← woodsea_gaford-deception-epic-background-music-57412.mp3
+  tour_epic_battle.mp3        ← yevhenastafiev-epic-epic-battle-607250.mp3
+  battle_wellerman_shanty.mp3 ← ebunny-wellerman-epic-shanty-354087.mp3
+  battle_jonasblakewood.mp3   ← jonasblakewood-battle-battle-music-595522.mp3
+  battle_nastelbom.mp3        ← nastelbom-battle-440508.mp3
+  battle_paulyudin.mp3        ← paulyudin-battle-battle-music-491417.mp3
+  battle_stereo_drum.mp3      ← stereo_color-battle-drum-493709.mp3
+  battle_mountain_beat.mp3    ← the_mountain-battle-beat-131618.mp3
+  battle_mountain_drop.mp3    ← the_mountain-battle-drop-132390.mp3
+sfx/
+  rifle_ar.mp3       ← Ar_gun_súng trường.mp3        (súng trường AR: Victoria, lính)
+  smg.mp3            ← SMG_gun.mp3                    (tiểu liên: Neo, Zero)
+  gun_auto.mp3       ← gun-các_sung_xấy_khác.mp3      (sấy liên thanh)
+  plasma.mp3         ← lordsonny-plasma-gun-fire-162136.mp3 (đạn năng lượng: pháo, T-Zero)
+  laser.mp3          ← voicebosch-laser-gun-174976.mp3 (laser đánh dấu, pháo điện từ)
+  energy_charge.mp3  ← nạp năng lượng.mp3             (tụ lực / gồng)
+  energy_charge2.mp3 ← yodguard-energy-charge-2-482499.mp3 (phép bổ trợ, hồi sinh)
+_trung_lap/ — bản trùng (lục.mp3 = gun_shot, 49053354-shotgun = shotgun, reaload_smallsgun = gun_reload, echoes_of_lumen = tour_heroic_orchestra, kulakovka = battle_epic)
+img/ — VFX: "Free" (Part 1–15, mỗi sheet 9 màu × 64px), "500 Bullet 24x24 Free", "Free Smoke Fx Pixel 04–07"
