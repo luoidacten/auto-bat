@@ -32,7 +32,7 @@
     'sim/match.js',
     'sim/lineup.js',
     'sim/bookie.js',
-    'data/heroes/_common.js',
+    'data/heroes/common.js',
     'data/heroes/valerius.js',
     'data/heroes/gideon.js',
     'data/heroes/koda.js',
