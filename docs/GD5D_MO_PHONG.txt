@@ -1,0 +1,38 @@
+# GĐ5d — số đo nhỏ, bản GĐ5c (commit eb6ebd7) vs bản Utility AI, cùng hạt giống
+
+== Trận đầy đủ, 6 trận (hạt f1–f6), đội hình ngẫu nhiên, HLV máy hai bên
+hạt | GĐ5c: phút, hạ gục, trụ, đội thắng | Utility AI: phút, hạ gục, trụ, đội thắng
+f1  | 25.1, 21, 10, Xanh  | 23.0, 38, 10, Xanh
+f2  | 22.6, 29,  9, Đỏ    | 20.9, 37,  9, Xanh
+f3  | 30.5, 42, 12, Xanh  | 20.9, 46,  9, Xanh
+f4  | 25.0, 24, 13, Đỏ    | 25.5, 33,  9, Xanh
+f5  | 22.6, 22,  9, Đỏ    | 22.7, 39,  8, Đỏ
+f6  | 33.0, 33, 11, Xanh  | 18.9, 24,  8, Xanh
+TB GĐ5c:       26.5 phút, 2/6 trận > 30 phút, hạ gục 28.5, trụ 10.7, quái lớn/cuối 5.0, lỗi 0
+TB Utility AI: 22.0 phút, 0/6 trận > 30 phút, hạ gục 36.2, trụ  8.8, quái lớn/cuối 4.7, lỗi 0
+
+== Quá trình chỉnh (cùng 6 hạt)
+- Utility AI, lệnh HLV còn yếu (người trung bình chỉ 1/5 theo lệnh): 25.5 phút, 0 trận > 30, hạ gục 43.3, trụ 10.8, lính kết liễu 19.8/phút (GĐ5c 17.6)
+- Tăng sức nặng lệnh HLV: 20.3 phút, hạ gục 36.3, trụ 8.7, lính 17.8/phút — trận f6 kết thúc 15:53:
+  HLV máy ra lệnh ~40 giây một lần, cả 5 người đi tranh quái cuối/giao tranh theo lệnh, lính tự phá 6 trụ không ai dọn.
+- Lệnh HLV nhạt dần theo thời gian (còn 1/2 khi sắp hết hạn): 22.0 phút (18.9–25.5) — bản cuối.
+- Đã thử: khi có lệnh vẫn cộng điểm cho lời gọi "về thủ/dọn lính" của đội trưởng → người trung bình 0/5 theo lệnh giao tranh, bỏ.
+
+== Làm theo lệnh HLV (cùng tình huống phút 14, chỉ đổi Kỷ Luật/Tín Nhiệm đội mình; đếm người còn sống)
+KL 18 / TN 90 | đẩy trụ giữa: 2/2 (3 chết) | rút: 5/5 | giao tranh: 2/2 (3 chết)
+KL 10 / TN 60 | đẩy trụ giữa: 5/5 | rút: 4/4 (1 chết) | giao tranh: 2/3 (chưa theo: mid → Biến về)
+KL  4 / TN 25 | đẩy trụ giữa: 3/4 (chưa theo: sup → Thủ nhà) | rút: 2/2 (3 chết) | giao tranh: 0/4 (top → Biến về, mid/adc/sup → Thủ nhà)
+Tổng: KL cao 9/9, trung bình 11/12, thấp 5/10.
+
+== Giao diện (Playwright, máy tính + điện thoại ngang)
+- Nút "🧠 Gỡ lỗi AI": trên đầu mỗi tướng hiện 3 hành động điểm cao nhất + lý do, và mục tiêu đang nhắm + lý do.
+- Dải tuyển thủ hiện ý định (📣 khi đang theo lệnh); chạm tuyển thủ → khối "Ý định" với top-3.
+- Trận sự nghiệp (tuyển thủ thật của đội): lệnh giao tranh "📣 … — 2/5 làm theo ngay (✋ chưa theo: … — đang ưu tiên Giữ đường)". Không lỗi trang.
+
+== Ngẫu nhiên có hạt giống
+- Trong src/sim, src/manager, src/data: không có Math.random. Nhiễu quyết định, nhận thức (bỏ sót), chọn đường vòng… lấy từ luồng "ai" của trận (m.rngAI).
+- Math.random chỉ còn ở giao diện: hiệu ứng vẽ/âm thanh, tướng đứng chơi ở màn chờ, và tạo hạt giống cho sự nghiệp/trận mới.
+
+== node tools/mophong.js --kiemtra
+✔ TẤT ĐỊNH: hai lần chạy giống hệt nhau
+✔ PHÁT LẠI: cùng hạt giống + cùng chuỗi lệnh → giống hệt

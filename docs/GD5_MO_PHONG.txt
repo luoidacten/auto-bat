@@ -1,0 +1,64 @@
+# GĐ5 — số đo nhỏ (theo dặn: ít mô phỏng; đo lớn để GĐ6)
+
+== node tools/mua.js --mua 3 --hat gd5 (toàn kết quả nhanh, sự cố để mặc định)
+══ Mùa 1 ══
+  Đội của bạn Voi Rừng Buôn Ma Thuột: Hạng 2, hạng chung cuộc 1 • quỹ 1.1 tỷ • tín nhiệm 67.2
+  Meta (132 ván): Diệp Thanh Phong 94%/59% • Victoria 92%/78% • Raven 83%/47% • Gideon 82%/58% • Elara 77%/39% (có mặt/thắng)
+  Bản cập nhật mùa này: —
+  Sự cố đội bạn: không • tin mùa: ⚖⚖
+  Hạng 1 mùa sau: điểm đội hình TB 14.8 • tiền TB 1.79 tỷ • âm quỹ 0 đội
+  Hạng 2 mùa sau: điểm đội hình TB 12.6 • tiền TB 563 tr • âm quỹ 0 đội
+  Hạng 3 mùa sau: điểm đội hình TB 10.6 • tiền TB 221 tr • âm quỹ 0 đội
+══ Mùa 2 ══
+  Đội của bạn Voi Rừng Buôn Ma Thuột: Hạng 1, hạng chung cuộc 2 • quỹ 2.59 tỷ • tín nhiệm 94
+  Meta (128 ván): Victoria 91%/61% • Elara 82%/45% • Theron 76%/58% • Raven 75%/54% • Roxie & T-Zero 73%/50% (có mặt/thắng)
+  Bản cập nhật mùa này: 2.5 (1 thay đổi), 2.0 (12 thay đổi)
+  Sự cố đội bạn: không • tin mùa: 📋⚖⚖📋
+  Hạng 1 mùa sau: điểm đội hình TB 14.6 • tiền TB 2.3 tỷ • âm quỹ 0 đội
+  Hạng 2 mùa sau: điểm đội hình TB 12.9 • tiền TB 694 tr • âm quỹ 0 đội
+  Hạng 3 mùa sau: điểm đội hình TB 11.2 • tiền TB 336 tr • âm quỹ 0 đội
+══ Mùa 3 ══
+  Đội của bạn Voi Rừng Buôn Ma Thuột: Hạng 1, hạng chung cuộc 2 • quỹ 4.11 tỷ • tín nhiệm 96
+  Meta (132 ván): Victoria 87%/53% • Roxie & T-Zero 80%/56% • Diệp Thanh Phong 80%/42% • Elara 79%/54% • Theron 79%/56% (có mặt/thắng)
+  Bản cập nhật mùa này: 3.0 (10 thay đổi)
+  Sự cố đội bạn: không • tin mùa: 📋⚖
+  Hạng 1 mùa sau: điểm đội hình TB 14.5 • tiền TB 2.98 tỷ • âm quỹ 0 đội
+  Hạng 2 mùa sau: điểm đội hình TB 13.1 • tiền TB 715 tr • âm quỹ 0 đội
+  Hạng 3 mùa sau: điểm đội hình TB 12.1 • tiền TB 372 tr • âm quỹ 0 đội
+Bản lưu 243 KB • 199 tuyển thủ • 335 cặp ăn ý • 4.8s
+
+== Lệch kết quả nhanh do cấm chọn (300 cặp đội ngẫu nhiên, bản 1.0)
+mean edge 0.007 sd 0.229 ms/game 2.19
+
+== Sự cố đội bạn: 2 sự nghiệp lịch tập KHÔNG nghỉ + 1 sự nghiệp lịch mặc định, mỗi cái 2 mùa (trợ lý đá, xử lý ngẫu nhiên 60% thư)
+career 0 champ,indiv,scrim,champ,indiv stress 39,39,39,5,3 ended null
+career 1 champ,indiv,scrim,champ,indiv stress 39,39,2,2,4 ended null
+career 2 champ,indiv,scrim,champ,rest stress 0,0,0,0,1 ended null
+{
+  'break:1': 6,
+  'break:2': 14,
+  'break:0': 8,
+  'quarrel:2': 5,
+  'quarrel:1': 2,
+  'break:-': 2
+} fixStarts 2
+
+== Chuỗi bán độ (ép khởi phát ở tuần 1, 3 sự nghiệp, trợ lý đá; nhánh = lựa chọn khi có bằng chứng: 0 kỷ luật nội bộ / 1 báo ban tổ chức / 2 bỏ qua)
+== nhánh 0: Lửa Đen
+  sau 10 tuần: còn ở đội true, bị cấm false, đang bán độ false, tín nhiệm ban lãnh đạo 60 → 62.7, tin: 
+== nhánh 1: Sao Lặng
+  T5 suspect → "🔍 Điều tra (8 tr)": Điều tra xong: có bằng chứng — xem thư mới.
+  T5 caught → "Báo ban tổ chức": Sao Lặng bị cấm thi đấu và rời đội. Ban lãnh đạo đánh giá cao sự minh bạch (+6), người hâm mộ ủng hộ.
+  sau 10 tuần: còn ở đội false, bị cấm true, đang bán độ false, tín nhiệm ban lãnh đạo 60 → 66, tin: Thiên Nga Hạ Long tự báo cáo: Sao Lặng bán độ, bị cấm thi đấ
+== nhánh 2: Sấm Lì
+  T4 suspect → "🔍 Điều tra (8 tr)": Điều tra xong: có bằng chứng — xem thư mới.
+  T4 caught → "Bỏ qua": Bạn chọn im lặng. Sấm Lì vẫn ở đội…
+  sau 10 tuần: còn ở đội false, bị cấm true, đang bán độ false, tín nhiệm ban lãnh đạo 60 → 41.4, tin: Ban tổ chức cấm Cáo Lặng (Bão Biển Đà Nẵng) thi đấu đến hết  | Ban tổ chức cấm Nắng Nhỏ (Diều Hâu Nam Định) thi đấu đến hết | Bê bối: Sấm Lì (Thiên Nga Hạ Long) bán độ — cấm thi đấu tới 
+
+== Trận có 7 bản làm lại + Lyra + đổi trang bị/luật (seed gd5): tất định & không lỗi
+det true errors 0 [] time 18m winner 0 20545ms
+
+== node tools/mophong.js --kiemtra
+✔ TẤT ĐỊNH: hai lần chạy giống hệt nhau
+Trận có lệnh: 194 lệnh người chơi, HLV máy 32 lệnh • 97d4261 vs phát lại 97d4261
+✔ PHÁT LẠI: cùng hạt giống + cùng chuỗi lệnh → giống hệt

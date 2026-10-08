@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1018">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Đấu Trường Huấn Luyện Viên</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <canvas id="cv"></canvas>
+  <div id="ui"></div>
+  <div id="match-ui" class="hidden"></div>
+  <div id="modal"></div>
+  <div id="toast"></div>
+  <div id="audio-ctl"><button id="btn-music" title="Bật/tắt nhạc nền" onclick="Sound.toggleMusic();audioBtns()">🎵</button><button id="btn-sfx" title="Bật/tắt hiệu ứng âm thanh" onclick="Sound.toggleSfx();audioBtns()">🔊</button><button class="mob-only" title="Toàn màn hình" onclick="goFullscreen()">⛶</button></div>
+  <div id="rotate" onclick="this.classList.add('gone')">📱🔄 Xoay ngang điện thoại để xem trận rõ hơn<small>(chạm để ẩn)</small></div>
+
+  <script src="js/01-core.js"></script>
+  <script src="js/01b-audio.js"></script>
+  <script src="js/02-data.js"></script>
+  <script src="js/03-weapons.js"></script>
+  <script src="js/03b-weapons2.js"></script>
+  <script src="js/03h-newchars.js"></script>
+  <script src="js/03i-east.js"></script>
+  <script src="js/03j-heroes.js"></script>
+  <script src="js/03c-roster.js"></script>
+  <script src="js/03d-talents.js"></script>
+  <script src="js/03g-items.js"></script>
+  <script src="js/03e-commands.js"></script>
+  <script src="js/03f-mods.js"></script>
+  <script src="js/03k-spells.js"></script>
+  <script src="js/04-fighter.js"></script>
+  <script src="js/05-ai.js"></script>
+  <script src="js/06-match.js"></script>
+  <script src="js/06b-hazards.js"></script>
+  <script src="js/06c-slash.js"></script>
+  <script src="js/06f-vfx.js"></script>
+  <script src="js/07-career.js"></script>
+  <script src="js/08-ui.js"></script>
+  <script src="js/08b-teams.js"></script>
+  <script src="js/09-main.js"></script>
+</body>
+</html>

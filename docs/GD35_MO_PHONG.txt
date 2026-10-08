@@ -1,0 +1,72 @@
+===== GĐ3.5 — số đo (ít mô phỏng; cân bằng lớn để GĐ6) =====
+
+----- 1) Thời lượng & cân bằng sơ bộ: node tools/mophong.js --tran 24 --hat gd35 -----
+Đang chạy 24 trận trên 4 luồng…
+══════════ BÁO CÁO MÔ PHỎNG ══════════
+Số trận: 24 (lỗi văng: 0) • thời gian chạy 95.5s • trung bình 14.88s/trận/luồng
+
+THỜI LƯỢNG: trung bình 23.8 phút • trung vị 23.6 • mục tiêu 15–30 (ở x1 = 15–30 phút ngoài đời)
+  <15: 0.0% | 15–20: 4.2% | 20–25: 54.2% | 25–30: 37.5% | 30–35: 4.2% | ≥35: 0.0%
+  Dưới 15 phút: 0.0% • quá phút 30: 4.2% (mục tiêu mỗi loại < 10%) • hết giờ tối đa: 0
+
+PHE: Xanh thắng 41.7% ± 19.7% (mục tiêu 48–52%)
+
+TƯỚNG (mục tiêu 45–55%):
+  Tướng        Vị trí  Trận  Thắng           KDA            Lính/phút  Cấp  ST lên tướng/phút
+  galo         jungle      6   83.3% ±29.8%  2.3/2.7/3.2            1.8   10.8      543 ⚠
+  ryoma        mid        10   80.0% ±24.8%  5.3/2.8/1.2            3.3   11.8      450 ⚠
+  kazuki       top        12   75.0% ±24.5%  1.0/2.3/1.5            2.5   10.8      194 ⚠
+  zero         adc         8   75.0% ±30.0%  2.9/1.9/3.8            3.2   10.0      421 ⚠
+  thanhphong   mid         7   71.4% ±33.5%  2.4/2.6/4.7            1.8   11.1      354 ⚠
+  valerius     top         9   66.7% ±30.8%  0.2/1.1/0.8            2.0   10.4      130 ⚠
+  ignatius     mid         6   66.7% ±37.7%  4.7/2.3/2.5            3.5   12.0      516 ⚠
+  percy        adc        11   63.6% ±28.4%  1.8/2.5/2.5            3.1   10.0      293 ⚠
+  vesper       jungle      7   57.1% ±36.7%  3.6/3.0/2.0            0.9    9.9      408 ⚠
+  death        jungle      7   57.1% ±36.7%  2.7/3.4/1.7            1.2    9.6      347 ⚠
+  chrononeo    adc         9   55.6% ±32.5%  2.8/2.2/3.4            2.4    9.9      463 ⚠
+  raven        sup        17   52.9% ±23.7%  1.8/2.1/3.5            0.8    9.3      465
+  theron       jungle      8   50.0% ±34.6%  3.1/2.4/2.8            1.7   10.8      497
+  victoria     sup        12   50.0% ±28.3%  3.3/1.4/2.8            1.1    9.8      466
+  aria         sup        19   47.4% ±22.5%  0.4/2.1/3.0            0.6    8.3      182
+  jack         adc         9   44.4% ±32.5%  2.6/2.9/0.9            2.8    9.3      254 ⚠
+  koda         jungle      7   42.9% ±36.7%  1.7/3.7/1.1            1.8   10.3      266 ⚠
+  clint        jungle      7   42.9% ±36.7%  2.0/2.6/3.0            1.6   10.7      231 ⚠
+  borg         top         7   42.9% ±36.7%  0.6/1.1/0.7            2.4   11.3       98 ⚠
+  florian      top         8   37.5% ±33.5%  0.9/1.5/0.8            1.7    9.8      145 ⚠
+  alice        mid         9   33.3% ±30.8%  0.6/3.6/1.3            2.1   10.1      144 ⚠
+  joker        mid         7   28.6% ±33.5%  2.0/2.9/2.9            1.8   10.4      373 ⚠
+  gideon       top        12   25.0% ±24.5%  0.4/1.1/1.1            2.1   10.0      133 ⚠
+  roxie        mid         9   22.2% ±27.2%  2.6/2.7/1.7            2.6   11.4      559 ⚠
+  elara        adc        11   18.2% ±22.8%  2.0/1.5/2.4            2.6    9.6      453 ⚠
+  wukong       jungle      6   16.7% ±29.8%  2.7/2.2/3.0            1.6   10.3      407 ⚠
+
+ĐỐI ĐẦU CÙNG VỊ TRÍ (mục tiêu: không cặp nào vượt 65%; chỉ in cặp ≥ 15 trận lệch quá 60%, hoặc tất cả nếu --dd):
+  49 cặp • cặp lệch nhất (≥ 15 trận):  0.0%
+
+TRANG BỊ (cuối trận): số lần có • tỉ lệ thắng khi có (món > 60% với ≥ 40 lần là dấu hiệu "luôn đúng")
+  giay_thuy_ngan      84  56.0%   riu_hac_thiet       72  52.8%   giay_khai_sang      60  46.7% 
+  lenh_bai            48  50.0%   giay_cuong_chien    47  51.1%   dao_pha_quan        47  51.1% 
+  kinh_cu_dem         47  51.1%   giay_thep           39  51.3%   ngoc_hien_triet     38  42.1% 
+  nanh_lua            31  41.9%   xich_hon            25  52.0%   vuong_mien          21  42.9% 
+  ngoc_boi            21  52.4%   mat_dam_lay         17  64.7%   mat_na              12  75.0% 
+  cung_gio_loc         9  44.4%   gay_bang_gia         8  75.0%   dong_ho_cat          7  71.4% 
+  huyet_kiem           6  50.0%   truong_hu_vo         3  33.3%   mu_hoa_than          2  50.0% 
+  lu_huong             1   0.0% 
+
+CÂY TIẾN HÓA: 378 nhánh xuất hiện • nhánh lệch nhất so với tỉ lệ thắng của tướng (≥ 25 trận):
+
+KINH TẾ THEO VỊ TRÍ: top 2.2 lính/phút, 198 vàng/phút • jungle 1.5 lính/phút, 297 vàng/phút • mid 2.5 lính/phút, 237 vàng/phút • adc 2.8 lính/phút, 243 vàng/phút • sup 0.8 lính/phút, 230 vàng/phút
+
+NHỊP TRẬN: 22.5 mạng hạ/trận (0.95/phút) • 9.3 trụ sập/trận
+LỖI TRONG TRẬN: 0 trận có lỗi kích hoạt
+
+----- 2) HLV máy: node tools/gd3.js --do hlv --cap 16 --hat g35 (đo theo cặp, 32 trận mỗi dòng) -----
+  ai vs none    : ai thắng 53.1% ± 17.3% • trụ 4.8–4.9 • quái lớn 2.78–0.44 • lệnh/trận 20.1
+  ai vs captain : ai thắng 46.9% ± 17.3% • trụ 5.1–5.4 • quái lớn 2.88–0.75 • lệnh/trận 22.0
+  (trước khi sửa lệnh tranh quái lớn & giới hạn người dọn lính: ai vs captain 28.1% và 34.4% — đội HLV máy mất trụ nhiều hơn)
+
+----- 3) Bu cục khi giao tranh (3 trận mỗi bản; tướng đang đánh nhau có ≥2 địch trong 8 đv) -----
+  bản trước GĐ3.5-3 : cách đồng đội gần nhất TB 4.01 đv • sát nhau < 1.2 đv 16.1% • đứng yên 16.6%
+  bản cuối GĐ3.5    : cách đồng đội gần nhất TB 4.80 đv • sát nhau < 1.2 đv 7.0%  • đứng yên 4.5%
+
+----- 4) Tất định & phát lại: node tools/mophong.js --kiemtra → ✔ (cả trận có câu hỏi Ăn/Bỏ được trả lời) -----

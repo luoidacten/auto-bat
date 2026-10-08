@@ -1,0 +1,69 @@
+# GĐ4 — số đo (mã cuối; 2 phép đo đầu chạy trước khi đưa mốc chống giằng co về 25/30 phút)
+
+══════ GĐ4 — thanhthao ══════
+100 trận (văng 0) • 395s • trung bình 27.3 phút/trận
+  m100 vs m0: m100 thắng 64.0% ± 9.4% (100 trận)
+    phút 10: vàng 11194 – 10474 • lính 84.2 – 80.7 • hạ 3.2 – 2.4
+    cuối trận: vàng 34516 – 31413 • lính 243 – 239 • hạ 18.9 – 12.7 • trụ 5.8 – 4.6
+  Chuyển hóa lợi thế: đội nhiều hạ gục hơn thắng 69% • nhiều vàng hơn (cuối) thắng 75% • dẫn vàng phút 10 thắng 68%
+
+══════ GĐ4 — chiso ══════
+60 trận (văng 0) • 241s • trung bình 26.3 phút/trận
+  cs15 vs cs9: cs15 thắng 65.0% ± 12.1% (60 trận)
+    phút 10: vàng 11544 – 10381 • lính 83.8 – 80.6 • hạ 3.7 – 2.4
+    cuối trận: vàng 33635 – 30146 • lính 231 – 231 • hạ 18.5 – 12.5 • trụ 5.8 – 4.4
+  Chuyển hóa lợi thế: đội nhiều hạ gục hơn thắng 68% • nhiều vàng hơn (cuối) thắng 78% • dẫn vàng phút 10 thắng 68%
+
+══════ Thời lượng — 24 trận, mã cuối (lính mạnh nhanh từ phút 25, nhà chính mất máu từ phút 30) ══════
+THỜI LƯỢNG: trung bình 26.2 phút • trung vị 25.4
+  <15: 0.0% | 15–20: 0.0% | 20–25: 50.0% | 25–30: 25.0% | 30–35: 25.0% | ≥35: 0.0%
+(trước khi đưa mốc về 25/30: trung bình 26.5 • quá phút 30: 29.2% • ≥35: 8.3%)
+
+══════ Mô phỏng nhanh 3 mùa giải (node tools/mua.js --mua 3 --hat gd4) ══════
+Thế giới "gd4": 30 đội, 232 tuyển thủ (38 tự do)
+  Hạng 1: điểm đội hình TB 15.0 • tiền TB 1.23 tỷ
+  Hạng 2: điểm đội hình TB 11.9 • tiền TB 446 tr
+  Hạng 3: điểm đội hình TB 9.4 • tiền TB 178 tr
+
+══ Mùa 1 ══
+  Hạng 1: SBH 5-2 • PHH 4-3 • SSH 4-3 • HXC 4-3 • RLS 4-3 • KLN 3-4 • BBĐ 3-4 • UNĐ 1-6 • vô địch playoff HXC
+  Hạng 2: BĐB 6-1 • CTB 4-3 • CLP 4-3 • ĐBV 4-3 • CMV 3-4 • TNH 3-4 • RHQ 2-5 • VRB 2-5 • vô địch playoff ĐBV
+  Hạng 3: KĐK 5-2 • TGT 5-2 • STQ 4-3 • CSL 4-3 • GNL 3-4 • BCN 3-4 • HAP 2-5 • DHN 2-5 • vô địch playoff CSL
+  Quốc tế: vô địch Manila Sharks, á quân Shanghai Lanterns
+  Đội của bạn Voi Rừng Buôn Ma Thuột: Hạng 2, hạng chung cuộc 8 • quỹ 592 tr • tín nhiệm 52.6
+  Chuyển nhượng mùa: 24 (mua 12, ký tự do 12) • tổng phí 5.05 tỷ
+  Tổng kết: ❌ Mục tiêu "Đứng nửa trên bảng (top 6)" — không đạt (hạng 8) • −25 tín nhiệm | ✅ Quỹ đội 592 tr
+  Thăng/xuống: ĐBV↑ UNĐ↓, CSL↑ VRB↓ • giải nghệ 2 • tân binh 16
+  Hạng 1 mùa sau: điểm đội hình TB 15.1 • tiền TB 1.81 tỷ • âm quỹ 0 đội
+  Hạng 2 mùa sau: điểm đội hình TB 12.3 • tiền TB 643 tr • âm quỹ 0 đội
+  Hạng 3 mùa sau: điểm đội hình TB 10.3 • tiền TB 247 tr • âm quỹ 0 đội
+
+══ Mùa 2 ══
+  Hạng 1: KLN 5-2 • RLS 5-2 • ĐBV 4-3 • SSH 4-3 • PHH 3-4 • SBH 3-4 • BBĐ 2-5 • HXC 2-5 • vô địch playoff RLS
+  Hạng 2: UNĐ 5-2 • CSL 5-2 • TNH 4-3 • CTB 4-3 • CLP 3-4 • CMV 3-4 • BĐB 2-5 • RHQ 2-5 • vô địch playoff UNĐ
+  Hạng 3: HAP 6-1 • DHN 4-3 • GNL 4-3 • STQ 4-3 • KĐK 4-3 • BCN 3-4 • VRB 2-5 • TGT 1-6 • vô địch playoff HAP
+  Quốc tế: vô địch Kỳ Lân Nha Trang, á quân Tokyo Ronin
+  Đội của bạn Voi Rừng Buôn Ma Thuột: Hạng 3, hạng chung cuộc 7 • quỹ 344 tr • tín nhiệm 12.8
+  Chuyển nhượng mùa: 34 (mua 14, ký tự do 20) • tổng phí 7.37 tỷ
+  Tổng kết: ❌ Mục tiêu "Vô địch giải (thăng hạng)" — không đạt (hạng 7) • −25 tín nhiệm | ✅ Quỹ đội 344 tr
+  Thăng/xuống: UNĐ↑ HXC↓, HAP↑ RHQ↓ • giải nghệ 7 • tân binh 16
+  ❌ BỊ SA THẢI — lời mời: Kỳ Đà Kon Tum, Diều Hâu Nam Định, Gấu Ngựa Lạng Sơn
+  → nhận Kỳ Đà Kon Tum
+  Hạng 1 mùa sau: điểm đội hình TB 15.1 • tiền TB 2.57 tỷ • âm quỹ 0 đội
+  Hạng 2 mùa sau: điểm đội hình TB 12.9 • tiền TB 984 tr • âm quỹ 0 đội
+  Hạng 3 mùa sau: điểm đội hình TB 11.3 • tiền TB 261 tr • âm quỹ 0 đội
+
+══ Mùa 3 ══
+  Hạng 1: KLN 5-2 • ĐBV 5-2 • RLS 4-3 • SBH 4-3 • SSH 4-3 • UNĐ 3-4 • BBĐ 2-5 • PHH 1-6 • vô địch playoff ĐBV
+  Hạng 2: HXC 6-1 • BĐB 5-2 • CMV 4-3 • HAP 3-4 • CLP 3-4 • TNH 3-4 • CTB 3-4 • CSL 1-6 • vô địch playoff HXC
+  Hạng 3: KĐK 6-1 • STQ 4-3 • DHN 4-3 • BCN 4-3 • TGT 4-3 • RHQ 3-4 • GNL 2-5 • VRB 1-6 • vô địch playoff KĐK
+  Quốc tế: vô địch Busan Sunrise, á quân Shanghai Lanterns
+  Đội của bạn Kỳ Đà Kon Tum: Hạng 3, hạng chung cuộc 1 • quỹ 597 tr • tín nhiệm 90
+  Chuyển nhượng mùa: 36 (mua 12, ký tự do 21) • tổng phí 9.96 tỷ
+  Tổng kết: ✅ Mục tiêu "Trụ hạng (không đứng bét)" — đạt (hạng 1) • +30 tín nhiệm | ✅ Quỹ đội 597 tr
+  Thăng/xuống: HXC↑ PHH↓, KĐK↑ CSL↓ • giải nghệ 5 • tân binh 16
+  Hạng 1 mùa sau: điểm đội hình TB 14.9 • tiền TB 3.02 tỷ • âm quỹ 0 đội
+  Hạng 2 mùa sau: điểm đội hình TB 12.6 • tiền TB 1.18 tỷ • âm quỹ 0 đội
+  Hạng 3 mùa sau: điểm đội hình TB 12.4 • tiền TB 175 tr • âm quỹ 2 đội
+
+Bản lưu 215 KB • 184 tuyển thủ • 310 cặp ăn ý • 3.4s

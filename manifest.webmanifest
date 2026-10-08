@@ -1,0 +1,10 @@
+{
+  "name": "Kẻ Đặt Cược — Đấu trường sinh tồn",
+  "short_name": "Kẻ Đặt Cược",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0b1018",
+  "theme_color": "#0b1018",
+  "icons": [{ "src": "img/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

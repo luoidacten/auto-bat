@@ -1,0 +1,53 @@
+# GĐ5e — số đo nhỏ, bản GĐ5d (commit d9b95e0) vs bản GĐ5e, cùng hạt giống
+
+== Trận đầy đủ, 6 trận (hạt f1–f6), đội hình ngẫu nhiên, HLV máy hai bên
+hạt | GĐ5d: phút, hạ gục, trụ, thắng, lính 10' | GĐ5e: phút, hạ gục, trụ, thắng, lính 10'
+f1  | 23.0, 38, 10, Xanh, 235 | 23.1, 43,  8, Đỏ,   237
+f2  | 20.9, 37,  9, Xanh, 195 | 30.8, 82, 11, Đỏ,   240
+f3  | 20.9, 46,  9, Xanh, 223 | 22.1, 41, 10, Đỏ,   265
+f4  | 25.5, 33,  9, Xanh, 238 | 26.2, 51, 13, Đỏ,   263
+f5  | 22.7, 39,  8, Đỏ,   180 | 16.5, 19,  8, Xanh, 261
+f6  | 18.9, 24,  8, Xanh, 256 | 29.6, 70, 12, Xanh, 230
+TB GĐ5d: 22.0 phút (0 trận > 30), hạ gục 36.2, trụ 8.8, lính kết liễu 10 phút đầu 221 (cả 10 tướng), lỗi 0
+TB GĐ5e: 24.7 phút (1 trận 30.8), hạ gục 51.0, trụ 10.3, lính kết liễu 10 phút đầu 249, lỗi 0
+
+== Utility chiêu & bị đuổi (trung bình mỗi trận, 6 trận)
+- Chiêu dùng lên lính/quái theo Utility: ~362 lần (GĐ5d: chỉ chiêu có nhãn "ăn lính", sau phút 4)
+- Lướt để di chuyển: ~167 lần, trong đó vượt tường ~10 lần
+- Lựa chọn khi bị đuổi: chạy ~447 • chiêu thoát thân / Tốc Biến ~47 • quay lại đánh ~85 • cắt đuôi qua bụi ~4
+
+== Quá trình chỉnh (ghi lại vì nhịp trận rất nhạy)
+1. Bản đầu (lính 330 +22/phút, quay lại đánh dễ): trận thử k1 kết thúc 13:00; 15 phút đầu hạ gục 33 so với 11 (hạt f4).
+   Tắt riêng "quay lại đánh" → 15. Nguyên nhân: ước lượng "không chạy kịp" bi quan (kẻ đuổi đánh xa làm "thời gian bị bắt kịp" luôn = 0).
+2. Sửa mô hình: tính số giây còn bị đánh trên đường chạy (nhanh hơn kẻ đuổi thì thoát dần khỏi tầm) so với số giây chịu được.
+   "Hết đường — liều" từ ~60 xuống ~40 lần/15 phút.
+3. 6 trận: 19.9 phút TB, 2 trận < 18 phút (f2 13.8) — lính dồn đống 50–70 con ở một phe (hiện tượng có từ GĐ5d: 57 vs 13, 64 vs 10).
+4. Lính tăng máu theo phút nhanh hơn (tới phút 10 bằng bản cũ): 25.7 phút nhưng hạ gục 60.7.
+5. Siết "quay lại đánh": 18.4 phút, 3 trận < 18, hạ gục 28 → nhịp trận dao động mạnh theo AI.
+6. Chốt chặn: trụ gia cố tới phút 15 (35% → 100%, trước: 40% → phút 10): 21.4 phút, còn 1 trận 13.9.
+7. "Thủ nhà" xét lính dồn ở trụ cả 3 đường (đi rừng/hỗ trợ coi mọi đường là việc mình): 24.7 phút, 16.5–30.8 — bản cuối.
+
+== Camera tiên tri (1 trận 9 phút, góc toàn cảnh)
+- Thời gian chiếu: giao tranh 769 mẫu, sắp chạm trán 112, đánh quái lớn 54, truy đuổi 19, sắp bắt lẻ 7, không có điểm nóng 114
+- Dự báo "sắp chạm trán / sắp bắt lẻ": 58 lần, 58 lần có giao tranh tại đó trong ≤ 6 giây
+- Đổi điểm chiếu 6.8 lần/phút (giữ tối thiểu 2.5s, không lia qua lại)
+- Sửa trong lúc thử: camera từng chiếu vào quái lớn đội địch đang đánh trong sương mù (lộ thông tin) → chỉ dùng quái đang thấy.
+
+== Giao diện (Playwright, điện thoại ngang 844×390 + máy tính 1280×720)
+- Thông báo "HẠ GỤC KÉP — A ⚔ B +1 hỗ trợ" hiện giữa trên; hạ gục trong trận thật mang đủ thông tin (chiến công đầu, liên hạ, chuỗi, chấm dứt chuỗi, diệt cả đội).
+- Nhãn camera "🎥 ⚔ Giao tranh" / "⚡ Sắp chạm trán" ở đáy màn hình; giao tranh trải rộng tự lùi camera (đo được ×0.82).
+- Dải tuyển thủ thu gọn còn chân dung + thanh máu; nút lệnh đang hồi vẫn thấy biểu tượng, số giây ở góc.
+- Sửa trong lúc thử: nút thu gọn làm lệch chỉ số hàng tuyển thủ (lỗi trang) → đã sửa. Lần chạy cuối: không lỗi trang.
+
+== Ngẫu nhiên có hạt giống
+- Nhiễu chọn chiêu, chọn điểm đáp, lựa chọn khi bị đuổi: luồng "ai" của trận (m.rngAI). Không thêm Math.random vào mô phỏng.
+
+== Làm theo lệnh HLV (bài thử GĐ5d, tình huống phút 14 — trận diễn ra khác GĐ5d nên tình huống khác)
+KL 18 / TN 90 | đẩy 5/5 | rút 4/4 (1 chết) | giao tranh 4/4 (1 chết)
+KL 10 / TN 60 | đẩy 4/4 (1 chết) | rút 4/5 (rừng → Đẩy trụ) | giao tranh 4/5 (rừng → Đẩy trụ)
+KL  4 / TN 25 | đẩy 5/5 | rút 4/5 (rừng → Đảo đường) | giao tranh 5/5
+(Ở tình huống này các việc khác đều kém hấp dẫn nên cả người kỷ luật thấp cũng theo; GĐ5d ở tình huống khác: 5/10.)
+
+== node tools/mophong.js --kiemtra
+✔ TẤT ĐỊNH: hai lần chạy giống hệt nhau
+✔ PHÁT LẠI: cùng hạt giống + cùng chuỗi lệnh (175 lệnh người chơi, HLV máy 32 lệnh) → giống hệt

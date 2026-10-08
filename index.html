@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1018">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Kẻ Đặt Cược — Đấu trường sinh tồn</title>
+  <script>if (location.protocol !== 'file:') { const l = document.createElement('link'); l.rel = 'manifest'; l.href = 'manifest.webmanifest'; document.head.appendChild(l); }</script>
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/game.css?v=gd9b">
+</head>
+<body>
+  <canvas id="cv"></canvas>
+  <div id="menu" class="screen"></div>
+  <div id="setup" class="screen hidden"></div>
+  <div id="run" class="screen hidden"></div>
+  <div id="busy" class="screen hidden"></div>
+  <div id="result" class="screen hidden"></div>
+  <div id="match" class="screen hidden"><div id="hud"></div></div>
+  <div id="rotate">📱🔄 Xoay ngang điện thoại để xem trận rõ hơn</div>
+  <script src="src/manifest.js?v=gd9b" data-v="gd9b"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(function () {});
+  </script>
+</body>
+</html>

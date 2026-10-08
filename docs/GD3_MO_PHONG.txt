@@ -1,0 +1,129 @@
+# Kết quả đo mô phỏng GĐ3 (tools/gd3.js, thiết kế cặp: mỗi hạt giống 2 trận đổi phe)
+
+## Ma trận kế hoạch — node tools/gd3.js --do kehoach --cap 120 --gon
+══════ GĐ3 — kehoach ══════
+720 trận (văng 0) • 951s • trung bình 17.3 phút/trận
+  push     vs safe    : push thắng 54.6% ± 6.3% (240 trận; Xanh 53.8%) • hạ 11.7–12.5 • trụ 4.5–4.2 • quái lớn 1.34–1.51
+  safe     vs invade  : safe thắng 53.8% ± 6.3% (240 trận; Xanh 49.6%) • hạ 15.8–11.1 • trụ 4.7–4.2 • quái lớn 1.60–1.12
+  invade   vs push    : invade thắng 54.6% ± 6.3% (240 trận; Xanh 47.1%) • hạ 14.9–13.2 • trụ 4.6–4.2 • quái lớn 1.48–1.07
+  Tổng (mục tiêu: không kế hoạch nào > 55% trước mọi kế hoạch khác): push 50.0% • safe 49.6% • invade 50.4%
+
+## HLV máy — node tools/gd3.js --do hlv --cap 150
+══════ GĐ3 — hlv ══════
+600 trận (văng 0) • 715s • trung bình 15.4 phút/trận
+  ai       vs none    : ai thắng 60.3% ± 5.5% (300 trận; Xanh 52.3%) • hạ 11.7–10.0 • trụ 4.8–3.9 • quái lớn 3.12–0.76 • lệnh/trận 11.7 (tốt 3.5, xấu 1.0) • hội ý 0.06
+      theo lệnh (số lần/trận, điểm TB): objective 3.8 (+1.10) • push 2.1 (+0.76) • fight 4.0 (+0.37) • retreat 0.3 (-0.88) • focus 0.6 (-0.11) • protect 0.2 (+0.59)
+  ai       vs captain : ai thắng 54.3% ± 5.6% (300 trận; Xanh 49.0%) • hạ 11.6–10.1 • trụ 4.5–4.2 • quái lớn 2.96–1.10 • lệnh/trận 12.0 (tốt 3.4, xấu 1.1) • hội ý 0.07
+      theo lệnh (số lần/trận, điểm TB): objective 3.8 (+1.03) • fight 4.0 (+0.27) • push 2.2 (+0.64) • focus 0.7 (-0.11) • retreat 0.3 (-0.65) • protect 0.3 (+0.69)
+
+## Cấm chọn dữ liệu vs ngẫu nhiên — node tools/gd3.js --do camchon --cap 150 (3 lần đo theo 3 mức ảnh hưởng của thành thạo; lần cuối là mã hiện tại)
+══════ GĐ3 — camchon ══════
+300 trận (văng 0) • 394s • trung bình 16.9 phút/trận
+  data     vs random  : data thắng 54.3% ± 5.6% (300 trận; Xanh 55.0%) • hạ 13.3–10.7 • trụ 4.8–4.0 • quái lớn 1.97–1.37
+══════ GĐ3 — camchon ══════
+300 trận (văng 0) • 399s • trung bình 16.9 phút/trận
+  data     vs random  : data thắng 63.3% ± 5.5% (300 trận; Xanh 52.7%) • hạ 13.5–10.2 • trụ 5.1–3.7 • quái lớn 1.99–1.33
+══════ GĐ3 — camchon ══════
+300 trận (văng 0) • 381s • trung bình 16.5 phút/trận
+  data     vs random  : data thắng 56.3% ± 5.6% (300 trận; Xanh 47.7%) • hạ 13.8–9.3 • trụ 5.1–3.6 • quái lớn 2.05–1.35
+
+## Thành thạo 100 vs 0 của một tuyển thủ (đường giữa) — node tools/gd3.js --do thanhthao --cap 150
+══════ GĐ3 — thanhthao ══════
+300 trận (văng 0) • 393s • trung bình 16.7 phút/trận
+  100      vs 0       : 100 thắng 56.3% ± 5.6% (300 trận; Xanh 49.7%) • hạ 11.7–11.2 • trụ 4.4–4.1 • quái lớn 1.46–1.40
+══════ GĐ3 — thanhthao ══════
+300 trận (văng 0) • 417s • trung bình 17.4 phút/trận
+  100      vs 0       : 100 thắng 49.7% ± 5.7% (300 trận; Xanh 51.0%) • hạ 12.3–11.6 • trụ 4.4–4.2 • quái lớn 1.50–1.44
+══════ GĐ3 — thanhthao ══════
+300 trận (văng 0) • 429s • trung bình 17.4 phút/trận
+  100      vs 0       : 100 thắng 49.7% ± 5.7% (300 trận; Xanh 51.7%) • hạ 12.2–11.6 • trụ 4.3–4.5 • quái lớn 1.47–1.51
+
+## Cấm chọn — mã cuối cùng (thành thạo chỉ phạt dưới 70)
+══════ GĐ3 — camchon ══════
+300 trận (văng 0) • 390s • trung bình 16.5 phút/trận
+  data     vs random  : data thắng 56.7% ± 5.6% (300 trận; Xanh 46.0%) • hạ 13.4–10.1 • trụ 4.9–3.7 • quái lớn 1.93–1.42
+
+## Cân bằng trên mã GĐ3 cuối — node tools/mophong.js --tran 600
+══════════ BÁO CÁO MÔ PHỎNG ══════════
+Số trận: 600 (lỗi văng: 0) • thời gian chạy 872.5s • trung bình 5.70s/trận/luồng
+
+THỜI LƯỢNG: trung bình 17.8 phút • trung vị 17.5 • mục tiêu 15–20
+  <15: 41.5% | 15–20: 21.2% | 20–25: 26.8% | 25–30: 9.3% | 30–35: 1.2% | ≥35: 0.0%
+  Kéo tới phút 30: 1.2% (mục tiêu < 5%) • hết giờ tối đa: 0
+
+PHE: Xanh thắng 51.3% ± 4.0% (mục tiêu 48–52%)
+
+TƯỚNG (mục tiêu 45–55%):
+  Tướng        Vị trí  Trận  Thắng           KDA            Lính/phút  Cấp  ST lên tướng/phút
+  ryoma        mid       198   58.1% ± 6.9%  3.6/3.0/1.7            2.8   10.0      447 ⚠
+  victoria     sup       386   57.8% ± 4.9%  3.4/1.8/3.6            1.1    9.3      572 ⚠
+  gideon       top       233   56.2% ± 6.4%  1.0/2.0/1.4            2.6   10.4      284 ⚠
+  thanhphong   mid       196   55.1% ± 7.0%  2.0/3.9/4.6            2.1    9.9      466 ⚠
+  kazuki       top       217   54.4% ± 6.6%  0.8/2.4/1.3            2.6   10.1      268
+  jack         adc       240   53.3% ± 6.3%  2.6/3.1/2.5            2.6    8.6      413
+  theron       jungle    156   53.2% ± 7.8%  4.1/2.0/2.7            2.5   11.1      757
+  vesper       jungle    192   52.6% ± 7.1%  3.4/3.0/2.2            1.1   10.3      543
+  galo         jungle    165   52.1% ± 7.6%  3.3/1.6/2.5            1.9   10.5      652
+  koda         jungle    173   52.0% ± 7.4%  3.4/2.5/2.2            1.6   10.7      499
+  elara        adc       248   52.0% ± 6.2%  2.6/2.4/3.2            2.5    8.8      653
+  ignatius     mid       195   50.8% ± 7.0%  3.9/2.2/4.1            3.2   10.5      732
+  zero         adc       235   50.6% ± 6.4%  3.3/2.9/2.8            2.9    9.0      583
+  chrononeo    adc       217   49.3% ± 6.7%  2.0/2.9/2.6            2.3    8.6      494
+  raven        sup       408   49.3% ± 4.9%  2.1/2.2/3.7            0.8    8.8      595
+  wukong       jungle    175   48.6% ± 7.4%  3.5/2.1/3.1            1.8   10.7      610
+  roxie        mid       202   48.0% ± 6.9%  0.9/1.9/2.9            1.8    9.4      442
+  death        jungle    175   48.0% ± 7.4%  2.8/3.3/3.0            1.2    9.9      557
+  valerius     top       271   48.0% ± 5.9%  0.5/1.2/0.9            2.4   10.1      221
+  florian      top       243   46.5% ± 6.3%  1.8/2.3/1.1            1.8    9.8      282
+  borg         top       236   45.8% ± 6.4%  1.2/2.1/1.4            2.0   10.1      211
+  percy        adc       260   45.0% ± 6.0%  1.5/2.6/2.6            2.9    8.4      362
+  joker        mid       202   44.6% ± 6.9%  1.8/3.5/2.9            2.0    9.4      417 ⚠
+  alice        mid       207   44.0% ± 6.8%  0.8/3.5/2.1            1.6    8.9      210 ⚠
+  aria         sup       406   43.3% ± 4.8%  0.7/2.5/3.0            0.7    8.4      228 ⚠
+  clint        jungle    164   43.3% ± 7.6%  2.0/1.7/1.7            1.7   10.1      359 ⚠
+
+ĐỐI ĐẦU CÙNG VỊ TRÍ (mục tiêu: không cặp nào vượt 65%; chỉ in cặp ≥ 15 trận lệch quá 60%, hoặc tất cả nếu --dd):
+  adc:chrononeo vs percy                63 trận  chrononeo thắng 63.5%
+  adc:chrononeo vs zero                 46 trận  chrononeo thắng 34.8% ⚠
+  jungle:clint vs galo                  26 trận  clint thắng 26.9% ⚠
+  jungle:clint vs koda                  22 trận  clint thắng 31.8% ⚠
+  jungle:clint vs vesper                35 trận  clint thắng 34.3% ⚠
+  jungle:clint vs wukong                31 trận  clint thắng 64.5%
+  jungle:galo vs theron                 30 trận  galo thắng 36.7%
+  jungle:koda vs wukong                 29 trận  koda thắng 65.5% ⚠
+  mid:alice vs joker                    32 trận  alice thắng 37.5%
+  mid:joker vs ryoma                    41 trận  joker thắng 36.6%
+  mid:joker vs thanhphong               36 trận  joker thắng 36.1%
+  mid:roxie vs ryoma                    33 trận  roxie thắng 30.3% ⚠
+  59 cặp • cặp lệch nhất (≥ 15 trận): jungle:clint vs galo 73.1%
+
+TRANG BỊ (cuối trận): số lần có • tỉ lệ thắng khi có (món > 60% với ≥ 40 lần là dấu hiệu "luôn đúng")
+  riu_hac_thiet     1481  54.8%   giay_thuy_ngan    1423  53.2%   giay_khai_sang    1235  57.6% 
+  lenh_bai          1198  50.0%   kinh_cu_dem       1113  53.3%   dao_pha_quan       988  55.5% 
+  ngoc_hien_triet    886  53.4%   giay_thep          836  56.7%   giay_cuong_chien   786  56.2% 
+  nanh_lua           752  50.7%   mat_dam_lay        448  48.9%   vuong_mien         384  58.1% 
+  xich_hon           372  57.3%   ngoc_boi           345  55.7%   mat_na             327  51.4% 
+  cung_gio_loc       131  58.8%   gay_bang_gia       124  55.6%   truong_hu_vo        82  59.8% 
+  huyet_kiem          74  50.0%   dong_ho_cat         68  50.0%   giap_gai            62  53.2% 
+  lu_huong            43  55.8%   song_dao            35  65.7%   mu_hoa_than         22  50.0% 
+  ao_hu_khong          4 100.0%   thuy_tinh            2  50.0%   dao_cat_gan          2 100.0% 
+  mui_khoan            1   0.0%   ao_thanh_linh        1   0.0% 
+
+CÂY TIẾN HÓA: 390 nhánh xuất hiện • nhánh lệch nhất so với tỉ lệ thắng của tướng (≥ 25 trận):
+  wukong 6b            59 trận  thắng  30.5% (-18.1 điểm)
+  galo 1c              58 trận  thắng  36.2% (-15.9 điểm)
+  wukong 6c            65 trận  thắng  63.1% (+14.5 điểm)
+  gideon 6c            61 trận  thắng  68.9% (+12.6 điểm)
+  galo 6c              45 trận  thắng  64.4% (+12.3 điểm)
+  alice 1a             63 trận  thắng  55.6% (+11.6 điểm)
+  vesper 12c           53 trận  thắng  64.2% (+11.5 điểm)
+  roxie 6b             52 trận  thắng  36.5% (-11.5 điểm)
+  raven 1b            132 trận  thắng  60.6% (+11.3 điểm)
+  galo 12a             52 trận  thắng  63.5% (+11.3 điểm)
+  galo 1a              60 trận  thắng  63.3% (+11.2 điểm)
+  thanhphong 12a       68 trận  thắng  66.2% (+11.1 điểm)
+
+KINH TẾ THEO VỊ TRÍ: top 2.3 lính/phút, 217 vàng/phút • jungle 1.7 lính/phút, 372 vàng/phút • mid 2.2 lính/phút, 242 vàng/phút • adc 2.6 lính/phút, 256 vàng/phút • sup 0.9 lính/phút, 267 vàng/phút
+
+NHỊP TRẬN: 24.5 mạng hạ/trận (1.37/phút) • 9.0 trụ sập/trận
+LỖI TRONG TRẬN: 0 trận có lỗi kích hoạt

@@ -1,0 +1,42 @@
+# GĐ5c — số đo nhỏ, bản gốc (commit e799efb) vs bản mới, cùng hạt giống
+
+== Giật / lính (2 trận × 12 phút, hạt j1,j2)
+GỐC: trận 2 × 12 phút | đổi hướng gắt 24.85/phút/tướng | lắc tại chỗ 1.65/phút | quay mặt 33.6/phút | đứng yên không làm gì 3.54 lần/phút lính đuổi tướng 6.1% thời gian lính | lính đánh trụ không ai dọn 67% (2493 lính·giây) | lính kết liễu 197/trận, hạ gục 9 
+MỚI: trận 2 × 12 phút | đổi hướng gắt 13.64/phút/tướng | lắc tại chỗ 1.19/phút | quay mặt 16.2/phút | đứng yên không làm gì 4.15 lần/phút lính đuổi tướng 2.4% thời gian lính | lính đánh trụ không ai dọn 65% (2207 lính·giây) | lính kết liễu 225/trận, hạ gục 8 
+
+== Lính kết liễu theo vị trí, 12 phút đầu (hạt j1,j2)
+GỐC:
+top cs 24
+jungle cs 8
+mid cs 27
+adc cs 35
+sup cs 6
+MỚI:
+top cs 33
+jungle cs 6
+mid cs 28
+adc cs 38
+sup cs 8
+
+== Tự kết liễu lính chết quanh mình (≤ 7 đv), 10 phút đầu
+GỐC:
+mid lính chết gần 212, tự kết liễu 88 (42%), tướng khác 0
+adc lính chết gần 173, tự kết liễu 86 (50%), tướng khác 4
+top lính chết gần 230, tự kết liễu 94 (41%), tướng khác 0
+MỚI:
+mid lính chết gần 187, tự kết liễu 80 (43%), tướng khác 1
+adc lính chết gần 143, tự kết liễu 71 (50%), tướng khác 7
+top lính chết gần 228, tự kết liễu 116 (51%), tướng khác 0
+
+== Trận đầy đủ, 6 trận (hạt f1–f6), đội hình ngẫu nhiên, AI hai bên
+GỐC: 25.2 phút, 2/6 trận > 30 phút, hạ gục 33.0/trận, trụ 11.0, lính kết liễu cả đội 15.1/phút
+MỚI: 26.5 phút, 2/6 trận > 30 phút, hạ gục 28.5/trận, trụ 10.7, lính kết liễu cả đội 17.6/phút
+
+== Dịch Chuyển (1 trận 20 phút, đường trên + giữa mang Dịch Chuyển): niệm 13 lần, 13 lần tới nơi, 0 lỗi
+== Cục máu (1 trận 15 phút): nhặt 12 lần, 0 lỗi
+== Giằng co → quyết định (3 trận): 1 lần giả giao tranh cho người đẩy lẻ
+
+== node tools/mophong.js --kiemtra
+✔ TẤT ĐỊNH: hai lần chạy giống hệt nhau
+Trận có lệnh: 148 lệnh người chơi, HLV máy 22 lệnh • 61aa74ba vs phát lại 61aa74ba
+✔ PHÁT LẠI: cùng hạt giống + cùng chuỗi lệnh → giống hệt

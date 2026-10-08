@@ -1,0 +1,51 @@
+══════════ BÁO CÁO MÔ PHỎNG ĐẤU TRƯỜNG ══════════
+Số trận: 24 (văng: 0) • chạy 182.6s • trung bình 28.61s/trận/luồng
+
+THỜI LƯỢNG: trung bình 35.7 phút • trung vị 37.7 • ngắn nhất 25.3 • dài nhất 47.9 • mục tiêu 30–60 (bo 6 đóng lúc 46:30, hết giờ 60:00)
+  <30: 21% | 30–40: 54% | 40–50: 25% | 50–60: 0% | hết 60:00: 0%
+  Lần đầu hai tướng đánh nhau: giữa 120s (25% 90s • 75% 160s)
+  Hết giờ (người còn sống đồng hạng 1): 0 trận • có đồng hạng 1: 0 trận
+  Thời điểm bị loại (phút): 25% 9.9 • giữa 15.7 • 75% 23.1
+
+GIAO TRANH: 17.7 lần hạ gục/trận (0.50/phút) • kền kền 8% số mạng (mục tiêu 20–30%)
+  Chết trong bo: 0.42/trận • đã dùng lượt hồi sinh: 9.3 người/trận
+  Boss bị hạ: 5.92/trận • thính được lấy: 4.1/6 mỗi trận
+  Giao tranh kết thúc "chết": 23.2/trận • thời lượng 25% 10s • giữa 23s • 75% 43s • 90% 136s • 33 chiêu/giao tranh (mục tiêu 20–120s)
+  Giao tranh kết thúc "tách": 8.2/trận • thời lượng 25% 7s • giữa 14s • 75% 28s • 90% 48s • 39 chiêu/giao tranh (mục tiêu 20–120s)
+  Cổng quyết đấu: 3.2 cổng/trận • 1.0 trận quyết đấu/trận • thời lượng giữa 22s (25% 10s • 75% 30s)
+  Bình đã uống: 127/trận • mảnh hồn: 7.7/trận • nhà vô địch có mảnh hồn bậc cao nhất trung bình 4.7
+  Mảnh hồn rơi khi bị hạ: 35.2/trận • được nhặt lại: 14.7/trận
+
+TƯỚNG (hạng trung bình; kỳ vọng ~5.5; vô địch kỳ vọng ~10%):
+  Tướng        Tính cách  Trận  Hạng TB  Vô địch  Top 3   Mạng  Chết  Kền kền  Cấp
+  lyra         chuotlui     13     2.4     23%    85%    0.0   1.6     0.0  15.8 ⚠
+  aria         hoabinh       5     2.6      0%    80%    0.4   1.8     0.0  15.0
+  ryoma        tramtuong    12     2.9     42%    67%    6.8   1.4     0.1  14.8 ⚠
+  chrononeo    thamfarm      7     3.4     43%    43%    3.0   1.4     0.4  14.0 ⚠
+  vesper       thoatxac     10     3.5     20%    60%    3.2   1.6     0.3  13.7
+  raven        tientri       9     4.1      0%    56%    0.9   2.0     0.1  10.9
+  elara        li           11     4.2     18%    55%    2.7   1.5     0.4  12.8
+  koda         batnat        8     4.3     38%    38%    4.5   1.5     0.1  12.8
+  florian      nguyquan     12     4.4     25%    42%    5.3   1.8     0.5  12.3
+  zero         thamfarm      9     5.0     11%    22%    2.0   1.8     0.2  12.4
+  victoria     kenken        6     5.2     17%    17%    2.2   1.7     0.5  11.0
+  alice        moicau        9     5.2      0%    33%    0.4   2.0     0.0  10.1
+  roxie        thucdung     12     5.7      0%    25%    0.8   1.9     0.0  10.3
+  jack         conbac        8     5.8      0%     0%    1.1   2.0     0.1   9.6
+  theron       vesi          6     5.8      0%    17%    1.7   2.0     0.3   9.8
+  clint        gaccong      11     5.9      0%     0%    0.3   2.0     0.0   9.5
+  percy        bacle         7     6.0      0%    29%    1.1   2.0     0.0  10.7
+  kazuki       doimang       5     6.4      0%    20%    1.8   2.0     0.2  10.2
+  death        amsat         8     6.5      0%    25%    1.9   2.0     0.1   8.9
+  gideon       lanhchua      7     6.7      0%    14%    0.3   1.9     0.0   9.0
+  ignatius     honloan       5     6.8      0%    20%    0.8   2.0     0.0   9.4
+  galo         riabao        8     7.4      0%    25%    0.8   2.0     0.3   9.4
+  valerius     vosi          9     7.7      0%     0%    0.6   2.0     0.0   6.8 ⚠
+  thanhphong   cuongtin     10     7.7      0%    10%    0.8   2.0     0.0   6.3 ⚠
+  joker        khatnuoc     10     7.7      0%     0%    0.5   2.0     0.0   6.6 ⚠
+  wukong       quayphan      8     8.0      0%     0%    1.1   2.0     0.4   7.1 ⚠
+  borg         hobao        15     8.1      7%     7%    1.0   1.9     0.1   6.9 ⚠
+
+TÍNH CÁCH: chuotlui hạng 2.4, vô địch 23%, 0.0 mạng (🦅0.0) • hoabinh hạng 2.6, vô địch 0%, 0.4 mạng (🦅0.0) • tramtuong hạng 2.9, vô địch 42%, 6.8 mạng (🦅0.1) • thoatxac hạng 3.5, vô địch 20%, 3.2 mạng (🦅0.3) • tientri hạng 4.1, vô địch 0%, 0.9 mạng (🦅0.1) • li hạng 4.2, vô địch 18%, 2.7 mạng (🦅0.4) • batnat hạng 4.3, vô địch 38%, 4.5 mạng (🦅0.1) • thamfarm hạng 4.3, vô địch 25%, 2.4 mạng (🦅0.3) • nguyquan hạng 4.4, vô địch 25%, 5.3 mạng (🦅0.5) • kenken hạng 5.2, vô địch 17%, 2.2 mạng (🦅0.5) • moicau hạng 5.2, vô địch 0%, 0.4 mạng (🦅0.0) • thucdung hạng 5.7, vô địch 0%, 0.8 mạng (🦅0.0) • conbac hạng 5.8, vô địch 0%, 1.1 mạng (🦅0.1) • vesi hạng 5.8, vô địch 0%, 1.7 mạng (🦅0.3) • gaccong hạng 5.9, vô địch 0%, 0.3 mạng (🦅0.0) • bacle hạng 6.0, vô địch 0%, 1.1 mạng (🦅0.0) • doimang hạng 6.4, vô địch 0%, 1.8 mạng (🦅0.2) • amsat hạng 6.5, vô địch 0%, 1.9 mạng (🦅0.1) • lanhchua hạng 6.7, vô địch 0%, 0.3 mạng (🦅0.0) • honloan hạng 6.8, vô địch 0%, 0.8 mạng (🦅0.0) • riabao hạng 7.4, vô địch 0%, 0.8 mạng (🦅0.3) • vosi hạng 7.7, vô địch 0%, 0.6 mạng (🦅0.0) • cuongtin hạng 7.7, vô địch 0%, 0.8 mạng (🦅0.0) • khatnuoc hạng 7.7, vô địch 0%, 0.5 mạng (🦅0.0) • quayphan hạng 8.0, vô địch 0%, 1.1 mạng (🦅0.4) • hobao hạng 8.1, vô địch 7%, 1.0 mạng (🦅0.1)
+
+LỖI TRONG TRẬN: 0 trận có lỗi kích hoạt

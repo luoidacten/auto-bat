@@ -1,0 +1,51 @@
+══════════ BÁO CÁO MÔ PHỎNG ĐẤU TRƯỜNG ══════════
+Số trận: 24 (văng: 0) • chạy 50.5s • trung bình 7.67s/trận/luồng
+
+THỜI LƯỢNG: trung bình 36.9 phút • trung vị 38.7 • ngắn nhất 25.6 • dài nhất 44.6 • mục tiêu 30–60 (bo 6 đóng lúc 46:30, hết giờ 60:00)
+  <30: 21% | 30–40: 38% | 40–50: 42% | 50–60: 0% | hết 60:00: 0%
+  Lần đầu hai tướng đánh nhau: giữa 72s (25% 65s • 75% 94s)
+  Hết giờ (người còn sống đồng hạng 1): 0 trận • có đồng hạng 1: 0 trận
+  Thời điểm bị loại (phút): 25% 9.3 • giữa 13.0 • 75% 20.2
+
+GIAO TRANH: 17.2 lần hạ gục/trận (0.47/phút) • kền kền 14% số mạng (mục tiêu 20–30%)
+  Chết trong bo: 0.29/trận • đã dùng lượt hồi sinh: 8.5 người/trận
+  Boss bị hạ: 3.08/trận • thính được lấy: 4.1/6 mỗi trận
+  Giao tranh kết thúc "chết": 24.3/trận • thời lượng 25% 15s • giữa 36s • 75% 75s • 90% 152s • 43 chiêu/giao tranh (mục tiêu 20–120s)
+  Giao tranh kết thúc "tách": 10.1/trận • thời lượng 25% 16s • giữa 29s • 75% 56s • 90% 71s • 54 chiêu/giao tranh (mục tiêu 20–120s)
+  Cổng quyết đấu: 3.4 cổng/trận • 0.6 trận quyết đấu/trận • thời lượng giữa 28s (25% 16s • 75% 44s)
+  Bình đã uống: 80/trận • mảnh hồn: 19.5/trận • nhà vô địch có mảnh hồn bậc cao nhất trung bình 3.5
+  "Cửa trên" tạm (người triệu gọi chỉ số cao nhất) vô địch: 8% (GDD: 25–35%, sẽ đo lại bằng mô hình tỷ lệ cược GĐ7)
+
+TƯỚNG (hạng trung bình; kỳ vọng ~5.5; vô địch kỳ vọng ~10%):
+  Tướng        Tính cách  Trận  Hạng TB  Vô địch  Top 3   Mạng  Chết  Kền kền  Cấp
+  ryoma        hobao         7     2.4     57%    71%    7.6   0.7     0.6  16.1 ⚠
+  florian      conbac        8     3.1     38%    63%    5.3   1.4     0.3  12.6 ⚠
+  aria         li            7     3.4     14%    71%    0.6   1.3     0.3   9.3 ⚠
+  death        amsat         9     3.8     22%    56%    1.3   1.7     0.2   8.1
+  zero         thamfarm     10     4.3     20%    60%    2.9   1.6     0.2  13.3
+  vesper       amsat        12     4.4      8%    50%    2.5   1.8     0.4   9.1
+  koda         amsat         9     4.4     11%    33%    2.9   1.9     0.2  10.3
+  chrononeo    thamfarm      8     4.5     25%    38%    3.0   1.5     0.3  12.8
+  joker        kenken       17     4.6      6%    47%    1.2   1.8     0.3   9.6
+  thanhphong   li           11     4.6      0%    36%    1.4   1.7     0.1   9.8
+  elara        thamfarm      9     4.7     33%    33%    2.9   1.2     0.3  12.0
+  galo         thamfarm      8     4.9     13%    38%    1.9   1.6     0.3  10.8
+  lyra         li            6     5.0      0%    33%    1.0   1.8     0.0   7.5
+  gideon       li           12     5.3      8%    17%    0.6   1.8     0.1   8.5
+  raven        amsat         9     5.4      0%    22%    1.0   1.8     0.1   8.3
+  alice        amsat         7     5.6     14%    29%    0.3   1.9     0.3   8.0
+  percy        kenken        5     6.0      0%    20%    1.4   1.8     0.2   9.2
+  victoria     kenken        8     6.1      0%    25%    2.1   2.0     0.8   8.8
+  jack         conbac        6     6.3      0%     0%    0.8   2.0     0.2   6.5
+  wukong       conbac        9     6.9     11%    11%    1.1   1.9     0.4   7.2
+  theron       thamfarm     10     7.1      0%    10%    1.2   1.9     0.2   8.0
+  roxie        kenken        6     7.2      0%    17%    0.7   2.0     0.2   6.8
+  valerius     li            7     7.3      0%     0%    0.7   2.0     0.1   7.4
+  ignatius     conbac       13     7.6      0%    15%    0.5   2.0     0.0   6.5 ⚠
+  clint        hobao         9     7.7      0%     0%    0.8   2.0     0.3   7.1 ⚠
+  borg         hobao        10     7.9      0%     0%    1.5   2.0     0.1   7.2 ⚠
+  kazuki       hobao         8     8.3      0%     0%    0.4   2.0     0.1   6.3 ⚠
+
+TÍNH CÁCH: amsat hạng 4.7, vô địch 11%, 1.7 mạng (🦅0.3) • li hạng 5.1, vô địch 5%, 0.9 mạng (🦅0.1) • thamfarm hạng 5.1, vô địch 18%, 2.4 mạng (🦅0.2) • kenken hạng 5.6, vô địch 3%, 1.4 mạng (🦅0.4) • conbac hạng 6.2, vô địch 11%, 1.8 mạng (🦅0.2) • hobao hạng 6.8, vô địch 12%, 2.3 mạng (🦅0.3)
+
+LỖI TRONG TRẬN: 0 trận có lỗi kích hoạt

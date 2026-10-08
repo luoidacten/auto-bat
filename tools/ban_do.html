@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="UTF-8"><title>Xem đấu trường</title>
+<style>body{margin:0;background:#0b1018;color:#ddd;font:13px system-ui} canvas{display:block}</style></head>
+<body>
+<canvas id="c" width="960" height="960"></canvas>
+<script src="../src/manifest.js"></script>
+<script>
+// Công cụ xem toàn đấu trường: tường, bụi, bãi quái, Thương Nhân, điểm xuất phát, ổ boss (thêm ?nut=1 để hiện nút tìm đường)
+window.addEventListener('load', () => {
+  const G = window.G, M = G.MAP, c = document.getElementById('c'), g = c.getContext('2d'), S = c.width / G.C.MAP;
+  // GĐ7: ?seed=abc → bản đồ sinh theo hạt giống đó (mặc định: cổ điển)
+  const sd = new URLSearchParams(location.search).get('seed'); if (sd) { G.buildMap(sd); if (G.MapArt) G.MapArt.reset(); }
+  g.drawImage(G.MapArt ? G.MapArt.render(0, 0, G.C.MAP, G.C.MAP, 5) : G.buildBackground(10), 0, 0, c.width, c.height);
+  const COL = { red: '#ff6a4a', blue: '#5aa0ff', gold: '#ffd24a', small: '#c8c0a0' };
+  for (const k of M.camps) { g.fillStyle = COL[k.type]; g.beginPath(); g.arc(k.x * S, k.y * S, 5, 0, 7); g.fill(); }
+  for (const t of M.merchants) { g.fillStyle = '#ffe9b0'; g.fillRect(t.x * S - 6, t.y * S - 6, 12, 12); }
+  M.spawns.forEach((p, i) => { g.fillStyle = G.SLOT_COL ? G.SLOT_COL[i] : '#fff'; g.beginPath(); g.arc(p.x * S, p.y * S, 7, 0, 7); g.fill(); g.fillStyle = '#000'; g.fillText(i, p.x * S - 3, p.y * S + 4); });
+  g.strokeStyle = '#ff5a2a'; g.lineWidth = 2; g.beginPath(); g.arc(M.bossLair.x * S, M.bossLair.y * S, M.bossLair.r * S, 0, 7); g.stroke();
+  // tên 6 vùng
+  if (M.REGIONS) { g.font = 'bold 22px system-ui'; g.textAlign = 'center'; for (const R of M.REGIONS) { const p = R.id === 5 ? { x: M.center.x, y: M.center.y + 40 } : M.polar(165, M.SEC(R.id)); g.fillStyle = 'rgba(0,0,0,0.55)'; g.fillText(R.icon + ' ' + R.name, p.x * S + 2, p.y * S + 2); g.fillStyle = '#fff'; g.fillText(R.icon + ' ' + R.name, p.x * S, p.y * S); } g.textAlign = 'left'; g.font = '13px system-ui'; }
+  if (location.search.includes('nut=1')) { g.fillStyle = 'rgba(255,255,255,0.5)'; for (const n of G.NAV.nodes) g.fillRect(n.x * S - 1, n.y * S - 1, 2, 2); }
+  for (const b of M.barrels || []) { g.fillStyle = '#d0402a'; g.fillRect(b.x * S - 3, b.y * S - 3, 6, 6); }
+  g.fillStyle = '#fff'; g.fillText('bản đồ: ' + M.seed + (M.fallback ? ' (lỗi → cổ điển: ' + M.fallback.join('; ') + ')' : ''), 8, c.height - 8);
+  if (M.problems.length) { g.fillStyle = '#ff8080'; M.problems.forEach((t, i) => g.fillText(t, 8, 16 + i * 14)); }
+  document.title = 'xong';
+});
+</script>
+</body></html>
