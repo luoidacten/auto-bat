@@ -114,10 +114,20 @@
       case 'gloves':
         for (const s of [-1, 1]) { ctx.fillStyle = '#fff'; ctx.strokeStyle = tc('#c070e0'); ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(14 + ext, s * 13, 6, 0, TAU); ctx.fill(); ctx.stroke(); }
         break;
-      case 'dual':
-        ctx.fillStyle = '#3a3d44'; ctx.fillRect(14, 8, 20, 6); ctx.fillRect(14, -14, 20, 6);
-        ctx.fillStyle = tc(st && st.stance === 'neo' ? '#6af0ff' : '#d0a050'); ctx.fillRect(32, 9, 5, 4); ctx.fillRect(32, -13, 5, 4);
+      case 'dual': {      // GĐ11: hai khẩu khác nhau — tay trên: CHRONO súng ngắn đồng cổ (cam, nòng dài, bánh răng) • tay dưới: NEO súng năng lượng tương lai (xanh dương, thân vát, lõi phát sáng)
+        const neo = st && st.stance === 'neo';
+        ctx.save(); ctx.rotate(rot * 0.3); ctx.translate(ext * 0.5, 0);
+        ctx.globalAlpha = neo ? 0.6 : 1;
+        ctx.fillStyle = '#6a4a22'; ctx.fillRect(12, -16, 6, 9);                                   // báng gỗ
+        ctx.fillStyle = tc('#c8862a'); ctx.fillRect(16, -15, 22, 5); ctx.fillRect(18, -11, 8, 4);  // thân đồng + ổ đạn
+        ctx.strokeStyle = '#ffb04a'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(22, -9, 3, 0, TAU); ctx.stroke();   // bánh răng
+        ctx.fillStyle = '#ff9a2a'; ctx.fillRect(37, -14, 4, 3);
+        ctx.globalAlpha = neo ? 1 : 0.6;
+        ctx.fillStyle = '#20283a'; ctx.beginPath(); ctx.moveTo(12, 8); ctx.lineTo(34, 7); ctx.lineTo(38, 10); ctx.lineTo(34, 14); ctx.lineTo(12, 15); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = tc('#3aa0ff'); ctx.shadowColor = '#3aa0ff'; ctx.shadowBlur = 8; ctx.fillRect(16, 10, 14, 2); ctx.fillRect(36, 9, 4, 3); ctx.shadowBlur = 0;
+        ctx.restore(); ctx.globalAlpha = 1;
         break;
+      }
       case 'crossbow': {
         ctx.fillStyle = '#6a4a2a'; ctx.fillRect(10, -3, 30, 6);
         ctx.strokeStyle = tc('#3a2a1a'); ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(30, 0, 16, -1.3, 1.3); ctx.stroke();

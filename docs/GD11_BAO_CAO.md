@@ -122,6 +122,7 @@ Vào từ màn hình chính → 🧪.
 - 8 loại đạn đánh thường mới; tướng không còn dùng chung "sao" hay "đạn".
 - Đòn cận chiến riêng cho 13 loại vũ khí.
 - Mỗi tướng có dấu ấn tung chiêu riêng (hạt và vầng sáng màu riêng).
+- **Chrono & Neo** (theo yêu cầu thêm): hai khẩu súng khác nhau. Chrono là súng ngắn đồng cổ, bắn viên đạn **cam** nặng; Neo là súng năng lượng, bắn tia **xanh dương** mảnh. Đổi thế thì đổi loại đạn và màu lửa nòng; **S4 bắn trộn cả hai loại**.
 
 ### THIET_KE.md
 - **Mục 0 mới: Tổng quan.** Gồm:

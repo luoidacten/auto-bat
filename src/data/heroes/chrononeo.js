@@ -11,6 +11,7 @@
   function applyStance(m, u) {
     const c = isC(u);
     m.addStatus(u, 'buff', 1e6, 1, { key: ST, persist: true, mods: c ? { asPct: -0.25, armorPen: 0.2 } : { asPct: 0.25, msPct: 0.08 } });
+    if (u.heroId === 'chrononeo') u.projKindNow = c ? 'chrono_b' : 'neo_b';   // GĐ11: đạn Chrono cam (nặng) / đạn Neo xanh dương (nhẹ)
   }
   function swap(m, u, free) {
     const to = isC(u) ? 'neo' : 'chrono';
@@ -68,11 +69,11 @@
           const dmg = H.amt(u, ctx.v([50, 80, 110, 140, 170]), 0.8);
           if (isC(u)) {
             const v = H.dirTo(u, ctx.pt);
-            H.shoot(m, u, ctx.pt, { speed: 30, range: 8, r: 0.5, pierce: true, kind: 'bullet', onHit: (mm, p, e) => { mm.damage(u, e, dmg * 1.3, 'phys', { tag: 's1' }); mm.knock(u, e, v.x, v.y, 1.5, 0.2); } });
+            H.shoot(m, u, ctx.pt, { speed: 30, range: 8, r: 0.5, pierce: true, kind: 'chrono_b', onHit: (mm, p, e) => { mm.damage(u, e, dmg * 1.3, 'phys', { tag: 's1' }); mm.knock(u, e, v.x, v.y, 1.5, 0.2); } });
             return;
           }
           const t = ctx.tgt; if (!t) return;
-          for (let i = 0; i < 2; i++) m.later(0.1 * i, (mm) => t.alive && u.alive && H.homing(mm, u, t, { speed: 34, kind: 'bullet', onHit: (m3, p, e) => { m3.damage(u, e, dmg * 0.6, 'phys', { tag: 's1' }); m3.addStatus(e, 'slow', 1, 0.3, { src: u }); } }));
+          for (let i = 0; i < 2; i++) m.later(0.1 * i, (mm) => t.alive && u.alive && H.homing(mm, u, t, { speed: 34, kind: 'neo_b', onHit: (m3, p, e) => { m3.damage(u, e, dmg * 0.6, 'phys', { tag: 's1' }); m3.addStatus(e, 'slow', 1, 0.3, { src: u }); } }));
         },
         ai: { use: 'poke', range: 6.5, aim: 'point', speed: 30, farm: 99 },
       },
@@ -91,7 +92,7 @@
               if (!u.alive) return;
               const L = marks.filter((e) => e.alive); if (!L.length) return;
               const n = Math.max(2, u.ws.ammo.chrono); u.ws.ammo.chrono = 0;
-              for (let i = 0; i < n; i++) { const e = L[i % L.length]; mm.later(0.5 * i / n, (m3) => e.alive && u.alive && H.homing(m3, u, e, { speed: 40, kind: 'bullet', onHit: (m4, p, x) => m4.damage(u, x, u.st.ad * 1.5 * (1 + 0.08 * ctx.rank), 'phys', { tag: 's2' }) })); }
+              for (let i = 0; i < n; i++) { const e = L[i % L.length]; mm.later(0.5 * i / n, (m3) => e.alive && u.alive && H.homing(m3, u, e, { speed: 40, kind: 'chrono_b', onHit: (m4, p, x) => m4.damage(u, x, u.st.ad * 1.5 * (1 + 0.08 * ctx.rank), 'phys', { tag: 's2' }) })); }
             });
             if (H.T(u, '9c')) m.addStatus(u, 'undying', 2.5, 1, { key: 'cn_tank' });
             // Giao Thoa Không Gian: dùng lại để kéo kẻ địch quanh về trước nòng súng
@@ -102,7 +103,7 @@
             return;
           }
           const v = H.dirTo(u, ctx.pt), dmg = H.amt(u, ctx.v([30, 45, 60, 75, 90]), 0.45), n = ctx.v([7, 8, 9, 9, 10]);
-          for (let i = 0; i < n; i++) { const a = -0.45 + 0.9 * i / (n - 1), c = M.cos(a), s = M.sin(a); m.proj({ owner: u, x: u.x, y: u.y, dx: v.x * c - v.y * s, dy: v.x * s + v.y * c, speed: 28, range: 8, r: 0.35, kind: 'bullet', onHit: (mm, p, e) => { mm.damage(u, e, dmg, 'phys', { tag: 's2' }); if (e.ga > 0) e.ga = Math.max(0, e.ga - 25); } }); }
+          for (let i = 0; i < n; i++) { const a = -0.45 + 0.9 * i / (n - 1), c = M.cos(a), s = M.sin(a); m.proj({ owner: u, x: u.x, y: u.y, dx: v.x * c - v.y * s, dy: v.x * s + v.y * c, speed: 28, range: 8, r: 0.35, kind: 'neo_b', onHit: (mm, p, e) => { mm.damage(u, e, dmg, 'phys', { tag: 's2' }); if (e.ga > 0) e.ga = Math.max(0, e.ga - 25); } }); }
         },
         ai: { use: 'burst', range: 7.5, aim: 'unit', recastWhen: (m, u, t) => t && t.kind === 'hero' && M.dist(u, t) > 3 && M.dist(u, t) < 6 },
       },
@@ -130,7 +131,7 @@
             const back = { x: d.x, y: d.y };
             d.x = uu.x; d.y = uu.y; mm.blink(uu, back.x, back.y);
             mm.addStatus(uu, 'haste', 1.5, 0.25, { key: 'cn_swap' }); mm.addStatus(uu, 'buff', 1.5, 1, { key: 'cn_swap', mods: { asPct: 0.25 } });
-            if (H.T(uu, '6b')) for (let i = 0; i < 3; i++) { const t = H.nearestEnemyHero(mm, uu, 7); if (t) mm.later(0.08 * i, (m3) => H.homing(m3, uu, t, { speed: 34, kind: 'bullet', onHit: (m4, pp, e) => { m4.damage(uu, e, uu.st.ad * 0.5, 'phys', { tag: 's3' }); m4.addStatus(e, 'slow', 1, 0.3, { src: uu }); } })); }
+            if (H.T(uu, '6b')) for (let i = 0; i < 3; i++) { const t = H.nearestEnemyHero(mm, uu, 7); if (t) mm.later(0.08 * i, (m3) => H.homing(m3, uu, t, { speed: 34, kind: 'neo_b', onHit: (m4, pp, e) => { m4.damage(uu, e, uu.st.ad * 0.5, 'phys', { tag: 's3' }); m4.addStatus(e, 'slow', 1, 0.3, { src: uu }); } })); }
             if (H.T(uu, '3b')) mm.hitCircle(uu, uu.x, uu.y, 2, (e) => mm.addStatus(e, 'stun', 0.75, 1, { src: uu }), { color: '#6af0ff' });
             if (H.T(uu, '9b')) { const h = uu.ws.hist.find((x) => mm.time - x.t <= 2.2); if (h && h.hp > uu.hp) mm.heal(uu, uu, h.hp - uu.hp); }
             mm.later(2, arm);
@@ -158,18 +159,18 @@
           const burst = (mm, src, scale) => {
             k++;
             for (let i = 0; i < n; i++) { const heavy = (i + k) % 2 === 0, a = i * 6.2831853 / n + k * 0.39;
-              mm.proj({ owner: u, x: src.x, y: src.y, dx: M.cos(a), dy: M.sin(a), speed: heavy ? 18 : 28, range: 20, r: heavy ? (c ? 0.7 : 0.5) : 0.35, kind: 'bullet', pierce: heavy,
+              mm.proj({ owner: u, x: src.x, y: src.y, dx: M.cos(a), dy: M.sin(a), speed: heavy ? 18 : 28, range: 20, r: heavy ? (c ? 0.7 : 0.5) : 0.35, kind: heavy ? 'chrono_b' : 'neo_b', pierce: heavy,
                 onHit: (m3, p, e) => { m3.damage(u, e, dmg * scale * (heavy ? 1.3 : 0.8), 'phys', { tag: 's4', aoe: true }); if (c) m3.knock(u, e, p.dx || 0, p.dy || 0, 0.5, 0.1); } }); }
           };
           m.zone({ owner: u, x: u.x, y: u.y, r: 6, life, every: 0.5, follow: u, kind: 'lotus', tick: (mm) => burst(mm, u, 1),
             onEnd: (mm) => {
               if (!u.alive) return;
               if (c) {
-                for (let i = 0; i < 30; i++) { const a = i * 0.2094; mm.proj({ owner: u, x: u.x, y: u.y, dx: M.cos(a), dy: M.sin(a), speed: 20, range: 10, r: 0.6, kind: 'bullet', pierce: true, onHit: (m3, p, e) => m3.damage(u, e, dmg * 1.6, 'phys', { tag: 's4', aoe: true }) }); }
+                for (let i = 0; i < 30; i++) { const a = i * 0.2094; mm.proj({ owner: u, x: u.x, y: u.y, dx: M.cos(a), dy: M.sin(a), speed: 20, range: 10, r: 0.6, kind: 'chrono_b', pierce: true, onHit: (m3, p, e) => m3.damage(u, e, dmg * 1.6, 'phys', { tag: 's4', aoe: true }) }); }
                 mm.hitCircle(u, u.x, u.y, 3, (e) => { const v = H.dirTo(u, e); mm.knock(u, e, v.x, v.y, 3, 0.25); }, { color: '#d0a050' });
               } else {
                 const m2 = ctx.v([10, 15, 20]);
-                for (let i = 0; i < m2; i++) { const a = i * 6.2831853 / m2; mm.proj({ owner: u, x: u.x, y: u.y, dx: M.cos(a), dy: M.sin(a), speed: 28, range: 10, r: 0.4, kind: 'bullet', onHit: (m3, p, e) => m3.damage(u, e, dmg, 'phys', { tag: 's4', aoe: true }) }); }
+                for (let i = 0; i < m2; i++) { const a = i * 6.2831853 / m2; mm.proj({ owner: u, x: u.x, y: u.y, dx: M.cos(a), dy: M.sin(a), speed: 28, range: 10, r: 0.4, kind: 'neo_b', onHit: (m3, p, e) => m3.damage(u, e, dmg, 'phys', { tag: 's4', aoe: true }) }); }
                 const e = H.nearestEnemyHero(mm, u, 8), v = e ? H.dirTo(e, u) : { x: u.fx, y: u.fy }; mm.dashTo(u, u.x + v.x * 3, u.y + v.y * 3, 20, {});
               }
             } });

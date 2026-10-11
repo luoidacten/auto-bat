@@ -225,7 +225,7 @@
           const gfx = u.hero ? u.hero.gfx : u.gfx, a = Math.atan2(e.ty - e.y, e.tx - e.x), c = (u.hero && u.hero.color) || u.color || '#ffffff';
           if (e.ranged) {
             if (gfx === 'pistol' || gfx === 'revolver' || gfx === 'rifle' || gfx === 'shotgun' || gfx === 'dual' || gfx === 'crossbow')
-              this.add(now, { k: 'muzzle', x: e.x + Math.cos(a) * u.r * 1.3, y: e.y + Math.sin(a) * u.r * 1.3, a, life: 0.12, c: '#ffe9a0', big: gfx === 'shotgun' });
+              this.add(now, { k: 'muzzle', x: e.x + Math.cos(a) * u.r * 1.3, y: e.y + Math.sin(a) * u.r * 1.3, a, life: 0.12, c: gfx === 'dual' ? (u.ws && u.ws.stance === 'neo' ? '#7ac0ff' : '#ffb04a') : '#ffe9a0', big: gfx === 'shotgun' || (gfx === 'dual' && !(u.ws && u.ws.stance === 'neo')) });   // GĐ11: lửa nòng Chrono cam / Neo xanh
             return;
           }
           const reach = (u.st ? u.st.range : 1.6) + u.r;

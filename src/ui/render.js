@@ -1425,11 +1425,23 @@
           ctx.translate(p.x, p.y); ctx.rotate(now * 7); const R = Math.max(3, r * 0.8);
           for (let i = 0; i < 4; i++) { ctx.rotate(Math.PI / 2); ctx.fillStyle = i % 2 ? '#2a0010' : '#8a1030'; ctx.beginPath(); ctx.ellipse(R * 0.5, 0, R * 0.6, R * 0.32, 0, 0, TAU); ctx.fill(); } break;
         }
-        case 'chrono': {  // Chrono & Neo: đạn thời gian — cam (quá khứ) / lam (tương lai) xen kẽ, vòng đồng hồ
-          const blue = (pj.id & 1) === 1, c1 = blue ? '#7ac8ff' : '#ffb04a';
-          trail(1.0, Math.max(2, r * 0.6), blue ? 'rgba(120,200,255,0.8)' : 'rgba(255,176,74,0.8)');
-          ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(1.8, r * 0.4), 0, TAU); ctx.fill();
-          ctx.strokeStyle = c1; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(3.5, r * 0.9), now * 6, now * 6 + 4.2); ctx.stroke(); break;
+        case 'chrono_b': {   // Chrono (Quá Khứ): viên đạn đồng nặng màu CAM, vệt dày, vòng kim đồng hồ quay
+          const R = Math.max(2.6, r * 0.75);
+          trail(1.3, Math.max(3, R * 1.2), 'rgba(255,150,40,0.85)');
+          ctx.shadowColor = '#ff9a2a'; ctx.shadowBlur = 10; ctx.fillStyle = '#ffd08a';
+          ctx.beginPath(); ctx.ellipse(p.x, p.y, R * 1.3, R * 0.8, ang, 0, TAU); ctx.fill();
+          ctx.strokeStyle = '#ff8a1a'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.arc(p.x, p.y, R * 1.9, now * 5, now * 5 + 4.2); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + Math.cos(now * 9) * R * 1.6, p.y + Math.sin(now * 9) * R * 1.6); ctx.stroke(); break;
+        }
+        case 'neo_b': {      // Neo (Tương Lai): tia đạn mảnh XANH DƯƠNG, nhanh, vệt dài sáng
+          trail(1.7, Math.max(1.6, r * 0.45), 'rgba(70,160,255,0.95)');
+          ctx.shadowColor = '#3aa0ff'; ctx.shadowBlur = 9; ctx.fillStyle = '#e6f4ff';
+          ctx.beginPath(); ctx.ellipse(p.x, p.y, Math.max(2.4, r * 0.8), Math.max(1.1, r * 0.28), ang, 0, TAU); ctx.fill(); break;
+        }
+        case 'chrono': {     // (cũ) xen kẽ
+          const blue = (pj.id & 1) === 1;
+          trail(1.0, Math.max(2, r * 0.6), blue ? 'rgba(70,160,255,0.8)' : 'rgba(255,150,40,0.8)');
+          ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(1.8, r * 0.4), 0, TAU); ctx.fill(); break;
         }
         case 'plasma': {  // Zero: tia plasma xanh dài
           trail(1.6, Math.max(2.5, r * 0.7), 'rgba(90,200,255,0.9)');
