@@ -44,6 +44,7 @@
     menu() {
       this.running = false; this.m = null; this.bk = null; this.afterReplay = null;
       if (G.BetUI) G.BetUI.unmountHud();
+      if (G.SandboxUI) G.SandboxUI.unmount();
       this.show('menu');
       G.Sound.music('menu');
       const sv = G.BetUI && G.BetUI.saved();
@@ -55,6 +56,7 @@
           <button id="mWatch">👁 Xem một trận tự do (không cược)</button>
           <button id="mSolo">⚔ Solo 1v1 • 2 tướng</button>
           <button id="mSim">⏩ Mô phỏng nhanh 1 trận</button>
+          <button id="mSbx">🧪 Phòng thử nghiệm (Sandbox)</button>
           <a class="btn" href="legacy/index.html">📜 Chơi bản cũ</a>
         </div>
         <div class="note"><b>Bạn là kẻ mắc nợ nhà cái.</b> Trả nợ bằng cách đặt cược vào đấu trường sinh tồn của 10 tướng do máy điều khiển: 3 chặng × 3 trận,
@@ -67,6 +69,7 @@
       $('#mRun').onclick = () => { if (sv) G.Dlg.confirm('Bắt đầu ván mới sẽ xóa ván đang chơi. Chắc chứ?', 'Ván mới', 'Thôi').then((ok) => { if (ok) G.BetUI.newRun(); }); else G.BetUI.newRun(); };
       if ($('#mResume')) $('#mResume').onclick = () => G.BetUI.resume();
       $('#mSim').onclick = () => this.quickSim(G.arenaConfig(this.newSeed()));
+      $('#mSbx').onclick = () => G.SandboxUI.open(this);
       $('#mMus').onclick = () => { G.Sound.toggleMusic(); this.menu(); };
       $('#mSfx').onclick = () => { G.Sound.toggleSfx(); this.menu(); };
       $('#mFull').onclick = () => goFullscreen();
@@ -173,7 +176,7 @@
       this.r.pullFx((e) => { this.hud.onFx(e); this.sound(e); });
       this.r.updateCamera(dt, sp);
       this.r.draw(sp > 0 && !m.over ? Math.min(1, this.acc / G.C.TICK) : 1);
-      if (!this.hudT || t > this.hudT) { this.hud.update(); this.r.drawMinimap(this.hud.mini); this.hudT = t + 160; if (this.bk) G.BetUI.notify(); }
+      if (!this.hudT || t > this.hudT) { this.hud.update(); this.r.drawMinimap(this.hud.mini); this.hudT = t + 160; if (this.bk) G.BetUI.notify(); if (m.sbx && G.SandboxUI) G.SandboxUI.update(m); }
       if (m.over && !this.ended) { this.ended = true; setTimeout(() => (this.bk && this.bk.m === m ? G.BetUI.after(m) : this.result(m)), 2200); G.Sound.play('applause'); }
     },
     // âm thanh theo sự kiện (chỉ những gì gần khung nhìn)

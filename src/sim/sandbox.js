@@ -131,7 +131,7 @@
         u = this.spawnHero({ hero: id, team: 1, level: S.hero ? S.hero.level : 9 }, this.heroes.length, p);
         u.sbRival = true;
       } else {
-        u = this.spawnHero({ hero: 'dummy_' + kind, def: dummyDef(kind), team: 1, level: 1, ai: dummyAI, items: ['__none'] }, this.heroes.length, p);
+        u = this.spawnHero({ hero: 'dummy_' + kind, def: dummyDef(kind), team: 1, level: 1, ai: dummyAI, items: ['__none'], pers: 'hoabinh', player: { name: DUMMY[kind].icon + ' ' + DUMMY[kind].name, stats: {} } }, this.heroes.length, p);
         u.dummy = kind;
         u.fixSt = { hp: DUMMY[kind].hp, ga: DUMMY[kind].ga };
         if (kind === 'armored' && S.armorMode === 'armor') u.fixSt = { hp: 1000, ga: 0, armor: 100, mr: 100 };
@@ -170,10 +170,10 @@
       else if (k === 'zone') this.sbZone(S.zone);
       return S[k];
     },
-    // lồng Solo 14 đv quanh tướng — dùng cơ chế sàn Solo (chặn trong vòng + đẩy khỏi trụ)
+    // lồng Solo 14 đv quanh tướng — dùng cơ chế sàn Solo (chặn trong vòng); overlay: vẫn vẽ bản đồ thật, chỉ thêm vòng lồng
     sbCage(on) {
       const S = this.sbx, h = S.hero || S.anchor;
-      if (on) { this.soloArena = { cx: h.x, cy: h.y, r: 7, theme: { id: 'cage', r: 7, pillars: [] }, themeKey: 'cage', worldPillars: [] }; S.cage = true; for (const d of S.dummies) if (dist(d, h) > 5) this.blinkTo(d, { x: h.x + 4, y: h.y }); }
+      if (on) { this.soloArena = { cx: h.x, cy: h.y, r: 7, theme: { id: 'cage', r: 7, pillars: [] }, themeKey: 'cage', worldPillars: [], overlay: true }; S.cage = true; for (const d of S.dummies) if (dist(d, h) > 5) this.blinkTo(d, { x: h.x + 4, y: h.y }); }
       else { this.soloArena = null; S.cage = false; }
       this.sbLog(on ? '🔒 Lồng Solo 14 đv' : '🔓 Bỏ lồng Solo');
     },

@@ -159,7 +159,7 @@
         if (n > bn) { bn = n; best = { x: sx / n, y: sy / n }; }
       }
       if (!cam.follow) { this.camWhy = null; return; }
-      if (m.soloArena) {
+      if (m.soloArena && !m.soloArena.overlay) {
         const h0 = m.heroes[0], h1 = m.heroes[1];
         let midX = m.soloArena.cx, midY = m.soloArena.cy;
         let d = 16;
@@ -271,7 +271,7 @@
       const tr = (typeof performance !== 'undefined' ? performance.now() : Date.now()) / 1000, dtR = Math.min(0.1, Math.max(0, tr - (this.lastReal || tr))); this.lastReal = tr;
       if (this.vfx) { this.vfx.update(now, dtR); const sh = this.vfx.shakeOffset(tr); if (sh.x || sh.y) ctx.translate(sh.x, sh.y); }
       // nền
-      if (m.soloArena) {
+      if (m.soloArena && !m.soloArena.overlay) {
         this.drawSoloLegacyArena(now, z);
       } else if (this.cam.x > 800 || this.cam.y > 800) {
         this.drawDuelRealmBackdrop(now, z);
@@ -297,7 +297,7 @@
       }
       // hiệu ứng dưới chân (vòng phù văn chiêu cuối, biến về…)
       if (this.vfx) this.vfx.draw(ctx, this, now, true);
-      if (!m.soloArena) this.drawArena(now, z);
+      if (!m.soloArena || m.soloArena.overlay) this.drawArena(now, z);
       // lính, quái, vật triệu hồi & tướng (sắp theo y để vật dưới đè vật trên)
       const list = m.units.filter((u) => u.alive);
       list.sort((a, b) => a.y - b.y || a.id - b.id);
@@ -337,6 +337,7 @@
         else if (u.hp < u.st.maxHp) this.drawBar(sp.x, sp.y - u.r * z - 5, Math.max(14, u.r * z * 2), 3, u.hp / u.st.maxHp, TEAM[u.team] || '#ddd');
       }
       this.drawTexts(now, z);
+      if (m.sbx && G.SandboxUI) G.SandboxUI.drawOverlay(this, ctx, m, alpha, z);   // GĐ11: lớp vẽ gỡ lỗi Sandbox
       if (this.vfx) { ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0); this.vfx.drawFlash(ctx, this); }
     }
     // hoạt cảnh trong vùng chiêu (lửa lập lòe, mây khí, gió xoáy, lưỡi kiếm, mưa thương, hoa hồi máu…)
@@ -1560,7 +1561,7 @@
 
     // ---------- bản đồ nhỏ: bo, bãi quái, boss, thính, Thương Nhân, 10 tướng ----------
     drawMinimap(mc) {
-      if (this.m && this.m.soloArena) {
+      if (this.m && this.m.soloArena && !this.m.soloArena.overlay) {
         if (!mc || !mc.width || !mc.height) return;
         const g = mc.getContext('2d'), S = mc.width, m = this.m, sa = m.soloArena;
         g.fillStyle = '#060912'; g.fillRect(0, 0, S, S);

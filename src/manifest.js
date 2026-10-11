@@ -94,6 +94,7 @@
     'ui/hud.js',
     'ui/bet_ui.js',
     'ui/solo_ui.js',
+    'ui/sandbox_ui.js',
     'ui/app.js',
   ];
   // Trình duyệt: chèn thẻ script theo đúng thứ tự (async=false giữ thứ tự thực thi)
