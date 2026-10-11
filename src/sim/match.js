@@ -687,6 +687,8 @@
       // GĐ8: bùa lợi boss cứu mạng (Hồn Thần Bất Diệt của Thiên Hồn Chủ, Ấn Niết Bàn của Phượng Hoàng)
       if (u.kind === 'hero' && this.bossBuffSave(u)) return;
       // nhánh tiến hóa "không chết" (Ý Chí Bất Diệt, Phượng Hoàng Tái Sinh…)
+      // GĐ10: sửa lỗi — nội tại "thoát chết" khai báo ở passive (Alice, Vesper, Boran…) trước đây không bao giờ được gọi
+      if (u.kind === 'hero' && u.hero.passive && u.hero.passive.onFatal && this.hook(u.hero.passive.onFatal, this, u, killer)) { if (u.hp < 1) u.hp = 1; return; }
       if (u.kind === 'hero' && u.fxl && u.fxl.onFatal) for (const fn of u.fxl.onFatal) if (this.hook(fn, this, u, killer)) { if (u.hp < 1) u.hp = 1; return; }
       // GĐ7b: mảnh hồn Đỏ "Thiên Mệnh" (hồi 400s) / Vàng "Vận Mệnh" (vỡ mảnh) — hồi sinh ngay tại chỗ
       if (u.kind === 'hero' && u.perks && u.perks.size) {
