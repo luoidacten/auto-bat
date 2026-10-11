@@ -44,6 +44,20 @@
     homing(m, u, t, o) {
       return m.proj(Object.assign({ owner: u, x: u.x, y: u.y, target: t }, o));
     },
+    // GĐ11: chọn tâm chiêu diện rộng — thử tâm tại vị trí DỰ ĐOÁN (sau lead giây) của từng tướng địch thấy được trong tầm,
+    // chấm điểm = số tướng địch lọt vùng (×10) − khoảng cách (ưu tiên kẻ gần mình nhất khi bằng nhau) + máu thấp; trả null nếu không có ai
+    bestAoe(m, u, range, R, lead) {
+      const es = m.heroes.filter((e) => e.alive && e !== u && e.team !== u.team && e.vis[u.team] && !(H.isAlly && H.isAlly(m, u, e)) && G.M.dist(u, e) <= range + R);
+      const fut = (e) => ({ x: e.x + (e.vx || 0) * (lead || 0), y: e.y + (e.vy || 0) * (lead || 0) });
+      let best = null, bs = -1e9;
+      for (const c of es) {
+        let p = fut(c); const d = G.M.dist(u, p); if (d > range) p = H.toward(u, p, range, true);
+        let n = 0, low = 0; for (const e of es) if (G.M.dist(fut(e), p) <= R * 0.85) { n++; low += 1 - e.hpPct; }
+        const s = n * 10 + low - G.M.dist(u, p) * 0.05;
+        if (s > bs) { bs = s; best = { x: p.x, y: p.y, n }; }
+      }
+      return best;
+    },
     isHero: (x) => x && x.kind === 'hero',
     // nhánh tiến hóa đang có (vd H.T(u, '6b'))
     T: (u, c) => !!(u.tset && u.tset[c]),

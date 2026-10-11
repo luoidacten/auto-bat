@@ -173,7 +173,7 @@
           const b = br(u, 's3');
           if (b === 'ap') { u.ws.sub = m.time + 2.5; if (m.fxOn) m.fx({ type: 'aura', id: u.id, color: '#9adf7a', life: 2.5 }); }
           else if (b === 'ad') {
-            const p = H.toward(u, ctx.pt, 6, false), x = p.x, y = p.y;
+            const p = H.toward(u, ctx.pt, 6, true), x = p.x, y = p.y;
             m.zone({ owner: u, x, y, r: 3.5, life: 4, every: 0.25, kind: 'smoke', tick: (mm) => {
               mm.hitCircle(u, x, y, 3.5, (e) => mm.addStatus(e, 'blind', 0.4, 1, { src: u, key: 'tsu_smoke' }), { noFx: true });
               if (M.dist(u, { x, y }) < 3.5 && m.time - (u.lastAtkT || -99) > 0.5) mm.addStatus(u, 'stealth', 0.35, 1, { key: 'tsu_smoke' });
@@ -199,7 +199,7 @@
         use(m, u, ctx) {
           const b = br(u, 's4');
           if (b === 'ap') {
-            const p = H.toward(u, ctx.pt, 6, false), delay = H.T(u, '9a') ? 0.5 : ctx.v([2, 1.5, 1]), dmg = H.amt(u, ctx.v([300, 450, 600]), 0, 1.1);
+            const p = H.toward(u, ctx.pt, 6, true), delay = H.T(u, '9a') ? 0.5 : ctx.v([2, 1.5, 1]), dmg = H.amt(u, ctx.v([300, 450, 600]), 0, 1.1);
             m.telegraph({ shape: 'circle', x: p.x, y: p.y, r: 8, life: delay, team: u.team, color: '#4a3aa0' });
             m.later(delay, (mm) => mm.hitCircle(u, p.x, p.y, 8, (e) => { mm.damage(u, e, dmg, 'magic', { tag: 's4', aoe: true }); mm.addStatus(e, 'stun', 1.5, 1, { src: u }); mm.addStatus(e, 'blind', 3, 1, { src: u }); }, { color: '#4a3aa0' }));
           } else if (b === 'ad') {

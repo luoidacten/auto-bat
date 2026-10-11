@@ -1491,6 +1491,16 @@
         }
         case 'note':
           ctx.fillStyle = '#7ae0a0'; ctx.shadowColor = '#7ae0a0'; ctx.shadowBlur = 10; ctx.font = `bold ${Math.max(12, 0.8 * z)}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('♪', p.x, p.y); break;
+        case 'alicecard': {   // GĐ11: Alice ném bài — lá bài lưng tím viền vàng xoay tít, vệt hạt kim tuyến tím
+          trail(0.9, 2, 'rgba(208,112,255,0.6)');
+          if (V && (now * 60 | 0) % 3 === 0) V.burstParts(now, pj.x, pj.y, 1, { color: '#ffd24a', speed: 0.6, life: 0.3, size: 0.08, a: ang + Math.PI, spread: 1.2 });
+          const R = Math.max(4, r * 1.1);
+          ctx.translate(p.x, p.y); ctx.rotate(ang + now * 14); ctx.shadowColor = '#d070ff'; ctx.shadowBlur = 8;
+          ctx.fillStyle = '#5a1a8a'; ctx.strokeStyle = '#ffd24a'; ctx.lineWidth = 1.2;
+          ctx.fillRect(-R * 0.5, -R * 0.72, R, R * 1.44); ctx.strokeRect(-R * 0.5, -R * 0.72, R, R * 1.44); ctx.shadowBlur = 0;
+          ctx.fillStyle = '#ffd24a'; ctx.beginPath(); for (let i = 0; i < 4; i++) { const q = i * Math.PI / 2; ctx.lineTo(Math.cos(q) * R * 0.32, Math.sin(q) * R * 0.32); ctx.lineTo(Math.cos(q + 0.785) * R * 0.1, Math.sin(q + 0.785) * R * 0.1); } ctx.closePath(); ctx.fill();
+          break;
+        }
         case 'card':
           ctx.translate(p.x, p.y); ctx.rotate(ang + now * 12);
           ctx.fillStyle = '#fff8e0'; ctx.strokeStyle = '#c03030'; ctx.lineWidth = 1; ctx.fillRect(-r * 0.5, -r * 0.7, r, r * 1.4); ctx.strokeRect(-r * 0.5, -r * 0.7, r, r * 1.4); break;

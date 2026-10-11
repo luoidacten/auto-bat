@@ -81,7 +81,7 @@
         cd: 2, cost: 30,
         use(m, u, ctx) {
           if (u.ws.dom) { u.ws.dom = null; u.mp += m.costOf(u, 's2'); return; }
-          const p = H.toward(u, ctx.pt, 8, false);
+          const p = H.toward(u, ctx.pt, 8, true);   // GĐ11: đặt đúng điểm nhắm (trước luôn văng ra tầm tối đa)
           m.telegraph({ shape: 'circle', x: p.x, y: p.y, r: 3.5, life: 0.3, team: u.team, color: '#bfe8ff' });
           u.ws.dom = { x: p.x, y: p.y, t0: m.time, next: m.time + 0.3 };
         },

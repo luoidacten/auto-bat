@@ -78,7 +78,7 @@
         name: 'Bom Từ Tính Khóa Trọng Lực', desc: 'Ném lựu đạn từ tính 8 đv, nổ bán kính 2.5: sát thương vật lý, choáng 1s, nạn nhân nhận thêm 25/30/30/30/50% sát thương từ mọi nguồn 4s. Để lại vực từ trường 3s cấm lướt / dịch chuyển / dây móc.',
         cd: [11, 10, 9.5, 9, 8.5], cost: [55, 55, 55, 55, 55],
         use(m, u, ctx) {
-          const p = H.toward(u, ctx.pt, 8, false), amp = ctx.v([0.25, 0.3, 0.3, 0.3, 0.5]), dmg = H.amt(u, ctx.v([70, 110, 150, 190, 230]), 0.7, 0);
+          const p = H.toward(u, ctx.pt, 8, true), amp = ctx.v([0.25, 0.3, 0.3, 0.3, 0.5]), dmg = H.amt(u, ctx.v([70, 110, 150, 190, 230]), 0.7, 0);
           m.telegraph({ shape: 'circle', x: p.x, y: p.y, r: 2.5, life: 0.35, team: u.team });
           m.later(0.35, (mm) => {
             mm.hitCircle(u, p.x, p.y, 2.5, (e) => { mm.damage(u, e, dmg, 'phys', { tag: 's3', aoe: true }); mm.addStatus(e, 'stun', 1, 1, { src: u }); mm.addStatus(e, 'vuln', 4, amp, { src: u, key: 'vec_mark' }); }, { color: '#40e0ff' });

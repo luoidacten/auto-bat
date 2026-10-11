@@ -45,7 +45,7 @@
   }
   H.def({
     id: 'alice', name: 'Alice', color: '#d070ff', gfx: 'gloves', kit: 'mage', pos: ['mid', 'jungle'], dmgType: 'magic',
-    ranged: true, projSpeed: 18, projKind: 'star', r: 0.58, resource: 'mana',
+    ranged: true, projSpeed: 18, projKind: 'alicecard', r: 0.58, resource: 'mana',
     stats: { range: 8.0, hp: 590, hpG: 84, mp: 420, mpG: 50, ad: 52, adG: 3, armor: 26, armorG: 3.6, mr: 30, mrG: 1.4, as: 0.63, asG: 0.015, ms: 3.5 },
     gauge: (u) => ({ v: u.ws.nn || 0, max: u.ws.bigCap ? 200 : 100, label: 'Náo Nhiệt', color: '#d070ff' }),
     passive: {

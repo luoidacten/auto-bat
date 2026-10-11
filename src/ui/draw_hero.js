@@ -111,8 +111,11 @@
         ctx.fillStyle = '#2a2e38'; ctx.fillRect(6, 5, 46, 6); ctx.fillRect(10, 9, 8, 9);
         ctx.fillStyle = '#4a5468'; ctx.fillRect(20, 1, 14, 4); ctx.fillStyle = tc('#8aa0c8'); ctx.fillRect(50, 6, 8, 3);
         break;
-      case 'gloves':
+      case 'gloves':      // găng trắng ảo thuật + quạt bài (Alice ném bài)
         for (const s of [-1, 1]) { ctx.fillStyle = '#fff'; ctx.strokeStyle = tc('#c070e0'); ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(14 + ext, s * 13, 6, 0, TAU); ctx.fill(); ctx.stroke(); }
+        ctx.save(); ctx.translate(20 + ext, 13);
+        for (let i = -1; i <= 1; i++) { ctx.save(); ctx.rotate(i * 0.35); ctx.fillStyle = '#5a1a8a'; ctx.strokeStyle = '#ffd24a'; ctx.lineWidth = 1; ctx.fillRect(0, -4, 10, 7); ctx.strokeRect(0, -4, 10, 7); ctx.restore(); }
+        ctx.restore();
         break;
       case 'dual': {      // GĐ11: hai khẩu khác nhau — tay trên: CHRONO súng ngắn đồng cổ (cam, nòng dài, bánh răng) • tay dưới: NEO súng năng lượng tương lai (xanh dương, thân vát, lõi phát sáng)
         const neo = st && st.stance === 'neo';

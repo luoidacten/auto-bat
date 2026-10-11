@@ -118,7 +118,7 @@
         cd: [110, 95, 80], cost: [100, 100, 100], castTime: 0.25,
         use(m, u, ctx) {
           const far = H.T(u, '12a') ? 60 : ctx.v([10, 20, 30]), R = H.T(u, '12a') ? 8 : ctx.v([3.5, 5, 8]);
-          const p = H.toward(u, ctx.pt, far, false), dmg = H.amt(u, ctx.v([180, 270, 360]), 0, 0.8);
+          const pick = H.bestAoe(m, u, far, R, 0.9), p = pick || H.toward(u, ctx.pt, far, true), dmg = H.amt(u, ctx.v([180, 270, 360]), 0, 0.8);   // GĐ11: chọn nơi đông địch nhất (hoặc kẻ gần nhất), đón đầu 0.9s; trước đây luôn rơi ở tầm tối đa nên trượt
           m.telegraph({ team: u.team, x: p.x, y: p.y, r: R, life: 0.75, color: '#3a9ad8' });
           let ward = null;
           if (H.T(u, '9a')) { ward = m.shield(u, u, u.st.maxHp * 0.3, 0.8); m.addStatus(u, 'unstop', 0.75, 1, { key: 'lyra_ward' }); }
@@ -139,7 +139,10 @@
             } });
           });
         },
-        ai: { use: 'ult', range: 10, aim: 'point', speed: 0, delay: 1, aoe: 3.5 },
+        ai: { use: 'ult', range: 10, aim: 'point', speed: 0, delay: 1, aoe: 3.5,
+          // GĐ11: tầm thật theo cấp chiêu (10/20/30, nhánh 12a: 60); chỉ tung khi có tướng địch lọt vùng
+          rangeFn: (m, u) => (H.T(u, '12a') ? 60 : [10, 20, 30][Math.max(0, Math.min(2, m.rankOf(u, 's4') - 1))]),
+          cond: (m, u) => { const far = H.T(u, '12a') ? 60 : [10, 20, 30][Math.max(0, Math.min(2, m.rankOf(u, 's4') - 1))]; return !!H.bestAoe(m, u, far, H.T(u, '12a') ? 8 : [3.5, 5, 8][Math.max(0, Math.min(2, m.rankOf(u, 's4') - 1))], 0.9); } },
       },
     },
     ai: { order: ['s1', 's2', 's3'], engageRange: 6.5, role: 'mage' },
