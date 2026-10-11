@@ -25,21 +25,37 @@
       this.fx = { badOdds: 0, fine: 0, extraHouse: 0 };   // mặt trái của quà (số trận còn hiệu lực)
       this.quotaCut = 0; this.final = false; this.over = false; this.result = null;
       this.shop = null;     // cửa hàng sau trận hiện tại
+      this.sav = 0; this.savLock = 0; this.savEarned = 0;   // GĐ9c: sổ tiết kiệm (tiền gửi lượt này khóa tới hết trận sau)
+      this.endless = false; this.best = 0;                  // GĐ9c: chế độ vô tận sau khi trả hết nợ
     }
     static from(o) { const r = new Run(o.seed); Object.assign(r, o); return r; }
+    // GĐ9c: charm không giới hạn, mua trùng thì CỘNG DỒN (đếm số bản)
     has(id) { return this.charms.includes(id); }
+    cnt(id) { let n = 0; for (const x of this.charms) if (x === id) n++; return n; }
     matchNo() { return this.stage * B().perStage + this.idx + 1; }
     totalMatches() { return B().stages.length * B().perStage; }
-    quota() { const S = B().stages[Math.min(this.stage, B().stages.length - 1)]; return Math.round(S.quota * (1 - Math.min(0.5, this.quotaCut)) / 10) * 10; }
+    nStages() { return B().stages.length; }
+    // chỉ tiêu chặng; chế độ vô tận: chặng cuối × endlessGrow mỗi chặng thêm
+    quota() {
+      const S = B().stages, last = S[S.length - 1].quota;
+      const base = this.stage < S.length ? S[this.stage].quota : last * Math.pow(B().endlessGrow, this.stage - S.length + 1);
+      return Math.round(base * (1 - Math.min(0.5, this.quotaCut)) / 10) * 10;
+    }
     mood() { return this.annoy >= 6 ? 2 : this.annoy >= 3 ? 1 : 0; }
     rng(tag) { return new G.Rng(this.seed + ':' + this.stage + ':' + this.idx + (this.final ? ':F' : '') + ':' + tag); }
     addAnnoy(n, why) { this.annoy = Math.max(0, this.annoy + n); if (why) this.annoyWhy = why; }
+    // ----- sổ tiết kiệm -----
+    assets() { return this.money + this.sav; }
+    savFree() { return Math.max(0, this.sav - this.savLock); }
+    deposit(x) { x = Math.round(x); if (x <= 0 || x > this.money) return 'Số tiền gửi không hợp lệ.'; this.money -= x; this.sav += x; this.savLock += x; return null; }
+    withdraw(x) { x = Math.round(x); if (x <= 0 || x > this.savFree()) return 'Tiền gửi lượt này chỉ rút được sau trận tới.'; this.sav -= x; this.money += x; return null; }
+    savRate() { return B().savRate; }
     // dàn tướng trận kế + người của nhà cái (số người theo chặng, bực bội, quà "Ân Huệ"; chặng sau có thể có người mới)
     nextConfig() {
       const cfg = G.arenaConfig(this.seed + '-t' + this.matchNo() + (this.final ? 'F' : ''));
       const R = this.rng('house'), H = B().house;
-      let want = this.final ? 4 : Math.min(4, R.int(0, 1 + this.stage) + (this.annoy >= 4 ? 1 : 0) + (this.annoy >= 7 ? 1 : 0) + (this.fx.extraHouse ? 1 : 0));
-      if (this.fx.extraHouse) { this.fx.extraHouse = 0; this.log.push({ t: this.matchNo(), txt: '🎁 Mặt trái của Ân Huệ: trận này nhà cái cài thêm 1 người.' }); }
+      let want = this.final ? 4 : Math.min(4, R.int(0, 1 + Math.min(2, this.stage)) + (this.endless ? 1 : 0) + (this.annoy >= 4 ? 1 : 0) + (this.annoy >= 7 ? 1 : 0) + this.fx.extraHouse);
+      if (this.fx.extraHouse) { this.log.push({ t: this.matchNo(), txt: `🎁 Mặt trái của Ân Huệ: trận này nhà cái cài thêm ${this.fx.extraHouse} người.` }); this.fx.extraHouse = 0; }
       const present = cfg.picks.filter((p) => H.includes(p.hero)).map((p) => p.hero);
       const missing = R.shuffle(H.filter((id) => !present.includes(id)));
       while (present.length < want && missing.length) {
@@ -60,48 +76,53 @@
     // ----- sau trận -----
     afterMatch(sum) {
       const lines = [];
-      if (this.has('ket_sat')) { const g = Math.min(300, Math.round(this.money * 0.05)); if (g > 0) { this.money += g; lines.push(`🔐 Két Sắt: +${g}`); } }
-      if (this.has('xieng_no')) { const owe = this.loans.reduce((a, l) => a + l.amt, 0), g = Math.min(this.money, Math.round(owe * 0.08)); if (g > 0) { this.money -= g; lines.push(`⛓ Xiềng Nợ: −${g} tiền lãi`); } }
+      // sổ tiết kiệm: tiền nằm trong sổ suốt trận được lãi (cộng dồn vào sổ); tiền gửi lượt này mở khóa
+      if (this.sav > 0) { const g = Math.round(this.sav * this.savRate()); if (g > 0) { this.sav += g; this.savEarned += g; lines.push(`🏦 Lãi tiết kiệm +${g} (${Math.round(this.savRate() * 100)}% số dư)`); } }
+      this.savLock = 0;
+      const ks = this.cnt('ket_sat');
+      if (ks) { const g = Math.min(300 * ks, Math.round(this.money * 0.05 * ks)); if (g > 0) { this.money += g; lines.push(`🔐 Két Sắt ×${ks}: +${g}`); } }
+      const xn = this.cnt('xieng_no');
+      if (xn) { const owe = this.loans.reduce((a, l) => a + l.amt, 0), g = Math.min(this.money, Math.round(owe * 0.08 * xn)); if (g > 0) { this.money -= g; lines.push(`⛓ Xiềng Nợ ×${xn}: −${g} tiền lãi`); } }
       for (const k of ['badOdds', 'fine']) if (this.fx[k] > 0) this.fx[k]--;
-      this.hist.push({ n: this.matchNo(), delta: sum.delta, money: this.money, final: this.final });
-      if (this.final) { this.over = true; this.result = this.money >= B().finalNeed ? 'free' : 'house'; return lines; }
+      this.hist.push({ n: this.matchNo(), delta: sum.delta, money: this.money, sav: this.sav, final: this.final });
+      if (this.final) { this.final = false; this.over = true; this.result = this.assets() >= B().finalNeed ? 'free' : 'house'; this.idx++; return lines; }
       this.idx++;
       this.shop = this.makeShop();
       return lines;
     }
     stageEnd() { return !this.final && this.idx >= B().perStage; }
-    // ----- cửa hàng: 3 charm (mua tối đa 1), quà nhà cái, vay / trả nợ -----
+    // ----- cửa hàng: 3 charm (mua tối đa 1 — có thể trùng charm đã có để cộng dồn), quà nhà cái, vay / trả nợ -----
     makeShop() {
       const R = this.rng('shop');
-      const pool = Object.keys(CH()).filter((id) => CH()[id].kind === 'shop' && !this.has(id));
-      const offer = R.shuffle(pool).slice(0, 3).map((id) => ({ id, price: Math.round(CH()[id].price * (1 + 0.1 * this.stage) / 10) * 10 }));
-      const gifts = Object.keys(CH()).filter((id) => CH()[id].kind === 'gift' && !this.has(id));
+      const pool = Object.keys(CH()).filter((id) => CH()[id].kind === 'shop');
+      const offer = R.shuffle(pool).slice(0, 3).map((id) => ({ id, price: Math.round(CH()[id].price * (1 + 0.1 * Math.min(this.stage, 6)) * (1 + 0.25 * this.cnt(id)) / 10) * 10 }));
+      const gifts = Object.keys(CH()).filter((id) => CH()[id].kind === 'gift');
       const gift = gifts.length && R.next() < 0.5 ? gifts[R.int(0, gifts.length - 1)] : null;
       return { offer, gift, bought: false, giftDone: !gift };
     }
-    freeSlots() { return B().slots - this.charms.length; }
     buy(id) {
       const S = this.shop, o = S && S.offer.find((x) => x.id === id);
       if (!o || S.bought) return 'Mỗi lần chỉ chọn 1 trong 3.';
-      if (this.money < o.price) return 'Không đủ tiền.';
-      if (this.freeSlots() <= 0) return 'Hết ô charm (bỏ bớt một charm).';
+      if (this.money < o.price) return 'Không đủ tiền mặt (rút bớt tiền tiết kiệm nếu cần).';
       this.money -= o.price; this.charms.push(id); S.bought = true; return null;
     }
-    drop(id) { const C0 = CH()[id]; if (!C0 || C0.kind === 'bad') return 'Charm xấu chỉ gỡ được khi trả nợ.'; this.charms = this.charms.filter((x) => x !== id); return null; }
+    drop(id) {
+      const C0 = CH()[id]; if (!C0 || C0.kind === 'bad') return 'Charm xấu chỉ gỡ được khi trả nợ.';
+      const k = this.charms.indexOf(id); if (k >= 0) this.charms.splice(k, 1); return null;
+    }
     takeGift(yes) {
       const S = this.shop; if (!S || !S.gift || S.giftDone) return;
       S.giftDone = true;
       if (!yes) return;
       const id = S.gift;
-      if (this.freeSlots() > 0) this.charms.push(id);
+      this.charms.push(id);
       this.addAnnoy(-1);
-      if (id === 'an_hue') { this.quotaCut += 0.2; this.fx.extraHouse = 1; }
-      if (id === 'qua_nho') { this.money += 400; this.fx.badOdds = this.annoy >= 5 ? 3 : 2; }
-      if (id === 'loi_hua') { this.quotaCut += 0.1; this.fx.fine = 3; }
+      if (id === 'an_hue') { this.quotaCut += 0.2; this.fx.extraHouse++; }
+      if (id === 'qua_nho') { this.money += 400; this.fx.badOdds += this.annoy >= 5 ? 3 : 2; }
+      if (id === 'loi_hua') { this.quotaCut += 0.1; this.fx.fine += 3; }
     }
     borrow(amt) {
       if (!B().loans.includes(amt)) return 'Khoản vay không hợp lệ.';
-      if (this.freeSlots() <= 0) return 'Charm xấu cần một ô trống.';
       const R = this.rng('loan' + this.loans.length), bad = ['xieng_no', 'mat_mo', 'tay_nhon'];
       const id = bad[R.int(0, bad.length - 1)];
       this.money += amt; this.loans.push({ amt, due: Math.round(amt * B().loanRate), charm: id }); this.charms.push(id);
@@ -110,28 +131,34 @@
     }
     repay(i) {
       const L = this.loans[i]; if (!L) return 'Không có khoản vay.';
-      if (this.money < L.due) return 'Không đủ tiền trả.';
+      if (this.money < L.due) return 'Không đủ tiền mặt trả.';
       this.money -= L.due; this.loans.splice(i, 1);
       const k = this.charms.indexOf(L.charm); if (k >= 0) this.charms.splice(k, 1);
       return null;
     }
-    // chỉ tiêu = mức tiền phải CÓ khi hết chặng; chặng giữa nộp góp một nửa, chặng cuối trả hết (kèm mọi khoản vay)
-    isLast() { return this.stage >= B().stages.length - 1; }
+    // chỉ tiêu = mức tài sản (tiền mặt + tiết kiệm) phải CÓ khi hết chặng. Chặng cuối của ván: trả hết nợ (chỉ tiêu + mọi khoản vay).
+    // Vô tận: mỗi chặng chỉ cần tài sản trừ nợ vay ≥ chỉ tiêu (không phải nộp).
+    isLast() { return !this.endless && this.stage >= B().stages.length - 1; }
     loanDue() { return this.loans.reduce((a, l) => a + l.due, 0); }
-    quotaNeed() { return this.quota() + (this.isLast() ? this.loanDue() : 0); }
+    quotaNeed() { return this.quota() + (this.isLast() || this.endless ? this.loanDue() : 0); }
     quotaPay() { return this.isLast() ? this.quotaNeed() : Math.round(this.quota() * B().installment / 10) * 10; }
+    spend(x) { const a = Math.min(this.money, x); this.money -= a; this.sav -= x - a; this.savLock = Math.min(this.savLock, this.sav); }
     payQuota() {
       const need = this.quotaNeed();
-      if (this.money < need) { this.over = true; this.result = 'debt'; return false; }
-      this.money -= this.quotaPay(); this.paid = (this.paid || 0) + this.quotaPay();
+      if (this.assets() < need) { this.over = true; this.result = this.endless ? 'endless' : 'debt'; return false; }
+      const pay = this.quotaPay();
+      this.spend(pay); this.paid = (this.paid || 0) + pay;
       if (this.isLast()) { for (const l of this.loans) { const k = this.charms.indexOf(l.charm); if (k >= 0) this.charms.splice(k, 1); } this.loans = []; }
       this.stage++; this.idx = 0; this.quotaCut = 0;
-      if (this.stage >= B().stages.length) {
+      if (this.endless) this.best = Math.max(this.best, this.stage);
+      if (!this.endless && this.stage >= B().stages.length) {
         if (this.annoy >= B().angryEnd) this.final = true;
         else { this.over = true; this.result = 'free'; }
       }
       return true;
     }
+    // GĐ9c: đã tự do → chơi tiếp vô tận (chỉ tiêu tăng mỗi chặng; vỡ nợ thì dừng, ghi kỷ lục)
+    goEndless() { if (this.result !== 'free') return; this.over = false; this.result = null; this.endless = true; this.final = false; this.idx = 0; this.best = Math.max(this.best, this.stage); }
   }
 
   // ================= TỶ LỆ =================
@@ -172,7 +199,7 @@
       const cand = rows.filter((r) => !this.house.includes(r.id)).sort((a, b) => a.p1 - b.p1).slice(0, 5);
       const bait = cand.length ? cand[R.int(0, cand.length - 1)].id : null;
       const top = rows.slice().sort((a, b) => b.p1 - a.p1)[0].p1;
-      const noise = run.has('kinh_lup') ? 0 : run.has('mat_mo') ? 0.3 : 0.15;
+      const noise = run.has('kinh_lup') ? 0 : 0.15 * (1 + run.cnt('mat_mo'));   // Mắt Mờ cộng dồn: mỗi bản thêm ±15%
       for (const r of rows) {
         const baitK = r.id === bait ? 1 : 0;
         r.est = Math.round((r.p1 / top) * 100 * (baitK && !run.has('kinh_lup') ? 1.5 : 1) * (1 + (R.next() * 2 - 1) * noise));
@@ -195,8 +222,9 @@
       rum.push({ txt: `${nm(weak.id)} chẳng ai đặt cửa — cửa dưới mà.`, truth: true });
       R.shuffle(rum);
       // Tình Báo: lộ 1 người của nhà cái
-      const spy = run.has('tinh_bao') && H.length ? H[R.int(0, H.length - 1)] : null;
-      return { rows, bait, rumors: rum.slice(0, 3), spy, margin: mg };
+      // Tình Báo: lộ người của nhà cái — mỗi bản lộ thêm 1 người
+      const spies = R.shuffle(H.slice()).slice(0, run.cnt('tinh_bao'));
+      return { rows, bait, rumors: rum.slice(0, 3), spy: spies[0] || null, spies, baitShown: run.cnt('kinh_lup') >= 2 ? bait : null, margin: mg };
     }
     // ----- câu đầu trận -----
     startQuestion() {
@@ -285,7 +313,7 @@
       // điều khoản ẩn: hay gặp hơn khi đang giao kèo, khi nhà cái bực, khi dính "Lời Hứa Ngọt"
       const F = G.BET_FINE[q.type];
       if (F) {
-        const p = 0.15 + (q.contract ? 0.45 : 0) + 0.05 * this.run.annoy + (this.run.fx.fine > 0 ? 1 : 0);
+        const p = (0.15 + (q.contract ? 0.45 : 0) + 0.05 * this.run.annoy + (this.run.fx.fine > 0 ? 1 : 0)) * Math.pow(0.7, Math.max(0, this.run.cnt('doc_chu') - 1));
         if (this.R.next() < p) { const ks = Object.keys(F).filter((k) => !(q.drawOpt && k === 'drawLose')); q.fineKey = ks[this.R.int(0, ks.length - 1)]; q.fine = F[q.fineKey]; }
       }
       this.qs.push(q); this.pending = q; this.nMid++; this.lastQ = this.m.time;
@@ -402,8 +430,8 @@
     }
     // Lật Câu Hỏi: đổi câu đang hỏi sang loại khác (1 lần mỗi trận)
     reroll() {
-      const q = this.pending; if (!q || !q.mid || this.rerolled || !this.run.has('lat_cau')) return null;
-      this.rerolled = true;
+      const q = this.pending; if (!q || !q.mid || (this.rerolls || 0) >= this.run.cnt('lat_cau')) return null;
+      this.rerolls = (this.rerolls || 0) + 1; this.rerolled = this.rerolls >= this.run.cnt('lat_cau');
       const tries = [() => this.mkDeath(), () => this.mkVulture(), () => this.mkFight()].filter(() => true);
       for (const f of tries) { const n = f(); if (n && n.type !== q.type) { this.qs = this.qs.filter((x) => x !== q); this.pending = null; this.nMid--; return this.ask(n); } }
       return q;
@@ -434,7 +462,7 @@
     // ----- phân xử -----
     onEvent(e) {
       const m = this.m;
-      if (e.type === 'kill' && e.vulture && this.run.has('mat_ken_ken')) { this.money += 60; this.delta += 60; this.vultureGain += 60; }
+      if (e.type === 'kill' && e.vulture && this.run.has('mat_ken_ken')) { const g = 60 * this.run.cnt('mat_ken_ken'); this.money += g; this.delta += g; this.vultureGain += g; }
       for (const q of this.qs) {
         if (q.done || !q.mid) continue;
         if ((q.type === 'fight' || q.type === 'solo_duel') && e.type === 'kill' && (e.victim === q.a || e.victim === q.b)) {
@@ -502,7 +530,7 @@
     }
     payWin(b, amt) {
       const run = this.run;
-      amt *= (run.has('dong_xu') ? 1.1 : 1) * (run.has('tay_nhon') ? 0.9 : 1);
+      amt *= (1 + 0.1 * run.cnt('dong_xu')) * Math.pow(0.9, run.cnt('tay_nhon'));
       amt = Math.round(amt);
       b.status = 'won'; b.payout = amt; b.justWon = true;
       if (b.contract && this.contract && this.contract.ok) this.contract.escrow += amt;   // giữ lại tới cuối trận
@@ -511,7 +539,7 @@
     }
     contractWrong(q, why) {
       const c = this.contract; if (!c || !c.ok) return;
-      if (this.run.has('bao_hiem') && !this.forgiven) { this.forgiven = true; this.say('📜 Bảo Hiểm Giao Kèo đỡ cho bạn ta một lần. Chỉ một lần thôi.'); return; }
+      if ((this.forgives || 0) < this.run.cnt('bao_hiem')) { this.forgives = (this.forgives || 0) + 1; this.forgiven = true; this.say(`📜 Bảo Hiểm Giao Kèo đỡ cho bạn ta (lần ${this.forgives}/${this.run.cnt('bao_hiem')}).`); return; }
       c.ok = false; c.failQ = q.id; c.why = why;
       this.say(pickLine(this.R, 'contractFail'));
     }
@@ -544,7 +572,7 @@
         if (win) this.payWin(b, b.stake * mult);
         else {
           b.status = 'lost';
-          if (run.has('luoi_an_toan')) { const g = Math.round(b.stake * 0.5); this.money += g; this.delta += g; lines.push(`🕸 Lưới An Toàn hoàn ${g}`); }
+          if (run.has('luoi_an_toan')) { const k = 1 - Math.pow(0.5, run.cnt('luoi_an_toan')), g = Math.round(b.stake * k); this.money += g; this.delta += g; lines.push(`🕸 Lưới An Toàn ×${run.cnt('luoi_an_toan')} hoàn ${g} (${Math.round(k * 100)}%)`); }
           if (b.stake >= 500) run.addAnnoy(-1);
         }
       }

@@ -14,11 +14,13 @@
     run: null, bk: null, sel: null,
     // ---------- lưu / tải ----------
     load() { try { const o = JSON.parse(localStorage.getItem(KEY) || 'null'); return o && o.v ? G.Run.from(o) : null; } catch (e) { return null; } },
-    save() { try { if (this.run && !this.run.over) localStorage.setItem(KEY, JSON.stringify(this.run)); else localStorage.removeItem(KEY); } catch (e) { /* bỏ qua */ } },
-    saved() { const r = this.load(); return r && !r.over ? r : null; },
+    // ván đã TỰ DO vẫn được giữ (để chơi tiếp vô tận)
+    save() { try { if (this.run && (!this.run.over || this.run.result === 'free')) localStorage.setItem(KEY, JSON.stringify(this.run)); else localStorage.removeItem(KEY); } catch (e) { /* bỏ qua */ } },
+    saved() { const r = this.load(); return r && (!r.over || r.result === 'free') ? r : null; },
     newRun() { this.run = new G.Run('run-' + Math.floor(Math.random() * 1e9).toString(36)); this.run.lastLine = G.HOUSE_LINES.greet[0]; this.save(); this.hub(); },
     resume() {
       this.run = this.load(); if (!this.run) return G.App.menu();
+      if (this.run.over) return this.end();
       // thoát giữa trận = bỏ trận (tiền cược đã trừ, không được hoàn)
       if (this.run.live) { const n = this.run.live; this.run.live = null; this.run.log.push({ t: n, txt: `Trận ${n}: bạn ta bỏ ngang — tiền đã cược nhà cái giữ.` }); this.run.afterMatch({ delta: 0 }); this.save(); return this.shop(); }
       if (this.run.shop && this.run.idx > 0 && !this.run.shopLeft) return this.shop();
@@ -32,19 +34,37 @@
       return `<div class="house"><div class="hface">🎩<span class="hm">${mood}</span></div><div class="hsay">“${esc(line || r.lastLine || '')}”<small>— Nhà cái</small></div></div>`;
     },
     statusBar() {
-      const r = this.run, B = G.BET, q = r.quotaNeed(), k = Math.min(1, r.money / Math.max(1, q));
-      const left = B.stages.slice(r.stage).reduce((a, s, i, arr) => a + Math.round((i ? s.quota : r.quota()) * (r.stage + i >= B.stages.length - 1 ? 1 : B.installment)), 0) + r.loanDue();
-      return `<div class="bstat"><span>💰 <b>${fmt(r.money)}</b></span>${r.final ? '<span>⚠ <b>TRẬN CỦA NHÀ CÁI</b></span>' : `<span>Chặng <b>${r.stage + 1}/${B.stages.length}</b> • trận <b>${Math.min(r.idx + 1, B.perStage)}/${B.perStage}</b></span>
-        <span>🎯 Cần có khi hết chặng: <b>${fmt(q)}</b> <i class="qbar"><i style="width:${Math.round(k * 100)}%"></i></i> <small class="dim">${r.quotaPay() ? `(nộp ${fmt(r.quotaPay())})` : '(chỉ cần đạt mốc)'}</small></span><span class="dim">Nợ còn phải trả ${fmt(left)}</span>`}
+      const r = this.run, B = G.BET, q = r.quotaNeed(), k = Math.min(1, r.assets() / Math.max(1, q));
+      const left = r.endless ? 0 : B.stages.slice(r.stage).reduce((a, s, i) => a + Math.round((i ? s.quota : r.quota()) * (r.stage + i >= B.stages.length - 1 ? 1 : B.installment)), 0) + r.loanDue();
+      return `<div class="bstat"><span>💰 <b>${fmt(r.money)}</b></span><span title="Sổ tiết kiệm">🏦 <b>${fmt(r.sav)}</b></span>${r.final ? '<span>⚠ <b>TRẬN CỦA NHÀ CÁI</b></span>' : `<span>${r.endless ? `♾ <b>Vô tận</b> — chặng <b>${r.stage + 1}</b>` : `Chặng <b>${r.stage + 1}/${B.stages.length}</b>`} • trận <b>${Math.min(r.idx + 1, B.perStage)}/${B.perStage}</b></span>
+        <span>🎯 Cần có khi hết chặng: <b>${fmt(q)}</b> <i class="qbar"><i style="width:${Math.round(k * 100)}%"></i></i> <small class="dim">(tiền mặt + tiết kiệm${r.endless && r.loans.length ? ', đã tính nợ vay' : ''})</small></span>${r.endless ? `<span class="dim">Kỷ lục vô tận: chặng ${Math.max(r.best, this.bestAll())}</span>` : `<span class="dim">Nợ còn phải trả ${fmt(left)}</span>`}`}
         ${r.loans.length ? `<span>🧾 Vay ${r.loans.map((l) => fmt(l.due)).join(' + ')}</span>` : ''}</div>`;
     },
     charmRow(canDrop) {
-      const r = this.run, B = G.BET, cells = [];
-      for (let i = 0; i < B.slots; i++) {
-        const id = r.charms[i], C = id && CHm()[id];
-        cells.push(C ? `<div class="charm ${C.kind}" title="${esc(C.desc)}"><span class="ci">${C.icon}</span><b>${esc(C.name)}</b><small>${esc(C.desc)}</small>${canDrop && C.kind !== 'bad' ? `<button data-drop="${id}">bỏ</button>` : ''}</div>` : '<div class="charm empty">ô trống</div>');
+      const r = this.run, cells = [], seen = new Set();
+      for (const id of r.charms) {
+        if (seen.has(id)) continue; seen.add(id);
+        const C = CHm()[id], n = r.cnt(id); if (!C) continue;
+        cells.push(`<div class="charm ${C.kind}" title="${esc(C.desc)}"><span class="ci">${C.icon}${n > 1 ? `<b class="stk">×${n}</b>` : ''}</span><b>${esc(C.name)}</b><small>${esc(C.desc)}</small>${canDrop && C.kind !== 'bad' ? `<button data-drop="${id}">bỏ 1</button>` : ''}</div>`);
       }
-      return `<div class="charms">${cells.join('')}</div>`;
+      return `<div class="charms">${cells.join('') || '<div class="charm empty">chưa có charm — mua ở cửa hàng sau trận</div>'}</div>`;
+    },
+    // GĐ9c: sổ tiết kiệm — gửi lượt này, rút được từ lượt sau; tiền nằm trong sổ suốt một trận được lãi % số dư (cộng dồn)
+    bankBox() {
+      const r = this.run, free = r.savFree(), rate = Math.round(r.savRate() * 100);
+      return `<div class="bank"><b>🏦 Sổ tiết kiệm</b> — số dư <b>${fmt(r.sav)}</b>${r.savLock ? ` <small>(${fmt(r.savLock)} vừa gửi, rút được sau trận tới)</small>` : ''} • lãi <b>${rate}%</b>/trận, cộng dồn${r.savEarned ? ` • đã nhận ${fmt(r.savEarned)} tiền lãi` : ''}
+        <div class="row stake"><label>Gửi <input id="bkIn" type="number" min="10" step="10" value="${Math.max(0, Math.round(r.money * 0.25 / 10) * 10)}"></label><button id="bkDep" ${r.money <= 0 ? 'disabled' : ''}>⬇ Gửi</button><button id="bkAll" ${r.money <= 0 ? 'disabled' : ''}>Gửi hết</button>
+          <button id="bkOut" ${free <= 0 ? 'disabled' : ''}>⬆ Rút ${fmt(free)}</button></div>
+        <small class="dim">Tiết kiệm không dùng để cược trong trận được, nhưng vẫn tính vào chỉ tiêu cuối chặng.</small></div>`;
+    },
+    bindBank() {
+      const r = this.run, go = (f) => { const e = f(); if (e) G.Dlg.alert(e); else r.lastLine = G.HOUSE_LINES.bank[0]; this.save(); this.refreshCur(); };
+      if ($('#bkDep')) $('#bkDep').onclick = () => go(() => r.deposit(+$('#bkIn').value || 0));
+      if ($('#bkAll')) $('#bkAll').onclick = () => go(() => r.deposit(r.money));
+      if ($('#bkOut')) $('#bkOut').onclick = () => go(() => r.withdraw(r.savFree()));
+    },
+    bestAll() { try { return +(localStorage.getItem('kdc_best_v1') || 0); } catch (e) { return 0; } },
+    saveBest(n) { try { if (n > this.bestAll()) localStorage.setItem('kdc_best_v1', String(n)); } catch (e) { /* bỏ qua */ }
     },
     bindDrop() { for (const b of document.querySelectorAll('#run [data-drop]')) b.onclick = () => { this.run.drop(b.dataset.drop); this.save(); this.refreshCur(); }; },
     refreshCur() { if (this.cur === 'shop') this.shop(); else this.hub(); },
@@ -54,11 +74,12 @@
       if (r.over) return this.end();
       const log = r.log.slice(-12).reverse().map((x) => `<li>${esc(x.txt)}</li>`).join('');
       this.screen(`${this.houseBox()}${this.statusBar()}
-        <h3>🧿 Charm <small class="dim">(${r.charms.length}/${G.BET.slots} ô)</small></h3>${this.charmRow(true)}
-        <div class="row btns"><button class="big" id="hGo">▶ ${r.final ? 'Vào trận của nhà cái' : `Vào trận ${r.matchNo()}/${r.totalMatches()}`}</button><button id="hMenu">← Màn hình chính</button><button id="hQuit" class="red">🏳 Bỏ ván</button></div>
+        ${this.bankBox()}
+        <h3>🧿 Charm <small class="dim">(${r.charms.length} — không giới hạn, mua trùng thì cộng dồn)</small></h3>${this.charmRow(true)}
+        <div class="row btns"><button class="big" id="hGo">▶ ${r.final ? 'Vào trận của nhà cái' : r.endless ? `Vào trận ${r.idx + 1}/${G.BET.perStage} — vô tận chặng ${r.stage + 1}` : `Vào trận ${r.matchNo()}/${r.totalMatches()}`}</button><button id="hMenu">← Màn hình chính</button><button id="hQuit" class="red">🏳 Bỏ ván</button></div>
         <details class="blog"><summary>📖 Nhật ký nhà cái (${r.log.length})</summary><ul>${log || '<li class="dim">chưa có gì</li>'}</ul></details>
-        <details class="blog"><summary>📜 Luật chơi</summary><div class="hint">Bạn nợ nhà cái. Mỗi chặng 3 trận; hết chặng phải <b>có đủ chỉ tiêu</b> (thiếu là thua); chặng cuối trả hết nợ (kể cả tiền vay) thì được tự do. Trước trận nhà cái hỏi câu đầu (Ai sống tới cuối / Ai Top 1 / Top 3) và có thể mời ký <b>Giao Kèo N câu</b> (N câu tiếp theo trong trận đều đúng thì ×10 tiền giao kèo; các câu này ở dạng dễ hơn — có / không — nhưng hay có điều khoản chữ nhỏ; sai một câu, kể cả bỏ qua, là mất sạch; không được hủy). Giữa trận, khi có giao tranh / boss / thính… nhà cái tạm dừng để hỏi tiếp. Có thể trả tiền để <b>can thiệp</b> (gọi thính, hồi boss, thu bo) — làm thế khi đang có kèo là "Phô Mai", nhà cái không vui. Nhà cái <b>không trung thực</b>: sức mạnh ước lượng có sai số, có tướng bị thổi phồng, tin đồn có tin giả, và một số tướng là <b>người của nhà cái</b> (không đánh nhau, có thể cùng sống tới cuối → đồng hạng). Luật luôn được ghi ra — kể cả điều khoản chữ nhỏ. Sau mỗi trận: cửa hàng charm (chọn 1 trong 3), quà của nhà cái (có mặt trái), vay tiền (nhận charm xấu).</div></details>`);
-      this.bindDrop();
+        <details class="blog"><summary>📜 Luật chơi</summary><div class="hint">Bạn nợ nhà cái. Mỗi chặng 6 trận; hết chặng phải <b>có đủ chỉ tiêu</b> (tiền mặt + tiết kiệm; thiếu là thua); chặng cuối trả hết nợ (kể cả tiền vay) thì được tự do — rồi có thể <b>chơi tiếp vô tận</b> (chỉ tiêu ×1.6 mỗi chặng). <b>Sổ tiết kiệm</b>: tiền gửi lượt này rút được từ lượt sau; tiền nằm trong sổ suốt một trận được lãi 5% số dư (cộng dồn). Trước trận nhà cái hỏi câu đầu (Ai sống tới cuối / Ai Top 1 / Top 3) và có thể mời ký <b>Giao Kèo N câu</b> (N câu tiếp theo trong trận đều đúng thì ×10 tiền giao kèo; các câu này ở dạng dễ hơn — có / không — nhưng hay có điều khoản chữ nhỏ; sai một câu, kể cả bỏ qua, là mất sạch; không được hủy). Giữa trận, khi có giao tranh / boss / thính… nhà cái tạm dừng để hỏi tiếp. Có thể trả tiền để <b>can thiệp</b> (gọi thính, hồi boss, thu bo) — làm thế khi đang có kèo là "Phô Mai", nhà cái không vui. Nhà cái <b>không trung thực</b>: sức mạnh ước lượng có sai số, có tướng bị thổi phồng, tin đồn có tin giả, và một số tướng là <b>người của nhà cái</b> (không đánh nhau, có thể cùng sống tới cuối → đồng hạng). Luật luôn được ghi ra — kể cả điều khoản chữ nhỏ. Sau mỗi trận: cửa hàng charm (chọn 1 trong 3; không giới hạn số charm, mua trùng thì cộng dồn), quà của nhà cái (có mặt trái), vay tiền (nhận charm xấu).</div></details>`);
+      this.bindDrop(); this.bindBank();
       $('#hGo').onclick = () => this.pre();
       $('#hMenu').onclick = () => G.App.menu();
       $('#hQuit').onclick = () => G.Dlg.confirm('Bỏ ván cược này? Mất hết tiến độ.', 'Bỏ ván', 'Thôi').then((ok) => { if (ok) { this.run.over = true; this.run.result = 'quit'; this.save(); G.App.menu(); } });
@@ -83,7 +104,7 @@
         const i = S.ids.indexOf(row.id), on = i >= 0;
         const odd = mode === 'top1' ? row.o1 : mode === 'survive' ? row.oS : null;
         return `<div class="bcard${on ? ' on' : ''}" data-id="${row.id}" style="--slot:${G.SLOT_COL[row.slot]}">
-          <div class="bh">${dot(row.id)}<b>${esc(hn(row.id))}</b>${on && mode === 'top3' ? `<span class="ord">${i + 1}</span>` : ''}${P.spy === row.id ? '<span class="spy" title="Tình Báo">🕵 người của nhà cái</span>' : ''}</div>
+          <div class="bh">${dot(row.id)}<b>${esc(hn(row.id))}</b>${on && mode === 'top3' ? `<span class="ord">${i + 1}</span>` : ''}${(P.spies || []).includes(row.id) ? '<span class="spy" title="Tình Báo">🕵 người của nhà cái</span>' : ''}${P.baitShown === row.id ? '<span class="spy" title="Kính Lúp ×2">🎈 bị thổi phồng</span>' : ''}</div>
           <div class="bp">${row.pers.icon} ${esc(row.pers.name)}</div>
           <div class="be"><small>Sức mạnh (nhà cái ước)</small> <i class="ebar"><i style="width:${Math.min(100, row.est)}%"></i></i> <b>${row.est}</b></div>
           <div class="bo">${odd ? `<b>×${odd.toFixed(2)}</b>` : `<small>Top 3 ~${Math.round(row.p3 * 100)}%</small>`}</div></div>`;
@@ -182,15 +203,16 @@
       if (q.type === 'fight' || q.type === 'vulture') title += ` <small>${esc(q.a.hero.name)} ⚔ ${esc(q.b.hero.name)}</small>`;
       else if (q.type === 'solo_duel') title += ` <small>${esc(q.a.hero.name)} ⚔ ${esc(q.b.hero.name)} (Không Gian Riêng)</small>`;
       if (q.type === 'boss') title += ` <small>${esc((G.BOSSES[q.bossId] || {}).name || 'boss')}</small>`;
+      const allP = run.cnt('ong_nhom') >= 2;   // Ống Nhòm ×2: mọi câu hiện tỷ lệ thật
       const spy = (q.type === 'fight' || q.type === 'solo_duel') && run.has('ong_nhom') ? `<div class="hint">🔭 ${[q.a, q.b].map((h) => `${esc(h.hero.name)}: cấp ${h.level}, máu ${Math.round(h.hpPct * 100)}%, sức mạnh ${Math.round(this.bk.power(h))}`).join(' • ')} • tỷ lệ thật ~${Math.round(q.opts[0].p * 100)}/${Math.round(q.opts[1].p * 100)}</div>` : '';
-      const opts = q.opts.map((o) => `<button class="qo${this.qKey === o.key ? ' on' : ''}" data-k="${o.key}">${o.hero ? `${dot(o.hero.heroId)} ${esc(o.hero.hero.name)} <small>${Math.round(o.hero.hpPct * 100)}%</small>` : esc(o.label)} <b>×${o.odds.toFixed(2)}</b></button>`).join('');
+      const opts = q.opts.map((o) => `<button class="qo${this.qKey === o.key ? ' on' : ''}" data-k="${o.key}">${o.hero ? `${dot(o.hero.heroId)} ${esc(o.hero.hero.name)} <small>${Math.round(o.hero.hpPct * 100)}%</small>` : esc(o.label)}${allP ? ` <small class="dim">~${Math.round(o.p * 100)}%</small>` : ''} <b>×${o.odds.toFixed(2)}</b></button>`).join('');
       const say = q.type === 'fight' ? 'Giao tranh nổ ra rồi, bạn ta. Ai sẽ là người thắng chung cuộc?' : q.type === 'solo_duel' ? 'Nhà cái bắt 2 thí sinh vào Không Gian Riêng solo! Ai sẽ thắng? Hay hòa/hết giờ?' : q.type === 'boss' ? 'Có kẻ động vào boss. Ai ra đòn cuối?' : q.type === 'drop' ? 'Thính sắp rơi. Ai mở được?' : q.type === 'death' ? 'Đoán xem — ai gục tiếp theo?' : 'Hai kẻ đánh nhau lâu quá… có con kền kền nào không?';
       qb.innerHTML = `<div class="qin">${this.houseBoxMini(say)}
         <div class="qq">${T.icon} <b>${title}</b>${q.contract ? ' <span class="tagc">📜 trong giao kèo</span>' : ''}</div>${spy}
         <div class="qopts">${opts}</div>
         ${q.fine ? `<div class="fine${doc ? ' doc' : ''}">* ${esc(q.fine)}</div>` : ''}
         <div class="row stake"><label>💵 <input id="qStake" type="number" min="${G.BET.minBet}" step="10" value="${this.qStake}"></label>${this.quick('q', run.money)}</div>
-        <div class="row btns"><button class="big" id="qGo" ${this.qKey ? '' : 'disabled'}>✅ Đặt</button><button id="qSkip">${q.contract ? '⏭ Bỏ qua (VỠ giao kèo!)' : '⏭ Bỏ qua'}</button><button type="button" id="qInspect">👁 Xem tình hình trận đấu</button>${run.has('lat_cau') && !this.bk.rerolled ? '<button id="qRe">🔄 Lật câu hỏi</button>' : ''}</div></div>`;
+        <div class="row btns"><button class="big" id="qGo" ${this.qKey ? '' : 'disabled'}>✅ Đặt</button><button id="qSkip">${q.contract ? '⏭ Bỏ qua (VỠ giao kèo!)' : '⏭ Bỏ qua'}</button><button type="button" id="qInspect">👁 Xem tình hình trận đấu</button>${(this.bk.rerolls || 0) < run.cnt('lat_cau') ? `<button id="qRe">🔄 Lật câu hỏi (${run.cnt('lat_cau') - (this.bk.rerolls || 0)})</button>` : ''}</div></div>`;
       qb.classList.remove('hidden');
       for (const b of qb.querySelectorAll('.qo')) b.onclick = () => { this.qKey = b.dataset.k; this.renderQ(); };
       $('#qStake').oninput = (e) => { this.qStake = +e.target.value || 0; };
@@ -284,7 +306,7 @@
       const r = this.run; this.cur = 'shop';
       if (!r.shop) r.shop = r.makeShop();
       const S = r.shop;
-      const offers = S.offer.map((o) => { const C = CHm()[o.id], owned = r.has(o.id); return `<div class="charm shop"><span class="ci">${C.icon}</span><b>${esc(C.name)}</b><small>${esc(C.desc)}</small><button data-buy="${o.id}" ${S.bought || owned || r.money < o.price ? 'disabled' : ''}>${owned ? 'đã mua' : `Mua ${fmt(o.price)}`}</button></div>`; }).join('');
+      const offers = S.offer.map((o) => { const C = CHm()[o.id], n = r.cnt(o.id); return `<div class="charm shop"><span class="ci">${C.icon}${n ? `<b class="stk">đang có ×${n}</b>` : ''}</span><b>${esc(C.name)}</b><small>${esc(C.desc)}</small><button data-buy="${o.id}" ${S.bought || r.money < o.price ? 'disabled' : ''}>${n ? `Mua thêm (×${n + 1}) ${fmt(o.price)}` : `Mua ${fmt(o.price)}`}</button></div>`; }).join('');
       const gift = S.gift && !S.giftDone ? (() => { const C = CHm()[S.gift]; return `<div class="gift">${this.houseBoxMini(G.HOUSE_LINES.gift[0])}<div class="charm gift"><span class="ci">${C.icon}</span><b>${esc(C.name)}</b><small>${esc(C.desc)}</small></div><div class="row btns"><button id="gYes">🎁 Nhận quà</button><button id="gNo">Từ chối</button></div></div>`; })() : '';
       const loans = `<div class="row btns">🏦 Vay: ${G.BET.loans.map((a) => `<button data-loan="${a}">${fmt(a)} <small>(trả ${fmt(a * G.BET.loanRate)})</small></button>`).join('')}</div>
         ${r.loans.map((l, i) => `<div class="row">🧾 Nợ ${fmt(l.amt)} → trả ${fmt(l.due)} (đang mang ${CHm()[l.charm].icon} ${esc(CHm()[l.charm].name)}) <button data-repay="${i}" ${r.money < l.due ? 'disabled' : ''}>Trả nợ</button></div>`).join('')}`;
@@ -292,10 +314,11 @@
       this.screen(`${this.houseBox(G.HOUSE_LINES.shop[0])}${this.statusBar()}
         <h3>🛒 Cửa hàng charm <small class="dim">— chọn 1 trong 3</small></h3><div class="charms">${offers}</div>
         ${gift}
-        <h3>🧿 Charm của bạn</h3>${this.charmRow(true)}
+        ${this.bankBox()}
+        <h3>🧿 Charm của bạn <small class="dim">(không giới hạn, cộng dồn)</small></h3>${this.charmRow(true)}
         <h3>🏦 Vay nhà cái <small class="dim">— nhận một charm xấu, chỉ gỡ khi trả nợ (×${G.BET.loanRate})</small></h3>${loans}
-        <div class="row btns"><button class="big" id="shGo">${stageEnd ? `→ Nộp chỉ tiêu chặng ${r.stage + 1}` : '→ Trận tiếp theo'}</button></div>`);
-      this.bindDrop();
+        <div class="row btns"><button class="big" id="shGo">${stageEnd ? `→ Cuối chặng ${r.stage + 1}: kiểm tra chỉ tiêu` : '→ Trận tiếp theo'}</button></div>`);
+      this.bindDrop(); this.bindBank();
       for (const b of document.querySelectorAll('[data-buy]')) b.onclick = () => { const e = r.buy(b.dataset.buy); if (e) G.Dlg.alert(e); this.save(); this.shop(); };
       for (const b of document.querySelectorAll('[data-loan]')) b.onclick = () => { const e = r.borrow(+b.dataset.loan); if (e) G.Dlg.alert(e); else r.lastLine = G.HOUSE_LINES.loan[0]; this.save(); this.shop(); };
       for (const b of document.querySelectorAll('[data-repay]')) b.onclick = () => { const e = r.repay(+b.dataset.repay); if (e) G.Dlg.alert(e); this.save(); this.shop(); };
@@ -304,27 +327,29 @@
     },
     // ---------- cuối chặng ----------
     quota() {
-      const r = this.run, q = r.quotaNeed(), pay = r.quotaPay(), ok = r.money >= q;
+      const r = this.run, q = r.quotaNeed(), pay = r.quotaPay(), A = r.assets(), ok = A >= q;
       this.screen(`${this.houseBox(ok ? G.HOUSE_LINES.stagePass[0] : G.HOUSE_LINES.stageFail[0])}${this.statusBar()}
-        <h2>🎯 Cuối chặng ${r.stage + 1}: phải có ${fmt(q)}${r.isLast() ? ' (trả hết nợ, kể cả tiền vay)' : pay ? ` — nộp góp ${fmt(pay)}` : ' (đạt mốc là qua)'}</h2>
-        <p>${ok ? `Bạn có ${fmt(r.money)} — đủ.${pay ? ` Nộp ${fmt(pay)}, còn ${fmt(r.money - pay)}.` : ''}` : `Bạn chỉ có ${fmt(r.money)} — thiếu ${fmt(q - r.money)}.${r.isLast() ? '' : ' Có thể quay lại vay nhà cái.'}`}</p>
+        <h2>🎯 Cuối ${r.endless ? 'chặng vô tận' : 'chặng'} ${r.stage + 1}: phải có ${fmt(q)}${r.isLast() ? ' (trả hết nợ, kể cả tiền vay)' : r.endless ? ' (đã cộng nợ vay)' : pay ? ` — nộp góp ${fmt(pay)}` : ' (đạt mốc là qua)'}</h2>
+        <p>Tài sản: 💰 ${fmt(r.money)} + 🏦 ${fmt(r.sav)} = <b>${fmt(A)}</b> — ${ok ? `đủ.${pay ? ` Trả ${fmt(pay)} (trừ tiền mặt trước, thiếu thì rút từ sổ), còn ${fmt(A - pay)}.` : ''}` : `thiếu ${fmt(q - A)}.${r.isLast() || r.endless ? '' : ' Có thể quay lại vay nhà cái.'}`}</p>
         <div class="row btns">${ok ? '<button class="big" id="qPay">💸 Nộp chỉ tiêu</button>' : '<button id="qLoan">🏦 Quay lại vay</button><button class="red" id="qGive">Chịu thua</button>'}</div>`);
       if ($('#qPay') && !pay) $('#qPay').textContent = r.isLast() ? '💸 Trả hết nợ' : '✅ Qua chặng';
-      if ($('#qPay')) $('#qPay').onclick = () => { r.payQuota(); r.lastLine = r.final ? G.HOUSE_LINES.finalIntro[0] : G.HOUSE_LINES.stagePass[0]; this.save(); r.over ? this.end() : this.hub(); };
+      if ($('#qPay')) $('#qPay').onclick = () => { r.payQuota(); r.lastLine = r.final ? G.HOUSE_LINES.finalIntro[0] : G.HOUSE_LINES.stagePass[0]; if (r.endless) this.saveBest(r.best); this.save(); r.over ? this.end() : this.hub(); };
       if ($('#qLoan')) $('#qLoan').onclick = () => { r.shop = r.shop || { offer: [], gift: null, bought: true, giftDone: true }; this.shop(); };
       if ($('#qGive')) $('#qGive').onclick = () => { r.payQuota(); this.save(); this.end(); };
     },
     // ---------- kết cục ----------
     end() {
-      const r = this.run, res = r.result;
-      const txt = res === 'free' ? (r.final ? G.HOUSE_LINES.finalWin[0] : G.HOUSE_LINES.endClean[0]) : res === 'house' ? G.HOUSE_LINES.finalLose[0] : res === 'debt' ? G.HOUSE_LINES.stageFail[0] : 'Bạn ta bỏ cuộc giữa chừng.';
-      const title = res === 'free' ? '🕊 TỰ DO' : res === 'house' ? '🎩 NHÀ CÁI THẮNG' : res === 'debt' ? '⛓ VỠ NỢ' : '🏳 BỎ CUỘC';
+      const r = this.run, res = r.result, wasFinal = r.hist.length && r.hist[r.hist.length - 1].final;
+      if (r.endless) this.saveBest(r.best);
+      const txt = res === 'free' ? (wasFinal ? G.HOUSE_LINES.finalWin[0] : G.HOUSE_LINES.endClean[0]) + ' ' + G.HOUSE_LINES.endless[0] : res === 'house' ? G.HOUSE_LINES.finalLose[0] : res === 'debt' ? G.HOUSE_LINES.stageFail[0] : res === 'endless' ? G.HOUSE_LINES.endlessFail[0] : 'Bạn ta bỏ cuộc giữa chừng.';
+      const title = res === 'free' ? '🕊 TỰ DO' : res === 'house' ? '🎩 NHÀ CÁI THẮNG' : res === 'debt' ? '⛓ VỠ NỢ' : res === 'endless' ? `♾ VÔ TẬN — DỪNG Ở CHẶNG ${r.stage + 1}` : '🏳 BỎ CUỘC';
       const H = r.hist.map((h) => `<span class="rk">Trận ${h.n}${h.final ? ' (nhà cái)' : ''}: <b class="${h.delta >= 0 ? 'gold' : 'warn'}">${h.delta >= 0 ? '+' : ''}${fmt(h.delta)}</b></span>`).join('');
       this.save();
       this.screen(`${this.houseBox(txt)}<h1 class="${res === 'free' ? 'gold' : 'warn'}">${title}</h1>
-        <p>💰 Cuối cùng: ${fmt(r.money)} • đã qua ${r.hist.length} trận • nhà cái ${G.HOUSE_LINES.mood[r.mood()]}</p><div class="ranks">${H}</div>
+        <p>💰 Cuối cùng: ${fmt(r.money)} + 🏦 ${fmt(r.sav)} • đã qua ${r.hist.length} trận • nhà cái ${G.HOUSE_LINES.mood[r.mood()]}${r.endless || this.bestAll() ? ` • kỷ lục vô tận: chặng ${Math.max(r.best, this.bestAll())}` : ''}</p><div class="ranks">${H}</div>
         <details class="blog"><summary>📖 Nhật ký nhà cái</summary><ul>${r.log.slice().reverse().map((x) => `<li>${esc(x.txt)}</li>`).join('')}</ul></details>
-        <div class="row btns"><button class="big" id="eNew">🎲 Ván mới</button><button id="eMenu">← Màn hình chính</button></div>`);
+        <div class="row btns">${res === 'free' ? '<button class="big" id="eEnd">♾ Chơi tiếp vô tận</button>' : ''}<button class="${res === 'free' ? '' : 'big'}" id="eNew">🎲 Ván mới</button><button id="eMenu">← Màn hình chính</button></div>`);
+      if ($('#eEnd')) $('#eEnd').onclick = () => { r.goEndless(); r.lastLine = G.HOUSE_LINES.endless[0]; this.save(); this.hub(); };
       $('#eNew').onclick = () => this.newRun();
       $('#eMenu').onclick = () => G.App.menu();
     },

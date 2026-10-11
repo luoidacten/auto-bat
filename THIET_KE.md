@@ -36,7 +36,7 @@
 - KN để lên cấp: 200 + 90 × (cấp − 1). Tổng KN tới cấp 18: 15640.
 - KN hạ tướng (người ra đòn cuối): 120 + 30 × cấp nạn nhân. Không có KN hỗ trợ.
 - **KN đuổi kịp**: thấp hơn cấp trung bình của những người còn trong trận thì KN quái +20% mỗi cấp (tối đa ×1.6); cao hơn trung bình quá 2 cấp thì −8% mỗi cấp (tối thiểu ×0.75).
-- Máu tướng ×2.4 so với bản MOBA; tướng kiểu "Lì đòn" thêm ×1.15. Sát thương tướng (và vật triệu hồi) lên tướng ×0.72 (GĐ8: từ 0.55; 10 phút đầu tăng dần từ ×0.8 lên đủ) → giao tranh 10–120s tùy trận và người đánh.
+- Máu tướng ×2.4 so với bản MOBA; tướng kiểu "Lì đòn" thêm ×1.15. Sát thương tướng (và vật triệu hồi) lên tướng ×0.6 (GĐ8: từ 0.55; 10 phút đầu tăng dần từ ×0.8 lên đủ) → giao tranh 10–120s tùy trận và người đánh.
 - **Không tự hồi máu** (hồi máu cơ bản = 0). Hồi máu chỉ bằng bình, chiêu, hút máu, thính, thắng quyết đấu. Ngoài giao tranh (5s không trúng đòn, không đánh tướng) chỉ hồi 2% mana tối đa mỗi giây. Hồi mana cơ bản ×1.6, tiêu hao mana ×0.6 (đủ mana để xả chiêu suốt giao tranh dài).
 - **Hồi sinh**: chết trong 30:00 đầu thì được hồi sinh **1 lần** sau 12s, với 70% máu, bất tử 2s, ở điểm xuất phát nằm trong bo xa người khác nhất (không có thì giữa vòng bo kế). Chết lần nữa, hoặc chết sau 30:00 → **bị loại**.
 - **Xếp hạng** theo thứ tự bị loại; nhiều người bị loại trong cùng một bước logic thì đồng hạng. Còn ≤ 1 người → hết trận.
@@ -435,6 +435,15 @@
 | 🧿 Phù Hộ Mệnh | phù | 200 | 1 | Dán lên người 60s: đòn chí mạng kế tiếp chỉ để lại 1 máu và cho khiên 15% máu tối đa. |
 | 🌫 Phù Ẩn Thân | phù | 160 | 1 | Tàng hình 4s (đánh / dùng chiêu thì lộ). |
 | 🌪 Phù Thần Tốc | phù | 110 | 2 | +40% tốc chạy 4s, miễn làm chậm. |
+| 📡 Cột Sóng Trinh Sát | dụng cụ | 130 | 2 | Cắm cột phát sóng tại chỗ (tồn tại 45s): Quét và làm lộ diện toàn bộ tướng địch trong bán kính 16 đv (kể cả núp bụi), vô hiệu hóa tàng hình trong vùng quét. |
+| 🧲 Lựu Đạn Xung Điện | dụng cụ | 150 | 2 | Ném tới điểm trong 7 đv, nổ sau 0.5s (bán kính 2.5 đv): Phá hủy ngay 350 Hộ Giáp (+30/cấp) của mọi mục tiêu và cấm dùng Dây Móc trong 2.5s. |
+| 🪞 Gương Ảo Ảnh Bỏ Túi | dụng cụ | 170 | 1 | Tạo ngay 1 phân thân chạy thẳng về phía trước trong 4s để đánh lừa đối thủ và quái rừng; bản thân nhận tàng hình 1.5s và tăng 25% tốc chạy. |
+| ❄ Bẫy Băng Cổ | dụng cụ | 110 | 3 | Đặt bẫy ẩn (90s): Kẻ địch giẫm phải bị Đóng Băng (choáng tuyệt đối) 1.2s, sau đó mặt sàn hóa băng trơn trượt làm giảm 40% khả năng kiểm soát hướng chạy trong 3s. |
+| 🩸 Dược Huyết Chiến | phù | 160 | 2 | Uống tức thì: Nhận 20% Hút Máu và +15% Công Vật Lý / Công Phép trong 8s, nhưng giảm 30% lượng Hộ Giáp hiện có của bản thân. |
+| 🧪 Dầu Đạn Ăn Mòn | phù | 140 | 2 | Thoa lên vũ khí (hiệu lực 12s): 4 đòn đánh hoặc phát bắn kế tiếp nhận thêm 50% Xuyên Thủng Hộ Giáp (sát thương đánh thẳng vào Máu Đỏ). |
+| 🪨 Phù Thạch Hóa | phù | 190 | 1 | Hóa đá cơ thể tại chỗ trong 2.0s: Bất động hoàn toàn, miễn nhiễm 100% mọi loại sát thương và khống chế (không bị bão bo đốt máu trong thời gian này). |
+| 💨 Bom Khói Dập Lửa | dụng cụ | 120 | 2 | Ném xuống chân tạo màn khói dày đặc bán kính 4 đv trong 5s: Chặn đứng mọi tầm nhìn từ bên ngoài vào, dập tắt các hiệu ứng Thiêu Đốt và Vết Thương Sâu trên người đứng bên trong. |
+| 🪶 Dây Móc Tiếp Tốc | dụng cụ | 180 | 2 | Bắn móc kéo thẳng bản thân về phía mục tiêu tướng hoặc quái lớn trong 8.5 đv: Gây choáng 0.5s khi chạm mục tiêu và lập tức hồi 1 phát lướt ngắn 2.5 đv. |
 - AI dùng: thanh tẩy khi bị khống chế cứng; phù kháng độc khi đứng ngoài bo; hộ mệnh / lá chắn / hồi máu khi bị đánh mà máu thấp; bỏ chạy bị bám sát → dây móc / tốc biến / ẩn thân / thần tốc / tốc hành / kiệt sức; đánh nhau → thiêu đốt / trừng trị kết liễu, bom vào kẻ bị khống chế, kiệt sức kẻ đang thắng mình; trừng trị cướp boss; bẫy dưới chân khi bị đuổi hoặc trên lối vào chỗ núp; dịch chuyển về Thương Nhân khi xa bo và vắng người. Mua theo "balo mong muốn" của tính cách.
 - **Rương đồ**: mỗi vùng 5 rương lúc đầu + 1 rương trong mỗi nhà / đền / cao nguyên / tháp canh; mỗi 120s thêm 5 rương trong vòng bo kế tiếp (tới phút 40). Mở mất 1.5s (đứng yên, bị đánh / khống chế thì hỏng): 2 vật phẩm ngẫu nhiên + 60 vàng, 15% nâng balo, 8% ý niệm +1. AI không mở rương khi vừa bị đánh hoặc có đối thủ trong 8 đv.
 - **May Mắn** (GĐ8): rương có thêm món (theo may mắn), ưu tiên món giá cao hơn; tỉ lệ ra mảnh hồn (15%), nâng balo, ý niệm ×(1 + may mắn).
@@ -726,7 +735,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S2 — Rút Bài May Rủi** (hồi 6/6/5.5/5.5/5s, 50/50/50/50/50 mana): Rút một lá: ♠ sát thương • ♣ khống chế ngẫu nhiên • ♦ nổ lan • ♥ hồi máu đồng minh • 🃏 đổi chỗ — áp lên tướng địch gần nhất trong 6 đv, rồi giữ lá đó. 10% rút hụt (hoàn 50% hồi chiêu).
 - **S3 — Tráo Bài** (hồi 10/9.5/9/8.5/8s, 40/40/40/40/40 mana): Lướt 3 đv và đổi lá bài đang giữ.
 - **S4 — Ván Cờ Đổi Chiều** (hồi 110/90/70s, 100/100/100 mana): Tung hộp bài lên trời: 45% Lá Toàn Năng (mọi chất cùng lúc lên mục tiêu) • 30% Đại Bác Bài (quét đường thẳng 10 đv) • 20% Tráo Sinh Mệnh (đổi % máu với tướng địch, chênh tối đa 30%) • 4.8% Cơn Ác Mộng (choáng 2.5s, kẻ quanh đó 1.5s) • 0.2% Thần Chết Bịp Bợm (kết liễu lập tức).
-- **Skill phụ — Mượn Tý Nha!** (hồi 40s): Khi ai đó trong tầm nhìn dùng món kích hoạt hoặc phép bổ trợ, Joker có 10s để dùng bản sao của nó.
+- **Skill phụ — Mượn Tý Nha!** (hồi 0s): Khi ai đó trong tầm nhìn dùng món kích hoạt, vật phẩm tiêu hao hoặc phép bổ trợ, Joker có 10s để dùng bản sao của nó (hồi chiêu 0s).
 
 ### Kazuki (kazuki) — 💣 Kẻ Đổi Mạng
 - Cận chiến • tài nguyên: không dùng mana • sát thương chính: vật lý
@@ -761,7 +770,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - Tầm xa • tài nguyên: mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 560 (+88), mana 320 (+40), công 54 (+3.3), giáp 26 (+3.8), KP 30 (+1.3), tốc đánh 0.7 (+3%), tốc chạy 3.62, tầm 6
 - **Nội tại — Dồn Dập:** Sát thương gốc yếu nhưng chạy nhanh. Mỗi phát bắn trúng (đánh thường hoặc tên Trận Địa) +10% sát thương (tối đa 8 tầng = +80%); 2.5s không bắn trúng thì mất hết.
-- **S1 — Trận Địa Nỏ** (hồi 8/7.5/7/6.5/6s, 50/50/50/50/50 mana): ĐỨNG YÊN mở trận địa bán kính 5 tối đa 5s: mỗi 0.15s tự bắn một mũi tên (24% SMVL, cộng Dồn Dập) vào kẻ địch gần nhất trong vùng. Di chuyển thì dừng (Lướt Chiến Thuật dời trận địa theo). Chỉ hồi chiêu khi trận địa kết thúc.
+- **S1 — Trận Địa Nỏ** (hồi 8/7.5/7/6.5/6s, 50/50/50/50/50 mana): ĐỨNG YÊN mở trận địa bán kính [10, 15, 18, 20, 25] tối đa [5, 8, 8, 8, 10]s: mỗi 0.15s tự bắn một mũi tên (24% SMVL, cộng Dồn Dập) vào kẻ địch gần nhất trong vùng. Di chuyển thì dừng (Lướt Chiến Thuật dời trận địa theo). Chỉ hồi chiêu khi trận địa kết thúc.
 - **S2 — Móc & Đạp** (hồi 10/9.5/9/8.5/8s, 50/50/50/50/50 mana): Bắn móc 7 đv: kéo kẻ trúng về sát Percy, choáng 0.75s rồi đạp văng 3.5 đv. Dùng được khi đang mở Trận Địa.
 - **S3 — Lướt Chiến Thuật** (hồi 6/6/5.5/5.5/5s, 30/30/30/30/30 mana): Lướt 4 đv theo hướng chỉ định; dùng khi đang mở Trận Địa thì dời trận địa theo (không làm dừng).
 - **S4 — Liên Châu** (hồi 80/70/60s, 100/100/100 mana): 4s: mỗi phát đánh thường và mỗi loạt Trận Địa bắn ra 3 mũi tên thay vì 1 (mũi phụ 60%).
@@ -828,21 +837,21 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 ### Vesper (vesper) — 👻 Thoát Xác
 - Cận chiến • tài nguyên: mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 560 (+86), mana 300 (+36), công 64 (+4), giáp 27 (+3.6), KP 30 (+1.4), tốc đánh 0.78 (+3%), tốc chạy 3.65, tầm 1.35
-- **Nội tại — Đâm Sau Lưng:** Đòn đánh và chiêu từ sau lưng mục tiêu +40% sát thương và câm lặng 0.75s (mỗi mục tiêu 1 lần mỗi 8s). Đánh thường là những nhát chém nhanh.
+- **Nội tại — Đâm Sau Lưng:** Đòn đánh và chiêu từ sau lưng mục tiêu +40% sát thương và câm lặng 0.75s (mỗi mục tiêu 1 lần mỗi 8s). Đòn đánh đầu tiên khi chưa bị phát hiện gây gấp đôi (x2) sát thương. Đánh thường là những nhát chém nhanh.
 - **S1 — Phi Dao Ảnh Bộ** (hồi 9/8.5/8/7.5/7s, 45/45/45/45/45 mana): Ném dao độc 7 đv: sát thương, câm lặng 1s, độc 3s. Trúng thì trong 2s dùng lại để dịch chuyển ra sau lưng mục tiêu.
 - **S2 — Xuyên Tâm** (hồi 8/7.5/7/6.5/6s, 40/40/40/40/40 mana): Lao 4 đv xuyên qua kẻ địch, chém mạnh mọi kẻ trên đường (từ sau lưng mạnh hơn).
-- **S3 — Ẩn Thân** (hồi 16/15/14/13/12s, 60/60/60/60/60 mana): Tàng hình 2.5s, +40% tốc chạy. Bị lộ khi đứng sát địch (2.5 đv) hoặc khi ra đòn.
-- **S4 — Bão Phi Đao** (hồi 100/85/70s, 100/100/100 mana): Phóng 10 dao quanh người (6 đv); trúng tướng thì dịch chuyển ra sau lưng tướng gần nhất bị trúng, đòn đánh kế tiếp trong 3s gây gấp đôi.
+- **S3 — Ẩn Thân** (hồi 16/15/14/13/12s, 60/60/60/60/60 mana): Tàng hình 2.5s, +40% tốc chạy. Nội tại: ngụy trang sau 5s ngoài giao tranh (lộ khi đứng trong 2.5 đv).
+- **S4 — Bão Phi Đao** (hồi 100/85/70s, 100/100/100 mana): Phóng 10 dao quanh người (6 đv); trúng tướng thì dịch chuyển ra sau lưng tướng gần nhất bị trúng, đòn đánh kế tiếp trong 3s gây gấp đôi. Nếu tung khi chưa bị phát hiện: nhận 50% xuyên giáp và 100% xuyên Hộ Giáp (đánh thẳng vào Máu Đỏ).
 
 ### Victoria (victoria) — 🦅 Kền Kền
-- Tầm xa • tài nguyên: mana • sát thương chính: vật lý
-- Chỉ số cấp 1: máu 570 (+88), mana 380 (+45), công 54 (+3), giáp 28 (+3.9), KP 30 (+1.5), tốc đánh 0.62 (+1.5%), tốc chạy 3.35, tầm 5
-- **Nội tại — Quân Lệnh:** 3 Lính Tinh Nhuệ đi theo và bắn mục tiêu của Victoria (chết thì 30s sau hồi sinh). Ai đánh Victoria thì cả đội lính nhắm kẻ đó và đuổi tới khi cách Victoria quá xa (13 đv) hoặc bị thu hồi (Victoria rút lui, hoặc lính sắp chết). Hào quang theo dạng (đồng minh trong 6 đv): 🔫 Lục +giáp/kháng phép • 🔥 AR +10% sát thương • 🚩 Cờ +10% tốc chạy, −20% thời gian bị khống chế.
+- Cận chiến • tài nguyên: mana • sát thương chính: vật lý
+- Chỉ số cấp 1: máu 580 (+88), mana 380 (+45), công 56 (+3.2), giáp 28 (+3.9), KP 30 (+1.5), tốc đánh 0.62 (+1.5%), tốc chạy 3.35, tầm 2.4
+- **Nội tại — Quân Lệnh & Cờ Chiến:** 3 Lính Tinh Nhuệ hộ vệ và chiến đấu cùng Victoria (chết thì 30s sau hồi sinh). Ưu tiên thế Cờ: Victoria và lính đánh cận chiến càn lướt, lính +25% tốc chạy và kháng khống chế. Hào quang (đồng minh trong 6 đv): 🚩 Cờ +12% tốc chạy, −25% thời gian bị khống chế • 🔥 AR +10% sát thương • 🔫 Lục +giáp/kháng phép.
 - **S1 — Hỏa Lực Theo Dạng** (hồi 6/5.5/5/4.5/4s, 40/40/40/40/40 mana): 🔫 Lục: 1 phát súng lục mạnh • 🔥 AR: loạt 5 viên hình nón • 🚩 Cờ: quét cờ hình vành khuyên (1.5–3.5 đv) làm chậm 30%.
 - **S2 — Thiết Lập Thế Trận** (hồi 12/11.5/11/10.5/10s, 60/60/60/60/60 mana): 🔫 Lục: lướt 3 đv + lá chắn • 🔥 AR: lựu đạn bán kính 2 đẩy lùi • 🚩 Cờ: cắm cờ trong 6 đv — đẩy lùi 1.5 đv và choáng 0.75s, tạo Vùng Đất Quân Lệnh 5s (đồng minh bên trong +15% tốc đánh).
 - **S3 — Tổng Lực Tác Chiến** (hồi 16/15/14/13/12s, 70/70/70/70/70 mana): 🔫 Lục: pháo điện từ rơi sau 2s, bán kính 3, choáng 1s • 🔥 AR: bão lửa bán kính 3 trong 3s • 🚩 Cờ: lính xung phong vào mục tiêu, mỗi lính choáng 0.5s.
 - **S4 — Mệnh Lệnh Tuyệt Đối** (hồi 120/100/80s, 100/100/100 mana): Hồi sinh toàn bộ lính; 8s lính hóa Thiết Binh (gấp đôi máu và sát thương); tên lửa nã tướng địch thấp máu nhất trong tầm nhìn (15 đv) mỗi 2s.
-- **Skill phụ — Chuyển Đổi Quân Lệnh** (hồi 6s): Xoay Lục → AR → Cờ. Sang AR: ném flash làm mù tướng địch gần nhất 1s • Sang Cờ: gọi pháo kích vào tướng địch gần nhất • Sang Lục: lướt 2.5 đv + lá chắn.
+- **Skill phụ — Chuyển Đổi Quân Lệnh** (hồi 4s): Xoay Cờ → AR → Lục. Ưu tiên thế Cờ càn lướt cận chiến: gọi pháo kích • Sang AR: ném flash làm mù 1s • Sang Lục: lướt 2.5 đv + lá chắn.
 
 ### Wukong (wukong) — 🃏 Quấy Nhiễu
 - Cận chiến • tài nguyên: không dùng mana • sát thương chính: vật lý
@@ -895,7 +904,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Zero**: 1: a. Thay Đạn Chiến Thuật / b. Giáp Phản Phản Ứng / c. Đạn Gia Tốc • 3: a. Khóa Họng Súng / b. Viên Đạn Áp Chế / c. Khói Ngụy Trang • 6: a. Đạn Chùm Càn Quét / b. Kích Nổ Dấu Ấn / c. Phản Xạ Điệp Viên • 9: a. Băng Đạn Hủy Diệt / b. Nạp Đạn Thần Tốc / c. Xuyên Giáp Quân Dụng • 12: a. Dịch Chuyển Ám Sát / b. Hỏa Lực Tuyệt Mật / c. Triệt Tiêu Hoàn Toàn
 
 ## 19. Nhà cái & đặt cược (GĐ9b — vòng chơi chính)
-- **Ván (run)**: bắt đầu với 1000 tiền; 3 chặng × 3 trận; hết chặng phải **có** 900 / 1300 / 2000 tiền (thiếu → vỡ nợ, thua ván); chặng cuối trả hết nợ (2000 + mọi khoản vay) → tự do; nhưng nếu nhà cái bực ≥ 6 thì phải qua **trận của nhà cái** (đủ 4 người của hắn trong trận, kết thúc trận phải còn ≥ 2000 tiền).
+- **Ván (run)**: bắt đầu với 1000 tiền; 3 chặng × 6 trận; hết chặng phải **có** 1500 / 2500 / 4000 tiền (thiếu → vỡ nợ, thua ván); chặng cuối trả hết nợ (4000 + mọi khoản vay) → tự do; nhưng nếu nhà cái bực ≥ 8 thì phải qua **trận của nhà cái** (đủ 4 người của hắn trong trận, kết thúc trận phải còn ≥ 2500 tiền).
 - **Tỷ lệ**: xác suất gốc từ thống kê mô phỏng (src/data/odds.js — tools/tyle.js: Top 1 = (số lần vô địch + 1) / (số trận + 10), chuẩn hóa trong dàn 10 tướng); tỷ lệ trả = (1 − phần nhà cái) / xác suất, làm tròn 0.05, trong khoảng ×1.05–×30. Phần nhà cái = 8% + 1.5% × mức bực bội + 10% khi dính "Món Quà Nhỏ" + 5% trong 60s sau một lần can thiệp. "Sống tới cuối" tính xác suất ×1.12 (đồng hạng vẫn thắng) nên tỷ lệ thấp hơn "Top 1".
 - **Nhà cái nói dối (nhưng công bằng)**: sức mạnh ước lượng sai số ±15% (Mắt Mờ ±30%, Kính Lúp 0); mỗi trận **thổi phồng** một tướng cửa dưới không phải người của mình (sức mạnh ×1.5, tỷ lệ ×0.8 — trông như cửa trên); 3 tin đồn trước trận có tin giả; người của nhà cái được rút ngắn tỷ lệ ×0.75 (chưa đủ bù lợi thế liên minh). Sau mỗi trận **nhật ký nhà cái** ghi rõ: ai là người của nhà cái, ai bị thổi phồng, tin đồn nào giả.
 - **Câu đầu trận** (chọn 1): 🛡 Ai sẽ sống tới cuối? • 👑 Ai sẽ Top 1? • 🥇 Top 3, 2, 1 là ai?. Top 3: đúng cả 3 đúng thứ tự ×6, đúng 2 vị trí ×3, đủ 3 người sai thứ tự ×2, đúng 1 vị trí ×1 (hoàn tiền); hệ số ×(0.3 ÷ xác suất top 3 trung bình của 3 người chọn, trong 0.5–2.5); chọn toàn 4 cửa trên → ×0.5 và nhà cái bực. Top 1 luôn kèm điều khoản: "Đồng hạng 1 KHÔNG được tính là Top 1."
@@ -909,28 +918,30 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Điều khoản chữ nhỏ** (luôn ghi ra, chữ nhỏ mờ; Đọc Chữ Nhỏ tô đỏ): xác suất gặp = 15% + 45% khi đang giao kèo + 5% × bực bội (Lời Hứa Ngọt: mọi câu). Ai thắng: "Nếu cả hai cùng sống sau 40 giây: tính là THUA (không hoàn tiền)." / "Thắng nghĩa là TỰ TAY hạ đối thủ — bị kẻ khác hạ hộ thì tính là thua." • Ai giết boss: "Boss phải chết trong 90 giây, quá hạn tính là thua (không hoàn tiền)." • Ai lấy thính: "Thính phải bị lấy trong 60 giây sau khi rơi, quá hạn tính là thua." • Ai bị hạ tiếp: "Chết vì bo không tính — chờ người bị hạ tiếp theo." • Kền kền?: "Kền kền phải là TƯỚNG hạ gục; chết vì bo / quái tính là "không".".
 - **Can thiệp** (trả tiền): 📦 Gọi thính 300 • 👑 Hồi sinh boss 400 • 🌀 Thu bo 250 — ×1.5 mỗi lần trong cùng trận, ×(1 + 0.15 × bực bội), Tay Trong −30%. Đang có kèo mở mà can thiệp = **"Phô Mai"** (bực +2; Phô Mai Hảo Hạng chỉ +1), không có kèo = "thêm hỗn loạn" (bực +1). Can thiệp được ghi (tick, loại) để "xem lại" diễn ra y hệt.
 - **Người của nhà cái** (Aria & Oktava, Percy, Elara, Koda): mỗi trận nhà cái cài 0 – (1 + chặng) người (+1 khi bực ≥ 4, +1 khi bực ≥ 7, +1 khi dính Ân Huệ; trận của nhà cái: cả 4), đưa họ vào dàn tướng nếu thiếu; từ chặng 2 có 35% mua chuộc thêm một tướng khác. Họ **liên minh lâu dài, không báo cho ai**: không nhắm / săn / làm kền kền nhau, chung tầm nhìn, đổi đồ thật thà, không kết liên minh tạm với ai. Vỡ vì **lòng tham** (cân nhắc mỗi 10s): thính rơi giữa hai người (theo tính cách: Kẻ Bắt Nạt 55%, Thợ Săn Bắt Lẻ 35%, Lì Lợm 15%, Hòa Bình 5%), bo từ vòng 5 ép sát (6%), chỉ còn toàn người của nhà cái (30%); trúng nhầm nhau ≥ 30% máu cũng vỡ. Dấu hiệu: gặp nhau thì lướt qua, không bao giờ làm kền kền nhau, dòng sự kiện "⚡ trở mặt" khi vỡ.
-- **Bực bội ẩn** (hiện bằng nét mặt 😏 / 😒 / 😠): +2 Phô Mai, +1 can thiệp, +2 thắng giao kèo, +1 thắng một kèo ≥ 1000 và ≥ ×5, +1 chọn toàn cửa trên; −1 nhận quà, −1 vay, −1 thua kèo ≥ 500. Bực càng nhiều: tỷ lệ xấu hơn, điều khoản chữ nhỏ nhiều hơn, nhiều người của nhà cái hơn, can thiệp đắt hơn, quà độc hơn; ≥ 6 sau chặng cuối → trận của nhà cái.
-- **Cửa hàng sau trận**: 3 charm (giá × (1 + 0.1 × chặng), mua tối đa 1), 5 ô charm; 50% có quà của nhà cái; vay 500 / 1000 / 2000 (trả ×1.3, nhận 1 charm xấu ngẫu nhiên, chỉ gỡ khi trả nợ). Thoát giữa trận = bỏ trận (tiền đã cược mất).
+- **Bực bội ẩn** (hiện bằng nét mặt 😏 / 😒 / 😠): +2 Phô Mai, +1 can thiệp, +2 thắng giao kèo, +1 thắng một kèo ≥ 1000 và ≥ ×5, +1 chọn toàn cửa trên; −1 nhận quà, −1 vay, −1 thua kèo ≥ 500. Bực càng nhiều: tỷ lệ xấu hơn, điều khoản chữ nhỏ nhiều hơn, nhiều người của nhà cái hơn, can thiệp đắt hơn, quà độc hơn; ≥ 8 sau chặng cuối → trận của nhà cái.
+- **Cửa hàng sau trận**: 3 charm (giá × (1 + 0.1 × chặng) × (1 + 0.25 × số bản đã có), mua tối đa 1). **GĐ9c: không giới hạn số charm, mua trùng thì CỘNG DỒN** (mỗi bản thêm hiệu lực — xem bảng); 50% có quà của nhà cái (quà cũng cộng dồn); vay 500 / 1000 / 2000 (trả ×1.3, nhận 1 charm xấu ngẫu nhiên, chỉ gỡ khi trả nợ). Thoát giữa trận = bỏ trận (tiền đã cược mất).
+- **GĐ9c — Sổ tiết kiệm**: giữa các trận gửi bao nhiêu cũng được; tiền gửi lượt này **khóa tới hết trận sau** (rút được từ lượt sau). Sau mỗi trận, số dư trong sổ được lãi **5%** và lãi cộng vào sổ (lãi kép). Tiết kiệm không dùng để cược trong trận, nhưng tính vào chỉ tiêu cuối chặng; trả nợ cuối ván trừ tiền mặt trước rồi mới tới sổ.
+- **GĐ9c — 6 trận mỗi chặng** (tổng 18 trận). **Chơi tiếp vô tận**: trả hết nợ (tự do) thì có thể chơi tiếp; mỗi chặng vô tận chỉ tiêu = chặng cuối × 1.6^k, tài sản trừ nợ vay phải ≥ chỉ tiêu (không phải nộp), nhà cái cài thêm 1 người mỗi trận; thiếu là dừng — ghi kỷ lục chặng vô tận.
 | Charm | Loại | Giá | Tác dụng | Mặt trái (giấu) |
 |---|---|---|---|---|
-| 🦅 Mắt Kền Kền | cửa hàng | 350 | Mỗi lần có kền kền ăn mạng trong trận: +60 tiền. | — |
-| 🕸 Lưới An Toàn | cửa hàng | 500 | Cược đầu trận (Sống / Top 1 / Top 3) mà thua vẫn được hoàn 50%. | — |
-| 📜 Bảo Hiểm Giao Kèo | cửa hàng | 600 | Giao kèo được sai 1 câu mỗi trận mà không vỡ (câu đó vẫn mất tiền). | — |
-| 🔄 Lật Câu Hỏi | cửa hàng | 300 | Mỗi trận được đổi một câu hỏi giữa trận sang câu khác (1 lần). | — |
-| 🔍 Đọc Chữ Nhỏ | cửa hàng | 400 | Điều khoản ẩn trong câu hỏi hiện rõ, tô đỏ. | — |
-| 🕵 Tình Báo | cửa hàng | 450 | Trước trận, lộ ra 1 người của nhà cái (nếu trận có). | — |
-| 🧀 Phô Mai Hảo Hạng | cửa hàng | 400 | Lách luật (can thiệp khi đang có kèo) không làm nhà cái bực thêm. | — |
-| 🔎 Kính Lúp Sức Mạnh | cửa hàng | 500 | Sức mạnh ước lượng hiện đúng giá trị thật (không sai số, không bị thổi phồng). | — |
-| 🤝 Tay Trong | cửa hàng | 350 | Can thiệp rẻ hơn 30%. | — |
-| 🪙 Đồng Xu May Mắn | cửa hàng | 550 | Mọi kèo thắng được thêm 10% tiền thưởng. | — |
-| 🔭 Ống Nhòm | cửa hàng | 300 | Câu "Ai thắng?" hiện máu, cấp, sức mạnh và tỷ lệ thật của hai bên. | — |
-| 🔐 Két Sắt | cửa hàng | 450 | Sau mỗi trận được lãi 5% số tiền đang có (tối đa 300). | — |
+| 🦅 Mắt Kền Kền | cửa hàng | 350 | Mỗi lần có kền kền ăn mạng trong trận: +60 tiền (mỗi bản +60). | — |
+| 🕸 Lưới An Toàn | cửa hàng | 500 | Cược đầu trận (Sống / Top 1 / Top 3) mà thua vẫn được hoàn 50% (2 bản 75%, 3 bản 87%…). | — |
+| 📜 Bảo Hiểm Giao Kèo | cửa hàng | 600 | Giao kèo được sai 1 câu mỗi trận mà không vỡ (câu đó vẫn mất tiền). Mỗi bản thêm 1 câu. | — |
+| 🔄 Lật Câu Hỏi | cửa hàng | 300 | Mỗi trận được đổi một câu hỏi giữa trận sang câu khác (mỗi bản thêm 1 lần). | — |
+| 🔍 Đọc Chữ Nhỏ | cửa hàng | 400 | Điều khoản ẩn trong câu hỏi hiện rõ, tô đỏ. Từ bản thứ 2: điều khoản ẩn ít xuất hiện hơn (×0.7 mỗi bản). | — |
+| 🕵 Tình Báo | cửa hàng | 450 | Trước trận, lộ ra 1 người của nhà cái (nếu trận có). Mỗi bản lộ thêm 1 người. | — |
+| 🧀 Phô Mai Hảo Hạng | cửa hàng | 400 | Lách luật (can thiệp khi đang có kèo) làm nhà cái bực ít hơn (1 bản: như can thiệp thường; 2 bản: không bực). | — |
+| 🔎 Kính Lúp Sức Mạnh | cửa hàng | 500 | Sức mạnh ước lượng hiện đúng giá trị thật (không sai số, không bị thổi phồng). Bản thứ 2: chỉ thẳng tướng bị thổi phồng. | — |
+| 🤝 Tay Trong | cửa hàng | 350 | Can thiệp rẻ hơn 30% (cộng dồn: ×0.7 mỗi bản). | — |
+| 🪙 Đồng Xu May Mắn | cửa hàng | 550 | Mọi kèo thắng được thêm 10% tiền thưởng (mỗi bản +10%). | — |
+| 🔭 Ống Nhòm | cửa hàng | 300 | Câu "Ai thắng?" hiện máu, cấp, sức mạnh và tỷ lệ thật của hai bên. Bản thứ 2: mọi câu hỏi hiện tỷ lệ thật. | — |
+| 🔐 Két Sắt | cửa hàng | 450 | Sau mỗi trận được lãi 5% tiền mặt (tối đa 300) — mỗi bản cộng thêm. | — |
 | 🎁 Ân Huệ | quà nhà cái | — | Giảm 20% chỉ tiêu chặng này. | Trận sau có thêm 1 người của nhà cái. |
 | 💝 Món Quà Nhỏ | quà nhà cái | — | Nhận ngay 400 tiền. | Tỷ lệ cược xấu đi (nhà cái ăn thêm 10%) trong 2 trận. |
 | 🍬 Lời Hứa Ngọt | quà nhà cái | — | Giảm 10% chỉ tiêu chặng này. | Mọi câu hỏi có điều khoản ẩn trong 3 trận. |
-| ⛓ Xiềng Nợ | xấu (khi vay) | — | Mỗi trận bị trừ lãi 8% khoản vay. | — |
-| 🌫 Mắt Mờ | xấu (khi vay) | — | Sức mạnh ước lượng sai số gấp đôi. | — |
-| 🫳 Bàn Tay Nhờn | xấu (khi vay) | — | Mỗi kèo thắng bị nhà cái "phí" 10%. | — |
+| ⛓ Xiềng Nợ | xấu (khi vay) | — | Mỗi trận bị trừ lãi 8% khoản vay (mỗi bản thêm 8%). | — |
+| 🌫 Mắt Mờ | xấu (khi vay) | — | Sức mạnh ước lượng sai số thêm ±15% mỗi bản. | — |
+| 🫳 Bàn Tay Nhờn | xấu (khi vay) | — | Mỗi kèo thắng bị nhà cái "phí" 10% (cộng dồn). | — |
 
 ## 18. Giao diện xem trận (trọng tài)
 - Danh sách 10 tướng (màu riêng theo ô xuất phát): cấp, máu, số mạng (🦅 kền kền), ♻ còn lượt hồi sinh, 🧪 bình máu / 💧 bình mana / 💠 số mảnh hồn (viền ảnh đổi màu theo bậc mảnh hồn), việc đang làm (đang đánh ai, đang uống bình, đang quyết đấu), hạng khi bị loại; thu gọn được. Chạm một tướng: camera theo dõi + thẻ tướng (chỉ số, tính cách, balo, ý niệm, mảnh hồn, người được bảo vệ / đồng minh đình chiến, thành tích) + "Đang nghĩ" (3 hành động điểm cao nhất kèm lý do).

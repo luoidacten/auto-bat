@@ -43,13 +43,16 @@ function playRun(G, seed, kieu) {
     run.afterMatch(sum); out.matches++;
     out.money.push(run.money);
     if (run.over) break;
+    // sổ tiết kiệm: thiếu tiền mặt thì rút; dư thì gửi 30% tiền mặt
+    if (run.money < 300 && run.savFree() > 0) run.withdraw(Math.min(run.savFree(), 600 - run.money));
+    else if (run.money > 600) run.deposit(Math.round(run.money * 0.3));
     // cửa hàng
     const S = run.shop;
     if (S.gift && !S.giftDone) run.takeGift(true);
     const want = ['dong_xu', 'luoi_an_toan', 'ket_sat', 'bao_hiem'];
-    for (const o of S.offer) if (want.includes(o.id) && run.money - o.price > run.quota() * 0.6) { run.buy(o.id); break; }
+    for (const o of S.offer) if (want.includes(o.id) && run.money - o.price > 400) { run.buy(o.id); break; }
     if (run.stageEnd()) {
-      while (run.money < run.quota() && run.freeSlots() > 0 && run.loans.length < 3) { const amt = B.loans.find((a) => run.money + a >= run.quota()) || B.loans[B.loans.length - 1]; if (run.borrow(amt)) break; }
+      while (run.assets() < run.quotaNeed() && run.loans.length < 3 && !run.isLast()) { const amt = B.loans.find((a) => run.assets() + a >= run.quotaNeed()) || B.loans[B.loans.length - 1]; if (run.borrow(amt)) break; }
       run.shop = null;
       if (!run.payQuota()) break;
       out.stages++;

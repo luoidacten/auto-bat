@@ -50,7 +50,7 @@
       $('#menu').innerHTML = `
         <div class="title"><h1>🎲 Kẻ Đặt Cược</h1><p>Đấu trường sinh tồn 10 tướng — bạn đứng ngoài nhìn như một trọng tài… và đặt cược</p></div>
         <div class="menu-btns">
-          ${sv ? `<button class="big" id="mResume">▶ Tiếp tục ván cược <small>(chặng ${sv.stage + 1}, trận ${sv.matchNo()} • 💰 ${U.fmt(sv.money)})</small></button>` : ''}
+          ${sv ? `<button class="big" id="mResume">▶ Tiếp tục ván cược <small>(${sv.over ? '🕊 đã tự do — chơi tiếp vô tận?' : `${sv.endless ? '♾ vô tận, ' : ''}chặng ${sv.stage + 1}, trận ${sv.idx + 1} • 💰 ${U.fmt(sv.money)} + 🏦 ${U.fmt(sv.sav || 0)}`})</small></button>` : ''}
           <button class="${sv ? '' : 'big'}" id="mRun">🎲 Ván cược mới</button>
           <button id="mWatch">👁 Xem một trận tự do (không cược)</button>
           <button id="mSolo">⚔ Solo 1v1 • 2 tướng</button>
