@@ -17,6 +17,10 @@
     setupNeutral() {
       this.camps = MAP.camps.map((c) => ({ id: c.id, type: c.type, ring: c.ring, region: c.region, x: c.x, y: c.y, unit: null, nextAt: C.CAMP_FIRST }));
       this.setupBosses();                                 // GĐ8: 4 ổ boss, quái tuần tra, nguy hiểm vùng (bosses.js)
+      this.setupRoamers();                                // GĐ11: quái lang thang & boss nhỏ (roamers.js)
+      // GĐ11: ~45% bãi quái nhỏ là BẦY — 1 Đầu Đàn (máu ×2.2, công ×1.4) + 2 quái con luôn đánh mục tiêu của đầu đàn
+      const pr = new G.Rng(this.seed + ':pack');
+      for (const c of this.camps) c.pack = c.type === 'small' && pr.next() < C.PACK.chance ? [] : null;
       this.drops = C.DROP.times.map((t, i) => ({ id: i, at: t, warned: false, landed: false, taken: false, x: 0, y: 0, openBy: null, openT: 0, by: null }));
     },
     spawnMonster(sub, def, x, y, extra) {
@@ -39,11 +43,22 @@
       const t = this.time;
       // bãi quái
       for (const c of this.camps) {
+        if (c.pack) c.pack = c.pack.filter((x) => x.alive);
         if (c.unit && !c.unit.alive) { c.unit = null; c.nextAt = t + C.CAMP[c.type].respawn; }
-        if (!c.unit && t >= c.nextAt) c.unit = this.spawnMonster(c.type, C.CAMP[c.type], c.x, c.y, { camp: c, skin: c.type === 'small' ? G.MON_SKIN[MAP.REGIONS[c.region].bio] : null });
+        if (!c.unit && t >= c.nextAt && !(c.pack && c.pack.length)) {
+          const skin = c.type === 'small' ? G.MON_SKIN[MAP.REGIONS[c.region].bio] : null;
+          if (c.pack) {
+            const P = C.PACK, D = C.CAMP.small;
+            c.unit = this.spawnMonster(c.type, Object.assign({}, D, { hp: D.hp * P.leadHp, hpMin: D.hpMin * P.leadHp, ad: D.ad * P.leadAd, adMin: D.adMin * P.leadAd, r: 1.1 }), c.x, c.y, { camp: c, skin, packLead: true });
+            c.unit.name = 'Đầu Đàn ' + (c.unit.name || 'Quái');
+            for (let i = 0; i < P.n; i++) { const a = i * 3.14 + 0.8, x = c.x + Math.cos(a) * 1.8, y = c.y + Math.sin(a) * 1.8;
+              c.pack.push(this.spawnMonster('small', Object.assign({}, D, { hp: D.hp * P.memHp, hpMin: D.hpMin * P.memHp }), x, y, { packOf: c, leaderU: c.unit, skin })); }
+          } else c.unit = this.spawnMonster(c.type, C.CAMP[c.type], c.x, c.y, { camp: c, skin });
+        }
       }
       // GĐ8: boss ở 4 ổ, quái tuần tra, nguy hiểm vùng
       this.updateBosses(dt);
+      this.updateRoamers();                               // GĐ11
       // thính
       for (const d of this.drops) this.updateDrop(d, dt);
     },
@@ -106,13 +121,20 @@
       if (!owner || owner.team === C.NEUTRAL) return;
       u.lastHitT = this.time;
       if (u.bossDef) { this.bossHit(u, owner, amt || 0); return; }
+      if (u.roam) { this.roamAggro(u, owner); return; }                // GĐ11: quái lang thang
       if (!u.aggro || !u.aggro.alive || dist(u.aggro, u.home) > C.LEASH + 2) u.aggro = owner;
+      // GĐ11: bầy — đầu đàn và cả bầy cùng nhắm kẻ vừa đánh
+      const L = u.leaderU && u.leaderU.alive ? u.leaderU : u.packLead ? u : null;
+      if (L) { if (!L.aggro || !L.aggro.alive) { L.aggro = owner; L.lastHitT = this.time; } for (const o of (L.camp && L.camp.pack) || []) if (o.alive && (!o.aggro || !o.aggro.alive)) { o.aggro = L.aggro; o.lastHitT = this.time; } }
     },
     monsterThink(u) {
       if (u.bossDef) return this.bossThink(u);
+      if (u.roam) return this.roamThink(u);                               // GĐ11: quái lang thang & boss nhỏ
       const t = this.time;
       if (u.thinkT > t) return;
       u.thinkT = t + 0.2;
+      // GĐ11: quái con trong bầy luôn đánh mục tiêu của đầu đàn
+      if (u.leaderU && u.leaderU.alive && u.leaderU.aggro && u.leaderU.aggro.alive) { u.aggro = u.leaderU.aggro; u.lastHitT = Math.max(u.lastHitT, u.leaderU.lastHitT); }
       if (u.patrol && (!u.aggro || !u.aggro.alive)) this.patrolStep(u);      // GĐ8: quái tuần tra đi vòng quanh ổ boss
       const a = u.aggro;
       const far = dist(u, u.home);
@@ -169,6 +191,12 @@
         return;
       }
       if (u.bossDef) { this.bossDeath(u, hero); return; }
+      if (u.roam) { this.roamDeath(u, hero); return; }                 // GĐ11
+      if (u.packOf) {                                                    // GĐ11: quái con trong bầy
+        if (hero) { const D = C.CAMP.small; this.gainGold(hero, (D.gold + C.CAMP_GOLD_MIN * min) * 0.4); this.gainXP(hero, (D.xp + C.CAMP_XP_MIN * min) * 0.4 * this.catchUp(hero)); }
+        if (this.fxOn) this.fx({ type: 'death', x: u.x, y: u.y, team: C.NEUTRAL });
+        return;
+      }
       // GĐ8: quái tuần tra quanh ổ boss: như bãi vàng + cơ hội mảnh hồn
       if (u.guard) {
         if (hero) { this.gainGold(hero, 120 + 4 * min); this.gainXP(hero, (220 + 6 * min) * this.catchUp(hero)); hero.stats.camps = (hero.stats.camps || 0) + 1; this.campSoul(hero, 'gold'); }

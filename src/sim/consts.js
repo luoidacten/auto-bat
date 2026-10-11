@@ -102,7 +102,8 @@
       small: { hp: 300, hpMin: 40, ad: 10, adMin: 2, armor: 10, mr: 10, as: 0.8, range: 1.6, r: 0.8, gold: 60, xp: 140, respawn: 60, name: 'Quái nhỏ' },
     },
     CAMP_GOLD_MIN: 3, CAMP_XP_MIN: 5,          // vàng/KN quái tăng mỗi phút
-    LEASH: 6.5, LEASH_RESET: 5,                // quái đuổi tối đa 6.5 đv khỏi chỗ, 5s không bị đánh thì về
+    LEASH: 10, LEASH_RESET: 8,                 // GĐ11: quái đuổi tối đa 10 đv khỏi chỗ (cũ 6.5), 8s không bị đánh mới về (cũ 5s — kiên nhẫn hơn)
+    PACK: { chance: 0.45, n: 2, leadHp: 2.2, leadAd: 1.4, memHp: 0.6 },   // GĐ11: bầy quái (đầu đàn + 2 quái con)
     BUFF_TIME: 90,                             // bùa 90s; người mang bùa bị hạ thì bùa sang kẻ hạ gục
     BUFF: { red: { dmgAmp: 0.12, burn: 6 }, blue: { mpr: 6, cdr: 0.15, cdrNoMana: 0.2 }, gold: { goldPct: 0.3, perSec: 1.2 } },
 

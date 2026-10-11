@@ -27,6 +27,7 @@
 
   const ACT = {
     farm:    { name: 'Ăn quái', icon: '🌲', hold: 4 },
+    monhunt: { name: 'Săn quái lang thang', icon: '💀', hold: 5 },   // GĐ11
     hunt:    { name: 'Đi săn', icon: '🎯', hold: 4 },
     boss:    { name: 'Tranh boss', icon: '👑', hold: 5 },
     drop:    { name: 'Tranh thính', icon: '📦', hold: 5 },
@@ -54,6 +55,7 @@
     if (e.shOn && e.shOn.has('G_VIS_04')) return 0;
     const d = dist(e, u), k = 1 + 0.25 * mp;
     if (m.time - Math.max(e.combatT || -99, (e.ws && e.ws.lastHeroHitT) || -99) < 1.5 && d < 30 * k) return 1;
+    if (m.time - ((e.ws && e.ws.roamFightT) || -99) < 1.5 && d < 35 * k) return 1;   // GĐ11: tiếng đánh quái lang thang vang xa 35 đv
     if ((e.dash || m.time - (e.lastDashT || -99) < 0.5) && d < 18 * k) return 1;
     if (e.bush < 0 && e.vx * e.vx + e.vy * e.vy > 0.25 && d < 9 * k) return 1;
     return 0;
@@ -155,6 +157,26 @@
       return { f: [['bãi quái', floor(cl(bs), 0.15)], ['máu', logi(X.hp, 0.3, 12)], ['an toàn', floor(lin(X.perNear(best, 18), 2, 0), 0.2)],
         ['giai đoạn', X.alive <= 3 ? 0.35 : X.phase === 'late' ? 0.65 : 1], ['còn cần KN/vàng', floor(lin(u.level, 18, 10), 0.5)]],
         k: (dở ? 1.5 : 1) * catchK, dir: { type: 'farm', camp: best, point: { x: best.x, y: best.y } } };
+    },
+    // GĐ11: săn nhóm quái lang thang / boss nhỏ trong tầm (thưởng lớn: mảnh hồn, bình to) — đủ sức mới đánh, đông đối thủ quanh thì ngại
+    monhunt(X) {
+      const { m, u } = X;
+      if (!m.roamGroups || !m.roamGroups.length) return null;
+      let best = null, bs = 0;
+      for (const g of m.roamGroups) {
+        const L = g.leader && g.leader.alive ? g.leader : g.units[0]; if (!L) continue;
+        const d = dist(u, L); if (d > 45 || !m.inZone(L, 2)) continue;
+        const cost = g.units.reduce((a, x) => a + X.ai.campCost(x), 0);
+        if (cost > u.hp * 0.8) continue;
+        const val = g.boss ? 2.2 : 1 + 0.25 * g.units.length;
+        let s = lin(d, 45, 6) * floor(lin(cost / Math.max(1, u.hp), 0.8, 0.2), 0.3) * Math.min(1.6, val / 1.5);
+        const crowd = X.perNear(L, 16, 6); if (crowd) s *= Math.pow(0.5, crowd);
+        if (L.aggro === u) s = Math.max(s, 1);
+        if (s > bs) { bs = s; best = L; }
+      }
+      if (!best) return null;
+      return { f: [['quái lang thang', floor(cl(bs), 0.15)], ['máu', logi(X.hp, 0.35, 12)], ['giai đoạn', X.alive <= 3 ? 0.3 : 1], ['còn cần KN/vàng', floor(lin(u.level, 18, 10), 0.4)]],
+        k: best.miniBoss ? 1.15 : 1, dir: { type: 'monhunt', target: best, point: { x: best.x, y: best.y } } };
     },
     hunt(X) {
       const { ai, u } = X;

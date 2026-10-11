@@ -14,6 +14,7 @@
     'sim/combat.js',
     'sim/neutral.js',
     'sim/bosses.js',
+    'sim/roamers.js',
     'sim/arena.js',
     'data/shards.js',
     'sim/extras.js',

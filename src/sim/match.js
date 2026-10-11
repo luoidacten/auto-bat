@@ -855,7 +855,7 @@
       };
     }
   }
-  Object.assign(Match.prototype, G.Combat, G.Neutral, G.BossMix, G.ArenaMix, G.ExtrasMix, G.BagMix, G.PropMix, G.ItemMix, G.TreeMix, G.DecoyMix, G.HouseMix);
+  Object.assign(Match.prototype, G.Combat, G.Neutral, G.BossMix, G.ArenaMix, G.ExtrasMix, G.BagMix, G.PropMix, G.ItemMix, G.TreeMix, G.DecoyMix, G.HouseMix, G.RoamMix);
   G.Match = Match;
   G.DEFAULT_PLAYER = DEFAULT_PLAYER;
 })();

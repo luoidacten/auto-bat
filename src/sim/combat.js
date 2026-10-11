@@ -84,6 +84,15 @@
         if (owner && owner.mastMul && tgt.kind === 'hero') a *= owner.mastMul;
         if (owner && owner.kind === 'hero' && G.heroCurve) a *= 1 + G.heroCurve(owner);                                 // GĐ5c: giai đoạn mạnh của tướng
         if (tgt.kind === 'monster' && owner && owner.bonus && owner.bonus.monsterAmp) a *= 1 + owner.bonus.monsterAmp;
+        // GĐ11: quái lang thang — khiên mặt trước, vỏ cản đạn, lốc xoáy phản đạn, bùn hấp thụ
+        if (tgt.rdef && owner) {
+          const R0 = tgt.rdef;
+          if (R0.front && ((owner.x - tgt.x) * tgt.fx + (owner.y - tgt.y) * tgt.fy) > 0) a *= 1 - R0.front;
+          if (R0.shell && owner.ranged) a *= 0.7;
+          if (tgt.ws.reflect > this.time && owner.ranged && info.auto && owner.alive) { const back = a * 0.5; this.later(0, (mm) => owner.alive && mm.damage(tgt, owner, back, 'phys', { tag: 'mob', noHook: true })); }
+          if (tgt.ws.absorb && tgt.ws.absorb.until > this.time) tgt.ws.absorb.got += a;
+          if (R0.mirror && this.time >= (tgt.ws.mirT || 0)) { tgt.ws.mirT = this.time + 6; this.addStatus(tgt, 'stealth', 1, 1, { key: 'mb_mirror' }); const v = G.M.dir(owner, tgt); this.later(0, (mm) => mm.blink(tgt, tgt.x + v.x * 2, tgt.y + v.y * 2)); }
+        }
         if (info.type === 'magic' && tgt.cursedT > this.time) a *= 1.1;
         if (info.crit && tgt.bonus.critRed) a *= 1 - tgt.bonus.critRed * 0.5;
         if (info.auto && tgt.bonus.autoRed && owner && owner.kind === 'hero') a *= 1 - tgt.bonus.autoRed;

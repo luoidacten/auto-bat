@@ -229,6 +229,7 @@
       switch (d.type) {
         case 'farm': return this.farmMicro(d);
         case 'boss': return this.bossMicro(d);
+        case 'monhunt': { const T0 = d.target; if (!T0 || !T0.alive) { this.decT = 0; return; } if (dist(this.u, T0) > this.u.st.range + this.u.r + T0.r + 0.3) return this.goTo(T0); return this.hitMonster(T0); }   // GĐ11
         case 'drop': return this.dropMicro(d);
         case 'hunt': return this.huntMicro(d);
         case 'hide': return this.stayAt(d.point, d.bush ? d.bush.r * 0.5 : 1.5);

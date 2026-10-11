@@ -333,6 +333,9 @@
         case 'boss_kill': return e.hero ? `👑 ${nm(e.hero)} hạ ${bossNm(e.boss)}${buffNm(e.boss) ? ' → ' + buffNm(e.boss) : ''}` : `👑 ${bossNm(e.boss)} bị hạ`;
         case 'buff_save': { const B0 = G.BOSS_BUFFS[e.buff]; return B0 ? `${B0.icon} ${nm(e.hero)} thoát chết nhờ <b>${esc(B0.name)}</b>` : null; }
         case 'treasure': return `✨ ${nm(e.hero)} nhận: ${(e.items || []).map((id) => { const I = (G.GOLDEN && G.GOLDEN[id]) || (G.SHARDS && G.SHARDS[id] && { icon: '✨', name: G.SHARDS[id].n }); return I ? `<b style="color:#fff099">${I.icon} ${esc(I.name)}</b>` : ''; }).join(', ')}`;
+        case 'roam_group': return `${e.icon} Nhóm ${esc(e.name)} đang đi tuần (${esc(G.MAP.regionAt(e.x, e.y).name)})`;
+        case 'roam_boss': return `${e.icon} <b>${esc(e.name)}</b> xuất hiện ở ${esc(G.MAP.regionAt(e.x, e.y).name)}`;
+        case 'roam_boss_kill': return `💀 ${nm(e.hero)} hạ boss nhỏ <b>${esc(e.name)}</b>`;
         case 'rel_line': return `💬 ${nm(e.hero)} gặp ${nm(e.other)}: <i>${esc(e.text || '')}</i>`;
         case 'tree_pick': return `🌳 ${nm(e.hero)} nâng <b>${esc(e.name || '')}</b> (cấp ${e.lv}) — ${esc(e.why || '')}`;
         case 'tree_x': return `🌟 ${nm(e.hero)} (Ý Niệm Rực Rỡ) mở thêm lựa chọn cấp ${e.lv}: <b>${esc(e.name || '')}</b>`;
