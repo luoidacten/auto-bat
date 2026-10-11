@@ -39,6 +39,13 @@
       if (!m.canCast(u, k)) continue;
       out.push({ k, r: T[k].r, back: !!T[k].back, wall: !!T[k].wall, cd: m.cdOf(u, k), cost: m.costOf(u, k), name: def.name });
     }
+    // GĐ11: tướng không có trong bảng tay → suy ra từ phân loại kỹ năng (chiêu "lướt lùi / thoát thân" nhắm hướng ra xa)
+    if (G.Brain) for (const k of ['s1', 's2', 's3', 'sub']) {
+      if (T[k]) continue;
+      const def = u.hero.skills[k]; if (!def || !def.ai || def.ai.aim !== 'away') continue;
+      const x = G.Brain.tax(def, k); if (!x || !x.sub.EscapeDash || !m.canCast(u, k) || u.recast[k]) continue;
+      out.push({ k, r: Math.min(8, def.ai.range || 4), back: false, wall: x.wall, cd: m.cdOf(u, k), cost: m.costOf(u, k), name: def.name });
+    }
     return out;
   }
   // điểm đáp khi lướt theo hướng (vx, vy): lướt thường dừng ở chân tường, xuyên tường thì bị đẩy ra khỏi tường ở cuối

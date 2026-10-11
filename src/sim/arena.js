@@ -68,6 +68,13 @@
       // sát thương bo mỗi 0.5s
       if (this.tick % 10 === 0) {
         const dps = z.dps;
+        // GĐ11: ĂN MÒN — mỗi 1s ngoài bo +1 tầng (tối đa 15), mỗi tầng +0.4% máu tối đa sát thương chuẩn mỗi giây;
+        // chỉ xóa khi ở trong bo liên tục > 3s. VẾT THƯƠNG SÂU: ngoài bo mọi hồi máu −65% (xem heal()).
+        if (dps > 0) for (const h of this.heroes) if (h.alive && !h.duel) {
+          if (this.inZone(h)) { if (h.corr && t - (h.zoneT || -99) > C.CORROSION.clear) h.corr = 0; continue; }
+          if (this.tick % 20 === 0) h.corr = Math.min(C.CORROSION.max, (h.corr || 0) + 1);
+          if (h.corr) this.damage(null, h, h.st.maxHp * C.CORROSION.per * h.corr * 0.5, 'true', { tag: 'zone', noHook: true });
+        }
         if (dps > 0) for (const h of this.heroes) if (h.alive && !h.duel && !this.inZone(h)) {
           h.zoneT = t;
           this.damage(null, h, h.st.maxHp * dps * 0.5 * (h.statuses.length && h.hasKey('fu_doc') ? 1 - C.FU_DOC : 1) * (1 - Math.min(0.85, (h.bonus.zoneRed || 0) + (h.hero.zoneRed || 0) + (h.ws.zoneRed || 0))), 'true', { tag: 'zone', noHook: true });   // GĐ7: Phù Kháng Độc • GĐ8: mảnh hồn Kháng Độc Bão Tố

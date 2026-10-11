@@ -74,6 +74,7 @@
     canDrink(u, kind) {
       if (!(u.alive && u.bag && this.potCount(u, kind) > 0 && !u.cast && !u.dash && !u.disabled)) return false;
       if (kind === 'ga' && !(u.ga < u.st.maxGa - 1)) return false;
+      if ((kind === 'hp' || kind === 'ga') && u.ai && G.Brain && !G.Brain.healOk(this, u)) return false;   // GĐ11: kỷ luật bình máu
       return true;
     },
     // chọn cỡ bình: vừa đủ bù phần đang thiếu; vội (đối thủ gần) thì ưu tiên bình nhỏ uống nhanh

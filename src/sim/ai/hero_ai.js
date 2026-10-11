@@ -137,6 +137,8 @@
       if (this.dodge()) return;
       if (this.avoidDanger()) return;
       this.tryRecasts();
+      if (G.Brain && G.Brain.react(this, enemies)) return;                 // GĐ11: bị đánh từ góc khuất → xoay mặt / bắn trả mù / tránh trục đạn
+      if (G.Brain && G.Brain.zoneEscape(this)) return;                      // GĐ11: ngoài bo → lướt vào
       // ---- đánh giá thế trận (đánh đơn) ----
       const fight = this.evalFight(enemies, allies);
       const raw = Math.min(4, fight.ratio * this.judgeK());
@@ -149,7 +151,7 @@
       // ---- đang quyết đấu: đánh tới cùng với đối thủ trong vòng ----
       if (u.duel && u.duel.state === 'fight') {
         const o = u.duel.a === u ? u.duel.b : u.duel.a;
-        if (o && o.alive) { this.mode = 'fight'; this.target = o; this.act = 'duel'; this.fightMicro(o, [o], allies, true); return; }
+        if (o && o.alive) { this.mode = 'fight'; this.target = o; this.act = 'duel'; if (G.Brain) G.Brain.duel(this, o); else this.fightMicro(o, [o], allies, true); return; }
       }
       // ---- QUYẾT ĐỊNH LỚN bằng Utility AI (mỗi 0.3–0.5s, lệch pha; nguy cấp / đang bị bo đốt thì quyết ngay) ----
       const burning = m.zoneSt.dps > 0 && !m.inZone(u, 0) && this.act !== 'zone';
@@ -355,6 +357,8 @@
     // ===================== lùi khi bị đuổi =====================
     retreat(enemies) {
       const m = this.m, u = this.u;
+      // GĐ11: Đường Cùng Phản Sát — không thoát được thì quay đầu khô máu thay vì chạy và cố uống bình
+      if (G.Brain && G.Brain.lastStand(this, enemies)) { this.mode = 'fight'; this.target = this.turnTgt; this.fightMicro(this.turnTgt, enemies, this.alliesNear || []); return; }
       this.fleeing = true;
       this.target = null;
       // bị đuổi → chấm điểm chạy / chiêu thoát thân / cắt đuôi qua bụi / quay lại đánh
@@ -487,6 +491,7 @@
         if (e === this.target) add('đang đánh', 0.6);
         if (e.disabled) add('bị khống chế', 0.3 + 0.2 * this.mastK);
         if (e.attackTarget === u || (u.dmgBy.has(e.id) && m.time - u.dmgBy.get(e.id) < 2)) add('đang đánh mình', 0.5);
+        if (u.lastAtt === e && m.time - (u.lastAttT || -99) < 3) add('vừa đánh lén mình', 1.0);   // GĐ11: ưu tiên trả đũa (+50 thù hận)
         const an = this.annoyOf(e);
         if (an > 0) add('khó chịu', Math.min(1.6, an / 25));
         if (this.grudge(e)) add('thù dai', 0.35);
@@ -709,6 +714,8 @@
         this.callout('✋ Né đòn thủ', '#cfd8e0');
         if (d < reach + 0.4 || gd.punish) { u.attackTarget = null; u.goal = this.strafeGoal(t, Math.max(reach + 0.6, u.ranged ? this.prefDist(t) : 0), allies, enemies); return; }
       }
+      // GĐ11: chống thả diều (lướt chéo áp sát rồi khống chế) • ép bo (khóa chân ngoài bão, đẩy văng ra ngoài bo)
+      if (G.Brain && (G.Brain.arrival(this, t) || G.Brain.antiKite(this, t, enemies) || G.Brain.zoneFight(this, t, enemies))) return;
       // 4) chiêu — GĐ7b: đang/đủ điều kiện "múa" thì đi theo chuỗi combo, không thì chiêu lẻ như cũ
       if (this.comboStep(t, enemies)) return;
       this.useSkills(t, this.holdT && m.time < this.holdT ? ['defend', 'support', 'escape', 'custom'] : null, false);   // đang gom chiêu: chỉ dùng chiêu thủ / hỗ trợ

@@ -138,6 +138,7 @@
         // sổ sách
         tgt.lastDmgT = this.time;
         if (tgt.ai && tgt.ai.cog && tot > 0) G.Cog.onHit(this, tgt, owner, tot);   // GĐ10: bất ngờ / mù tiêu điểm
+        if (tgt.ai && G.Brain && tot > 0) G.Brain.onHit(this, tgt, owner, info, tot);   // GĐ11: suy luận hướng đòn
         // kẻ vừa đánh (mọi loại: tướng, vật triệu hồi, quái) — hộ vệ của chủ dùng để nhắm kẻ đánh chủ
         if (owner && owner !== tgt && tot > 0) {
           tgt.lastAtt = owner; tgt.lastAttT = this.time;
@@ -185,6 +186,7 @@
     heal(src, tgt, amt, quiet) {
       if (!isUnit(tgt) || !tgt.alive || !(amt > 0)) return 0;
       if (tgt.has('wound')) amt *= 0.6;
+      if (tgt.kind === 'hero' && this.zoneSt && this.zoneSt.dps > 0 && !tgt.duel && !this.inZone(tgt)) amt *= 1 - C.GRIEVOUS;   // GĐ11: Vết Thương Sâu ngoài bo
       const h = Math.min(amt, tgt.st.maxHp - tgt.hp);
       tgt.hp += h;
       if (h > 0 && src && src.stats && src !== tgt) src.stats.heal += h;
