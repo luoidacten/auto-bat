@@ -71,6 +71,8 @@
         // Áo Choàng Thánh Linh: chặn 1 chiêu của tướng địch
         if (tgt.bonus.spellShield && owner && owner.kind === 'hero' && owner.team !== tgt.team && G.ITEM_IS_SKILL(info) && this.spellBlock(tgt)) return 0;
         let a = info.amt;
+        // GĐ10: chiêu cuối uy lực hơn — mọi sát thương mang tag s4 nhân C.ULT_AMP (áp cho cả tướng mới)
+        if (info.tag === 's4' && owner && owner.kind === 'hero') a *= C.ULT_AMP;
         if (owner && owner.st) {
           a *= 1 + (owner.st.dmgAmp || 0);
           if (info.type === 'phys' && owner.st.physAmp) a *= 1 + owner.st.physAmp;           // GĐ8: Công Vật Lý %

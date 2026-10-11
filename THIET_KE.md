@@ -930,9 +930,9 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 | 🔄 Lật Câu Hỏi | cửa hàng | 300 | Mỗi trận được đổi một câu hỏi giữa trận sang câu khác (mỗi bản thêm 1 lần). | — |
 | 🔍 Đọc Chữ Nhỏ | cửa hàng | 400 | Điều khoản ẩn trong câu hỏi hiện rõ, tô đỏ. Từ bản thứ 2: điều khoản ẩn ít xuất hiện hơn (×0.7 mỗi bản). | — |
 | 🕵 Tình Báo | cửa hàng | 450 | Trước trận, lộ ra 1 người của nhà cái (nếu trận có). Mỗi bản lộ thêm 1 người. | — |
-| 🧀 Phô Mai Hảo Hạng | cửa hàng | 400 | Lách luật (can thiệp khi đang có kèo) làm nhà cái bực ít hơn (1 bản: như can thiệp thường; 2 bản: không bực). | — |
+| 🧀 Phô Mai Hảo Hạng | undefined | 400 | Lách luật (can thiệp khi đang có kèo) làm nhà cái bực ít hơn (1 bản: như can thiệp thường; 2 bản: không bực). | — |
 | 🔎 Kính Lúp Sức Mạnh | cửa hàng | 500 | Sức mạnh ước lượng hiện đúng giá trị thật (không sai số, không bị thổi phồng). Bản thứ 2: chỉ thẳng tướng bị thổi phồng. | — |
-| 🤝 Tay Trong | cửa hàng | 350 | Can thiệp rẻ hơn 30% (cộng dồn: ×0.7 mỗi bản). | — |
+| 🤝 Tay Trong | undefined | 350 | Can thiệp rẻ hơn 30% (cộng dồn: ×0.7 mỗi bản). | — |
 | 🪙 Đồng Xu May Mắn | cửa hàng | 550 | Mọi kèo thắng được thêm 10% tiền thưởng (mỗi bản +10%). | — |
 | 🔭 Ống Nhòm | cửa hàng | 300 | Câu "Ai thắng?" hiện máu, cấp, sức mạnh và tỷ lệ thật của hai bên. Bản thứ 2: mọi câu hỏi hiện tỷ lệ thật. | — |
 | 🔐 Két Sắt | cửa hàng | 450 | Sau mỗi trận được lãi 5% tiền mặt (tối đa 300) — mỗi bản cộng thêm. | — |

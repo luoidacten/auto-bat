@@ -364,6 +364,14 @@
           }
         }
       }
+      // GĐ10: Không Gian Quyết Đấu nhỏ và trống — hai người trong đó luôn thấy nhau (trừ tàng hình) để không đứng nhìn nhau tới hết giờ
+      if (this.duelActive && this.duelActive()) {
+        const g = this.duelSt.gate;
+        if (g.realm) for (const [x, y] of [[g.a, g.b], [g.b, g.a]]) for (const e of this.units) {
+          if (!e.alive || (e !== y && e.owner !== y) || (e.statuses.length && e.has('stealth') && M.dist(x, e) > 2.5)) continue;
+          if (seen[x.team]) seen[x.team].add(e.id);
+        }
+      }
       // GĐ7b: đồng minh tạm thời chung tầm nhìn
       if (this.truces) for (const t of this.truces) if (!t.broken && t.until > this.time) { const A = seen[t.a.team], B = seen[t.b.team]; if (A && B) { for (const id of A) B.add(id); for (const id of B) A.add(id); } }
       for (const e of this.units) {
@@ -473,6 +481,15 @@
       let ms = u.st.ms * (k || 1);
       if (u.terr) { const tm = MAP.TERRAIN[u.terr].ms; if (tm > 1 || !(u.statuses.length && u.hasKey('fu_tuc'))) ms *= tm; }   // GĐ7: bùn / cát lún chậm, băng trơn nhanh (Phù Thần Tốc miễn chậm)
       if (ms <= 0) return;
+      // GĐ10: trong Không Gian Quyết Đấu (nằm ngoài bản đồ) không có điểm tìm đường — đi thẳng tới đích
+      const dh = u.kind === 'hero' ? u : u.owner;
+      if (dh && dh.duel && dh.duel.realm) {
+        const dx = goal.x - u.x, dy = goal.y - u.y, L = Math.sqrt(dx * dx + dy * dy);
+        if (L < 1e-6) return;
+        const s = Math.min(L, ms * dt);
+        u.x += dx / L * s; u.y += dy / L * s; u.fx = dx / L; u.fy = dy / L; u.moved = true; u.navP = null;
+        return;
+      }
       if (!u.navP || u.navT <= this.time || Math.abs((u.navGoalX || 0) - goal.x) + Math.abs((u.navGoalY || 0) - goal.y) > 1.5) {
         // tìm đường lại tối đa 3 lần/giây
         u.navP = G.NAV.nextPoint(u, goal); u.navT = this.time + 0.35; u.navGoalX = goal.x; u.navGoalY = goal.y;
@@ -794,6 +811,8 @@
       u.windup = null;
       const run = () => {
         if (ct > 0) u.ws.chargedT = this.time + 0.6;              // GĐ8: "đòn tụ lực" (chiêu có thời gian niệm) — mảnh hồn Diệt Thế Xuyên Tâm
+        // GĐ10: chiêu cuối mạnh hơn — 6s "Bộc Phát" sau khi tung chiêu cuối: +20% sát thương mọi nguồn, +15% tốc chạy (cả chiêu cuối dạng cường hóa bản thân)
+        if (key === 's4' && u.kind === 'hero') this.addStatus(u, 'buff', 6, 1, { key: 'ult_surge', mods: { dmgAmp: C.ULT_SURGE } }) && this.addStatus(u, 'haste', 6, 0.15, { key: 'ult_surge' });
         this.hook(def.use, this, u, ctx);
         this.heroHook(u, 'onSkill', key, ctx);
         if (u.ai) u.ai.onCast(key);

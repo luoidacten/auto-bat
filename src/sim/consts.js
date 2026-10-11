@@ -49,6 +49,7 @@
     SOUL: { carry: 8, campSmall: 0.05, campBig: 0.12, orbLife: 120, orbDelay: 2, orbR: 1.3, orbSpread: 4 },   // mang tối đa 8 mảnh (gắn được = cấp ý niệm); bị hạ: rơi toàn bộ, 120s trên đất
     DUEL: { first: 480, every: 300, open: 150, r: 2.6, join: 2.0, ring: 12, max: 150, burn: 0.04,
       reward: { gold: 1000, xp: 1200, heal: 0.5, soul: 3 } },    // cổng quyết đấu: thắng nhận vàng, KN, hồi máu, mảnh hồn Tím
+    ULT_AMP: 1.4, ULT_SURGE: 0.2,                  // GĐ10: chiêu cuối gây thêm 40% sát thương; 6s sau khi tung chiêu cuối +20% sát thương mọi nguồn
     DUEL_REALM: { cx: 1200, cy: 1200, r: 24, name: 'Không Gian Quyết Đấu' }, // không gian riêng biệt 2 người
     REVIVE_UNTIL: 1800, REVIVE_DELAY: 12,          // hồi sinh 1 lần nếu chết trong 30 phút đầu (GĐ8: bản đồ to hơn, sát thương cao hơn), sau 12s, ở chỗ an toàn trong bo
     REVIVE_HP: 0.7,

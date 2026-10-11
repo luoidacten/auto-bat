@@ -23,7 +23,7 @@
     midGap: 75, midFirst: 150, midMax: 6,                     // câu hỏi giữa trận: cách nhau ≥ 75s, sớm nhất giây 150, tối đa 6 câu
   };
 
-  // kind: shop (mua trong cửa hàng) • gift (nhà cái tặng — có mặt trái giấu kín) • bad (nhận khi vay — chỉ gỡ khi trả nợ)
+  // kind: off (GĐ10: ngừng bán — người chơi không còn can thiệp vào trận) • shop (mua trong cửa hàng) • gift (nhà cái tặng — có mặt trái giấu kín) • bad (nhận khi vay — chỉ gỡ khi trả nợ)
   const CHARMS = {
     mat_ken_ken: { kind: 'shop', icon: '🦅', name: 'Mắt Kền Kền', price: 350, desc: 'Mỗi lần có kền kền ăn mạng trong trận: +60 tiền (mỗi bản +60).' },
     luoi_an_toan: { kind: 'shop', icon: '🕸', name: 'Lưới An Toàn', price: 500, desc: 'Cược đầu trận (Sống / Top 1 / Top 3) mà thua vẫn được hoàn 50% (2 bản 75%, 3 bản 87%…).' },
@@ -31,9 +31,9 @@
     lat_cau: { kind: 'shop', icon: '🔄', name: 'Lật Câu Hỏi', price: 300, desc: 'Mỗi trận được đổi một câu hỏi giữa trận sang câu khác (mỗi bản thêm 1 lần).' },
     doc_chu: { kind: 'shop', icon: '🔍', name: 'Đọc Chữ Nhỏ', price: 400, desc: 'Điều khoản ẩn trong câu hỏi hiện rõ, tô đỏ. Từ bản thứ 2: điều khoản ẩn ít xuất hiện hơn (×0.7 mỗi bản).' },
     tinh_bao: { kind: 'shop', icon: '🕵', name: 'Tình Báo', price: 450, desc: 'Trước trận, lộ ra 1 người của nhà cái (nếu trận có). Mỗi bản lộ thêm 1 người.' },
-    pho_mai: { kind: 'shop', icon: '🧀', name: 'Phô Mai Hảo Hạng', price: 400, desc: 'Lách luật (can thiệp khi đang có kèo) làm nhà cái bực ít hơn (1 bản: như can thiệp thường; 2 bản: không bực).' },
+    pho_mai: { kind: 'off', icon: '🧀', name: 'Phô Mai Hảo Hạng', price: 400, desc: 'Lách luật (can thiệp khi đang có kèo) làm nhà cái bực ít hơn (1 bản: như can thiệp thường; 2 bản: không bực).' },
     kinh_lup: { kind: 'shop', icon: '🔎', name: 'Kính Lúp Sức Mạnh', price: 500, desc: 'Sức mạnh ước lượng hiện đúng giá trị thật (không sai số, không bị thổi phồng). Bản thứ 2: chỉ thẳng tướng bị thổi phồng.' },
-    tay_trong: { kind: 'shop', icon: '🤝', name: 'Tay Trong', price: 350, desc: 'Can thiệp rẻ hơn 30% (cộng dồn: ×0.7 mỗi bản).' },
+    tay_trong: { kind: 'off', icon: '🤝', name: 'Tay Trong', price: 350, desc: 'Can thiệp rẻ hơn 30% (cộng dồn: ×0.7 mỗi bản).' },
     dong_xu: { kind: 'shop', icon: '🪙', name: 'Đồng Xu May Mắn', price: 550, desc: 'Mọi kèo thắng được thêm 10% tiền thưởng (mỗi bản +10%).' },
     ong_nhom: { kind: 'shop', icon: '🔭', name: 'Ống Nhòm', price: 300, desc: 'Câu "Ai thắng?" hiện máu, cấp, sức mạnh và tỷ lệ thật của hai bên. Bản thứ 2: mọi câu hỏi hiện tỷ lệ thật.' },
     ket_sat: { kind: 'shop', icon: '🔐', name: 'Két Sắt', price: 450, desc: 'Sau mỗi trận được lãi 5% tiền mặt (tối đa 300) — mỗi bản cộng thêm.' },

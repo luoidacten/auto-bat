@@ -371,9 +371,9 @@
       const shuffled = this.R.shuffle(alive.slice());
       const a = shuffled[0], b = shuffled[1];
       const pa = Math.pow(this.power(a) * a.hpPct, 1.4), pb = Math.pow(this.power(b) * b.hpPct, 1.4);
-      const pWinA = 0.44 * pa / (pa + pb);
-      const pWinB = 0.44 * pb / (pa + pb);
-      const pDraw = 0.12;
+      const pWinA = 0.47 * pa / (pa + pb);   // GĐ10: không gian co lại sau 25s → hiếm khi hòa
+      const pWinB = 0.47 * pb / (pa + pb);
+      const pDraw = 0.06;
       const opts = [
         { key: 'h' + a.id, hero: a, p: pWinA, label: a.hero.name + ' thắng' },
         { key: 'h' + b.id, hero: b, p: pWinB, label: b.hero.name + ' thắng' },

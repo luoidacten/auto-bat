@@ -371,6 +371,8 @@
         return;
       }
       // quá lâu: vòng siết lại, đốt cả hai
+      // GĐ10: Không Gian Quyết Đấu của nhà cái co lại sau 25s — đốt máu tăng dần để hiếm khi hòa
+      if (g.realm && t - g.t0 > 25 && this.tick % 10 === 0) { const k = 0.02 * (1 + (t - g.t0 - 25) / 8); for (const h of [a, b]) if (h.alive) this.damage(null, h, h.st.maxHp * k, 'true', { tag: 'duel', noHook: true, duel: true }); }
       if (t - g.t0 > P.max && this.tick % 10 === 0) for (const h of [a, b]) this.damage(null, h, h.st.maxHp * P.burn * 0.5, 'true', { tag: 'duel', noHook: true, duel: true });
     },
     startDuel(g, a, b) {

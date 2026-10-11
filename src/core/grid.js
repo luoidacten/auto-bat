@@ -21,8 +21,9 @@
     // gọi fn(u) cho mọi đơn vị có tâm trong bán kính R (+ bán kính đơn vị nếu withR)
     query(x, y, R, fn, withR) {
       const pad = withR ? 1.5 : 0;
-      const c0 = Math.max(0, Math.floor((x - R - pad) / this.cell)), c1 = Math.min(this.cols - 1, Math.floor((x + R + pad) / this.cell));
-      const r0 = Math.max(0, Math.floor((y - R - pad) / this.cell)), r1 = Math.min(this.rows - 1, Math.floor((y + R + pad) / this.cell));
+      const c0 = Math.min(this.cols - 1, Math.max(0, Math.floor((x - R - pad) / this.cell))), c1 = Math.min(this.cols - 1, Math.floor((x + R + pad) / this.cell));
+      const r0 = Math.min(this.rows - 1, Math.max(0, Math.floor((y - R - pad) / this.cell))), r1 = Math.min(this.rows - 1, Math.floor((y + R + pad) / this.cell));
+      // GĐ10: điểm ngoài lưới (Không Gian Quyết Đấu) rơi vào ô biên — vẫn tìm thấy nhau
       for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) {
         const b = this.buckets[r * this.cols + c];
         for (let i = 0; i < b.length; i++) {
