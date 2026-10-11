@@ -274,6 +274,7 @@
       if (tgt.has('unstop') || tgt.has('invuln') || tgt.anchorT > this.time || (tgt.big && tgt.kind === 'monster')) return false;
       o = o || {};
       if (!(dist > 0) || !Number.isFinite(dx) || !Number.isFinite(dy)) return false;   // dữ liệu hỏng: bỏ qua thay vì làm tọa độ thành NaN
+      if (tgt.kind === 'hero' && tgt.hero.knockRes && ownerOf(src) !== tgt) dist *= 1 - tgt.hero.knockRes(tgt);   // GĐ10: kháng đẩy (Gideon)
       const L = Math.sqrt(dx * dx + dy * dy) || 1;
       dur = Math.max(0.05, dur);
       tgt.dash = { vx: dx / L * dist / dur, vy: dy / L * dist / dur, t: dur, cc: true, src, onWall: o.onWall || null, wallHit: false };

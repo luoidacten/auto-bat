@@ -1004,7 +1004,7 @@
     ultOk(k, ai, t, d, fleeing) {
       const m = this.m, u = this.u;
       if (t.kind !== 'hero') return false;
-      if (d > (ai.range || 5) + t.r) return false;
+      if (d > (ai.rangeFn ? ai.rangeFn(this.m, this.u) : ai.range || 5) + t.r) return false;
       if (fleeing) return !!(ai.cond && ai.cond(m, u, t));
       // giao tranh đáng dùng chiêu cuối: mục tiêu ít máu, hoặc đông người, hoặc đang thắng thế
       const many = this.enemiesNear.filter((e) => dist(e, t) < (ai.aoe || 3)).length;

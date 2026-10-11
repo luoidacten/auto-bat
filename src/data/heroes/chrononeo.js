@@ -5,7 +5,8 @@
   const G = globalThis.G, H = G.H, M = G.M;
   const ST = 'cn_stance';
   const isC = (u) => u.ws.stance === 'chrono';
-  const magOf = (u, s) => H.mag(u, (s === 'chrono' ? 4 : 10) + (H.T(u, '1a') ? 1 : 0));
+  // GĐ10: băng đạn tăng theo cấp — Chrono 4 → 10 viên, Neo 10 → 20 viên (cấp 18)
+  const magOf = (u, s) => H.mag(u, (s === 'chrono' ? 4 + Math.floor((Math.min(18, u.level || 1) - 1) * 6 / 17) : 10 + Math.floor((Math.min(18, u.level || 1) - 1) * 10 / 17)) + (H.T(u, '1a') ? 1 : 0));
   const rlOf = (u, s) => H.rlTime(u, (s === 'chrono' ? 2.5 : 1.5) * (H.T(u, '1b') ? 0.75 : 1));   // GĐ9: theo tốc đánh + Tốc Nạp
   function applyStance(m, u) {
     const c = isC(u);
@@ -30,7 +31,7 @@
     stats: { range: 6.0, ad: 60, adG: 3.7, as: 0.68, asG: 0.03 },
     passive: {
       name: 'Hai Thời Đại',
-      desc: 'Hai thế, mỗi thế một băng đạn: Chrono 4 viên nặng (×1.5 sát thương, −25% tốc đánh, xuyên 20% giáp, nạp 2.5s) • Neo 10 viên nhẹ (×0.75 sát thương, +25% tốc đánh, +8% tốc chạy, nạp 1.5s).',
+      desc: 'Hai thế, mỗi thế một băng đạn (tăng theo cấp): Chrono 4→10 viên nặng (×1.5 sát thương, −25% tốc đánh, xuyên 20% giáp, nạp 2.5s) • Neo 10→20 viên nhẹ, mỗi lần bóp cò bắn 2 viên liên tiếp (mỗi viên ×0.75 sát thương), +25% tốc đánh, +8% tốc chạy, nạp 1.5s.',
       init(m, u) { u.ws.stance = 'neo'; u.ws.ammo = { chrono: magOf(u, 'chrono'), neo: magOf(u, 'neo') }; u.ws.rl = 0; u.ws.hist = []; applyStance(m, u); },
       update(m, u, dt) {
         const s = u.ws.stance;
@@ -46,6 +47,8 @@
         // Nghịch Lý Thời Gian: bắn cả đạn quá khứ lẫn tương lai
         if (H.T(u, '12b')) info.amt *= 1.4;
         else info.amt *= s === 'chrono' ? 1.5 : 0.75;
+        // Neo: bắn 2 viên liên tiếp (trái / phải)
+        if (s === 'neo' && u.ws.ammo.neo > 0) { u.ws.ammo.neo--; const a2 = info.amt; info.extra.push(() => m.later(0.08, (mm) => t.alive && u.alive && mm.damage(u, t, a2, 'phys', { tag: 'auto2', auto: true }))); }
         if (u.ws.barrage > m.time && H.T(u, '3a')) info.extra.push(() => m.dot(u, t, 8 + 2 * u.level, 2, 'magic', 'cn_burn'));
       },
       onFatal(m, u) {
@@ -74,13 +77,22 @@
         ai: { use: 'poke', range: 6.5, aim: 'point', speed: 30, farm: 99 },
       },
       s2: {
-        name: 'Thời Khắc', desc: 'Chrono: Liên Xạ 3s — bắn nhanh gấp đôi, đi chậm 30%, không thể cản phá • Neo: mưa đạn 7 viên hình nón 6 đv.',
+        name: 'Thời Khắc', desc: 'Chrono: quét và đánh dấu mọi mục tiêu (tướng lẫn quái) trong 12 đv trong 2s, rồi Liên Xạ 0.5s xả hết băng đạn chia đều lên các mục tiêu bị đánh dấu BẤT KỂ KHOẢNG CÁCH; trong lúc xả đi chậm 30%, không thể cản phá • Neo: mưa đạn hình nón 8 đv gồm 7/8/9/9/10 viên, xé Hộ Giáp.',
         cd: [14, 13, 12, 11, 10], cost: [60, 60, 60, 60, 60], castTime: 0.1,
         use(m, u, ctx) {
           if (H.T(u, '3c')) u.cd.s2 *= 0.7;
           if (isC(u)) {
-            u.ws.barrage = m.time + 3; u.ws.ammo.chrono = magOf(u, 'chrono') + 4; u.ws.rl = 0;
-            m.addStatus(u, 'unstop', 3, 1, { key: 'cn_bar' }); m.addStatus(u, 'slow', 3, 0.3, { key: 'cn_bar' });
+            const marks = m.units.filter((e) => e.alive && e.team !== u.team && (e.kind === 'hero' || e.kind === 'monster') && e.targetable && M.dist(e, u) <= 12)
+              .sort((a, b) => (b.kind === 'hero') - (a.kind === 'hero') || M.dist2(a, u) - M.dist2(b, u) || a.id - b.id).slice(0, 6);
+            for (const e of marks) m.addStatus(e, 'mark', 2.5, 1, { key: 'cn_lock', src: u });
+            u.ws.barrage = m.time + 2.5; u.ws.rl = 0;
+            m.addStatus(u, 'unstop', 2.5, 1, { key: 'cn_bar' }); m.addStatus(u, 'slow', 2.5, 0.3, { key: 'cn_bar' });
+            m.later(2, (mm) => {
+              if (!u.alive) return;
+              const L = marks.filter((e) => e.alive); if (!L.length) return;
+              const n = Math.max(2, u.ws.ammo.chrono); u.ws.ammo.chrono = 0;
+              for (let i = 0; i < n; i++) { const e = L[i % L.length]; mm.later(0.5 * i / n, (m3) => e.alive && u.alive && H.homing(m3, u, e, { speed: 40, kind: 'bullet', onHit: (m4, p, x) => m4.damage(u, x, u.st.ad * 1.5 * (1 + 0.08 * ctx.rank), 'phys', { tag: 's2' }) })); }
+            });
             if (H.T(u, '9c')) m.addStatus(u, 'undying', 2.5, 1, { key: 'cn_tank' });
             // Giao Thoa Không Gian: dùng lại để kéo kẻ địch quanh về trước nòng súng
             if (H.T(u, '12a')) m.allowRecast(u, 's2', 3, (mm, uu) => {
@@ -89,36 +101,43 @@
             });
             return;
           }
-          const v = H.dirTo(u, ctx.pt), dmg = H.amt(u, ctx.v([30, 45, 60, 75, 90]), 0.45);
-          for (let i = 0; i < 7; i++) { const a = -0.45 + 0.15 * i, c = M.cos(a), s = M.sin(a); m.proj({ owner: u, x: u.x, y: u.y, dx: v.x * c - v.y * s, dy: v.x * s + v.y * c, speed: 28, range: 6, r: 0.35, kind: 'bullet', onHit: (mm, p, e) => mm.damage(u, e, dmg, 'phys', { tag: 's2' }) }); }
+          const v = H.dirTo(u, ctx.pt), dmg = H.amt(u, ctx.v([30, 45, 60, 75, 90]), 0.45), n = ctx.v([7, 8, 9, 9, 10]);
+          for (let i = 0; i < n; i++) { const a = -0.45 + 0.9 * i / (n - 1), c = M.cos(a), s = M.sin(a); m.proj({ owner: u, x: u.x, y: u.y, dx: v.x * c - v.y * s, dy: v.x * s + v.y * c, speed: 28, range: 8, r: 0.35, kind: 'bullet', onHit: (mm, p, e) => { mm.damage(u, e, dmg, 'phys', { tag: 's2' }); if (e.ga > 0) e.ga = Math.max(0, e.ga - 25); } }); }
         },
-        ai: { use: 'burst', range: 5.5, aim: 'unit', recastWhen: (m, u, t) => t && t.kind === 'hero' && M.dist(u, t) > 3 && M.dist(u, t) < 6 },
+        ai: { use: 'burst', range: 7.5, aim: 'unit', recastWhen: (m, u, t) => t && t.kind === 'hero' && M.dist(u, t) > 3 && M.dist(u, t) < 6 },
       },
       s3: {
-        name: 'Bước Thời Gian', desc: 'Chrono: bước lên 2.5 đv, giảm 30% sát thương 2s • Neo: lướt 4 đv để lại ảo ảnh; trong 3s dùng lại để quay về chỗ ảo ảnh.',
+        name: 'Bước Thời Gian', desc: 'Chrono: bước lên 2.5/2.5/2.5/3/4 đv, nạp đầy băng Chrono, giảm 30% sát thương 2/2/3/4/6s • Neo: lướt 6/6/6/7/8 đv, nạp đầy băng Neo, để lại ảo ảnh BẤT TỬ 10s tự bắn (25% sát thương); trong 10s dùng lại để đổi chỗ với ảo ảnh (mỗi 2s một lần), mỗi lần đổi +tốc chạy và tốc đánh 1.5s. Hồi chiêu bắt đầu tính từ giây thứ 4.',
         cd: [12, 11, 10, 9, 8], cost: [45, 45, 45, 45, 45],
         use(m, u, ctx) {
           const far = H.T(u, '1c') ? 1.25 : 1, from = { x: u.x, y: u.y };
           if (isC(u)) {
-            const p = H.toward(u, ctx.pt, 2.5 * far, false); m.dashTo(u, p.x, p.y, 14, {});
-            m.addStatus(u, 'reduce', 2, 0.3, { key: 'cn_step' });
+            const p = H.toward(u, ctx.pt, ctx.v([2.5, 2.5, 2.5, 3, 4]) * far, false); m.dashTo(u, p.x, p.y, 14, {});
+            u.ws.ammo.chrono = magOf(u, 'chrono'); if (u.ws.rl > 0) { u.ws.rl = 0; H.reloadDone(m, u); }
+            m.addStatus(u, 'reduce', ctx.v([2, 2, 3, 4, 6]), 0.3, { key: 'cn_step' });
             if (H.T(u, '6a')) m.allowRecast(u, 's3', 2.5, (mm, uu) => mm.hitCircle(uu, from.x, from.y, 2.5, (e) => { mm.damage(uu, e, H.amt(uu, 40 + 10 * uu.level, 0.5), 'phys', { tag: 's3', aoe: true }); const v = H.dirTo(from, e); mm.knock(uu, e, v.x, v.y, 2, 0.2); }, { color: '#d0a050' }));
             return;
           }
-          const hp0 = u.hp, t0 = m.time;
-          const d = m.makeDecoy(u, from.x, from.y, { life: 3, hp: 0.3 });
-          const p = H.toward(u, ctx.pt, 4 * far, false); m.dashTo(u, p.x, p.y, 20, {});
-          m.allowRecast(u, 's3', 3, (mm, uu) => {
+          const d = m.makeDecoy(u, from.x, from.y, { life: 10, hp: 0.3, dmg: 0.25 });
+          m.addStatus(d, 'invuln', 10, 1, { key: 'cn_ghost' });
+          const p = H.toward(u, ctx.pt, ctx.v([6, 6, 6, 7, 8]) * far, false); m.dashTo(u, p.x, p.y, 22, {});
+          u.ws.ammo.neo = magOf(u, 'neo'); if (u.ws.rl > 0) { u.ws.rl = 0; H.reloadDone(m, u); }
+          u.cd.s3 = m.cdOf(u, 's3') + 4;
+          const end = m.time + 10;
+          const arm = (mm) => { if (d.alive && mm.time < end) mm.allowRecast(u, 's3', end - mm.time, swapFn); };
+          const swapFn = (mm, uu) => {
             if (!d.alive) return;
             const back = { x: d.x, y: d.y };
-            if (H.T(uu, '6b')) { d.x = uu.x; d.y = uu.y; for (let i = 0; i < 3; i++) { const t = H.nearestEnemyHero(mm, uu, 7); if (t) mm.later(0.08 * i, (m3) => H.homing(m3, uu, t, { speed: 34, kind: 'bullet', onHit: (m4, pp, e) => { m4.damage(uu, e, uu.st.ad * 0.5, 'phys', { tag: 's3' }); m4.addStatus(e, 'slow', 1, 0.3, { src: uu }); } })); } }
-            else d.alive = false;
-            mm.blink(uu, back.x, back.y);
+            d.x = uu.x; d.y = uu.y; mm.blink(uu, back.x, back.y);
+            mm.addStatus(uu, 'haste', 1.5, 0.25, { key: 'cn_swap' }); mm.addStatus(uu, 'buff', 1.5, 1, { key: 'cn_swap', mods: { asPct: 0.25 } });
+            if (H.T(uu, '6b')) for (let i = 0; i < 3; i++) { const t = H.nearestEnemyHero(mm, uu, 7); if (t) mm.later(0.08 * i, (m3) => H.homing(m3, uu, t, { speed: 34, kind: 'bullet', onHit: (m4, pp, e) => { m4.damage(uu, e, uu.st.ad * 0.5, 'phys', { tag: 's3' }); m4.addStatus(e, 'slow', 1, 0.3, { src: uu }); } })); }
             if (H.T(uu, '3b')) mm.hitCircle(uu, uu.x, uu.y, 2, (e) => mm.addStatus(e, 'stun', 0.75, 1, { src: uu }), { color: '#6af0ff' });
             if (H.T(uu, '9b')) { const h = uu.ws.hist.find((x) => mm.time - x.t <= 2.2); if (h && h.hp > uu.hp) mm.heal(uu, uu, h.hp - uu.hp); }
-          });
+            mm.later(2, arm);
+          };
+          m.later(0.3, arm);
         },
-        ai: { use: 'escape', range: 4, aim: 'away', recastWhen: (m, u) => !!(u.ai && u.ai.fleeing && u.hpPct < 0.3) },
+        ai: { use: 'escape', range: 6, aim: 'away', recastWhen: (m, u, t) => { const d = m.decoysOf(u)[0]; if (!d) return false; const e = t || H.nearestEnemyHero(m, u, 9); return !!e && (u.ai && u.ai.fleeing ? M.dist(d, e) > M.dist(u, e) + 2 : M.dist(u, e) < 2.5 && m.time - (u.lastDmgT || -99) < 0.6); } },
       },
       sub: {
         name: 'Chuyển Thế', desc: 'Đổi thế. Sang Chrono: sóng đẩy lùi 1.5 đv quanh người + giảm 25% sát thương 1s • Sang Neo: +40% tốc chạy 1.5s.',
@@ -131,17 +150,37 @@
         } },
       },
       s4: {
-        name: 'Liên Hoa Thời Không', desc: '5s hợp nhất: mỗi 0.5s xả 8 viên hoa sen tỏa quanh người (6 đv). Dùng ngay sau Chuyển Thế (1.5s): hoa to gấp đôi.',
+        name: 'Liên Hoa Thời Không', desc: 'Hợp nhất 5/6/8s: mỗi 0.5s xả 8/10/14 viên hoa sen tỏa 360° bay tới khi tự tan, xen kẽ đạn Chrono (nặng, xuyên thấu) và đạn Neo (nhanh); vẫn dùng được Bước Thời Gian. • Dạng Chrono: đạn to, mạnh hơn, đẩy lùi nhẹ; kết thúc Nở Rộ 30 viên đạn nặng, hất văng kẻ áp sát 3 đv. • Dạng Neo: gọi Ảnh Chiếu bất tử cùng xả đạn (dùng lại để đổi chỗ), +10/14/18% tốc chạy; kết thúc tỏa 10/15/20 viên và lướt ngắn 3 đv.',
         cd: [110, 90, 70], cost: [100, 100, 100],
         use(m, u, ctx) {
-          const big = m.time - (u.ws.swapT || -9) <= 1.5, R = big ? 12 : 6, dmg = H.amt(u, ctx.v([30, 45, 60]), 0.3);
+          const c = isC(u), life = ctx.v([5, 6, 8]), n = ctx.v([8, 10, 14]), dmg = H.amt(u, ctx.v([30, 45, 60]), 0.3) * (c ? 1.3 : 1);
           let k = 0;
-          m.zone({ owner: u, x: u.x, y: u.y, r: R, life: 5, every: 0.5, follow: u, kind: 'lotus', tick: (mm) => {
+          const burst = (mm, src, scale) => {
             k++;
-            for (let i = 0; i < 8; i++) { const a = i * 0.785 + k * 0.39; mm.proj({ owner: u, x: u.x, y: u.y, dx: M.cos(a), dy: M.sin(a), speed: 20, range: R, r: 0.4, kind: 'bullet', onHit: (m3, p, e) => m3.damage(u, e, dmg, 'phys', { tag: 's4', aoe: true }) }); }
-          } });
+            for (let i = 0; i < n; i++) { const heavy = (i + k) % 2 === 0, a = i * 6.2831853 / n + k * 0.39;
+              mm.proj({ owner: u, x: src.x, y: src.y, dx: M.cos(a), dy: M.sin(a), speed: heavy ? 18 : 28, range: 20, r: heavy ? (c ? 0.7 : 0.5) : 0.35, kind: 'bullet', pierce: heavy,
+                onHit: (m3, p, e) => { m3.damage(u, e, dmg * scale * (heavy ? 1.3 : 0.8), 'phys', { tag: 's4', aoe: true }); if (c) m3.knock(u, e, p.dx || 0, p.dy || 0, 0.5, 0.1); } }); }
+          };
+          m.zone({ owner: u, x: u.x, y: u.y, r: 6, life, every: 0.5, follow: u, kind: 'lotus', tick: (mm) => burst(mm, u, 1),
+            onEnd: (mm) => {
+              if (!u.alive) return;
+              if (c) {
+                for (let i = 0; i < 30; i++) { const a = i * 0.2094; mm.proj({ owner: u, x: u.x, y: u.y, dx: M.cos(a), dy: M.sin(a), speed: 20, range: 10, r: 0.6, kind: 'bullet', pierce: true, onHit: (m3, p, e) => m3.damage(u, e, dmg * 1.6, 'phys', { tag: 's4', aoe: true }) }); }
+                mm.hitCircle(u, u.x, u.y, 3, (e) => { const v = H.dirTo(u, e); mm.knock(u, e, v.x, v.y, 3, 0.25); }, { color: '#d0a050' });
+              } else {
+                const m2 = ctx.v([10, 15, 20]);
+                for (let i = 0; i < m2; i++) { const a = i * 6.2831853 / m2; mm.proj({ owner: u, x: u.x, y: u.y, dx: M.cos(a), dy: M.sin(a), speed: 28, range: 10, r: 0.4, kind: 'bullet', onHit: (m3, p, e) => m3.damage(u, e, dmg, 'phys', { tag: 's4', aoe: true }) }); }
+                const e = H.nearestEnemyHero(mm, u, 8), v = e ? H.dirTo(e, u) : { x: u.fx, y: u.fy }; mm.dashTo(u, u.x + v.x * 3, u.y + v.y * 3, 20, {});
+              }
+            } });
+          if (!c) {
+            m.addStatus(u, 'haste', life, ctx.v([0.1, 0.14, 0.18]), { key: 'cn_ult' });
+            const d = m.makeDecoy(u, u.x, u.y, { life, hp: 0.3, dmg: 0.25 }); m.addStatus(d, 'invuln', life, 1, { key: 'cn_ghost' });
+            m.zone({ owner: u, x: d.x, y: d.y, r: 6, life, every: 0.5, follow: d, kind: 'lotus', tick: (mm) => d.alive && burst(mm, d, 0.6) });
+            m.allowRecast(u, 's4', life, (mm, uu) => { if (!d.alive) return; const back = { x: d.x, y: d.y }; d.x = uu.x; d.y = uu.y; mm.blink(uu, back.x, back.y); });
+          }
         },
-        ai: { use: 'ult', aim: 'self', range: 5.5, aoe: 6 },
+        ai: { use: 'ult', aim: 'self', range: 6.5, aoe: 6, recastWhen: (m, u, t) => { const d = m.decoysOf(u)[0]; return !!(d && t && M.dist(u, t) < 2.5 && M.dist(d, t) > 4); } },
       },
     },
     ai: { order: ['s1', 's2', 's3'], engageRange: 6, role: 'adc' },
