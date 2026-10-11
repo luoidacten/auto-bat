@@ -81,6 +81,9 @@
     koda: 'cuongloan', clint: 'gaccong', joker: 'bipbom', gideon: 'lanhchua', theron: 'vesi', kazuki: 'doimang',
     percy: 'bacle', vesper: 'thoatxac', raven: 'tientri', ryoma: 'tramtuong', ignatius: 'honloan', alice: 'moicau',
     galo: 'riabao', florian: 'nguyquan',
+    // GĐ10
+    luca: 'khatnuoc', kip: 'quayphan', olivia: 'cuongtin', justus: 'cuongtin', ratok: 'hobao', caelus: 'thucdung', boran: 'cuongloan',
+    ariston: 'cuongtin', mirage: 'bipbom', dahlia: 'nguyquan', vector: 'cauton', bachdiep: 'tramtuong', tsukiyo: 'amsat',
   };
   // GĐ6b — phong cách giao tranh (cố định theo tướng):
   //   allin: đã đánh là không chạy (đánh tới cùng) • fight: đánh tới khi còn ~10% máu mà không thắng nổi mới chạy
@@ -98,6 +101,9 @@
     elara: 'kite', zero: 'kite', percy: 'kite', chrononeo: 'kite', raven: 'kite', jack: 'kite',
     ignatius: 'kite', alice: 'kite', thanhphong: 'kite', roxie: 'kite', joker: 'kite', lyra: 'kite',
     aria: 'stand', victoria: 'stand', galo: 'stand', clint: 'stand',
+    // GĐ10
+    ratok: 'allin', boran: 'allin', ariston: 'allin', luca: 'fight', kip: 'fight', dahlia: 'fight', tsukiyo: 'fight',
+    olivia: 'kite', justus: 'kite', caelus: 'kite', mirage: 'kite', vector: 'kite', bachdiep: 'kite',
   };
   G.FIGHT_STYLE = STYLE; G.FIGHT_STYLE_BY_HERO = STYLE_BY_HERO;
   G.fightStyleOf = (heroId) => STYLE_BY_HERO[heroId] || 'fight';

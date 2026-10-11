@@ -24,6 +24,20 @@
   // 3 lối build sở trường + mảnh hồn yêu thích (mã) của từng tướng
   const H = {
     alice:      { b: ['burst', 'cdr', 'battle'], fav: ['P_VIS_02', 'G_VIS_04', 'R_VIS_02'] },
+    // ---- GĐ10: tướng mới ----
+    luca:       { b: ['burst', 'cdr', 'battle'], fav: ['P_VIS_02', 'G_VIS_04', 'R_VIS_02'] },
+    kip:        { b: ['assassin', 'lethal', 'duelist'], fav: ['G_RNG_04', 'P_AS_02', 'R_AS_01'] },
+    olivia:     { b: ['enchant', 'cdr', 'battle'], fav: ['P_VIS_01', 'G_VIS_03', 'R_VIS_01'] },
+    justus:     { b: ['enchant', 'cdr', 'battle'], fav: ['P_VIS_01', 'G_VIS_03', 'R_VIS_01'] },
+    ratok:      { b: ['tank', 'warden', 'bruiser'], fav: ['G_RNG_04', 'R_RNG_02', 'P_VIS_03'] },
+    caelus:     { b: ['burst', 'cdr', 'battle'], fav: ['G_VIS_01', 'R_VIS_01', 'P_VIS_04'] },
+    boran:      { b: ['bruiser', 'duelist', 'lethal'], fav: ['G_AS_01', 'B_AS_01', 'R_AS_01'] },
+    ariston:    { b: ['tank', 'bruiser', 'lethal'], fav: ['G_RNG_02', 'R_RNG_02', 'P_VIS_03'] },
+    mirage:     { b: ['burst', 'cdr', 'battle'], fav: ['P_VIS_02', 'G_VIS_04', 'R_VIS_02'] },
+    dahlia:     { b: ['magebruiser', 'battle', 'burst'], fav: ['P_AS_02', 'G_AS_02', 'R_VIS_02'] },
+    vector:     { b: ['gun', 'crit', 'lethal'], fav: ['G_RL_04', 'R_RNG_01', 'P_RL_04'] },
+    bachdiep:   { b: ['burst', 'cdr', 'battle'], fav: ['R_VIS_01', 'G_RNG_03', 'P03'] },
+    tsukiyo:    { b: ['assassin', 'duelist', 'magebruiser'], fav: ['G_AS_02', 'P_AS_02', 'R_AS_01'] },
     aria:       { b: ['enchant', 'cdr', 'warden'], fav: ['PK1', 'G_VIS_03', 'R_VIS_01'] },
     borg:       { b: ['bruiser', 'tank', 'duelist'], fav: ['G_RNG_04', 'R_RNG_02', 'P_VIS_03'] },
     chrononeo:  { b: ['gun', 'crit', 'speed'], fav: ['G_RL_04', 'P_RL_01', 'R_RL_01'] },
