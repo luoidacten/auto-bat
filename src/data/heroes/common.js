@@ -75,6 +75,18 @@
     // bắt đầu / xong một lần nạp: báo cho mảnh hồn & AI (hook onReloadStart / onReload), ghi mốc thời gian
     reloadStart(m, u) { u.ws.rlStartT = m.time; u.ws.rlHurt = m.time - (u.lastDmgT || -99) < 1; if (m.heroHook) m.heroHook(u, 'onReloadStart'); },
     reloadDone(m, u) { u.ws.rlDoneT = m.time; if (m.heroHook) m.heroHook(u, 'onReload'); },
+    // GĐ10: "đồng minh" trong đấu trường đánh đơn = người đang liên minh tạm / người cùng phe nhà cái / bạn bè cốt truyện
+    isAlly(m, u, h) {
+      if (!h || h === u || h.kind !== 'hero') return false;
+      if (u.permWith && u.permWith.get(h.id) && !u.permWith.get(h.id).broken) return true;
+      if (m.truces && m.truces.some((t) => !t.broken && t.until > m.time && ((t.a === u && t.b === h) || (t.b === u && t.a === h)))) return true;
+      return !!(G.isFriend && G.isFriend(u.heroId, h.heroId) && G.isFriend(h.heroId, u.heroId) && m.aliveCount() > 3);
+    },
+    friendsNear(m, u, R, self) {
+      const out = self ? [u] : [];
+      for (const h of m.heroes) if (h.alive && h !== u && (R == null || G.M.dist(h, u) <= R) && H.isAlly(m, u, h)) out.push(h);
+      return out;
+    },
     alliesNear(m, u, R, self) {
       return m.heroes.filter((h) => h.alive && h.team === u.team && (self || h !== u) && G.M.dist(h, u) <= R);
     },

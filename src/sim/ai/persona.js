@@ -686,6 +686,10 @@
     if (p === e) { if (backstabReady(m, u, e)) { add('đâm sau lưng', 3); return true; } return false; }
     if (mate(m, u, e)) return false;   // GĐ9b: người của nhà cái không đánh nhau
     if (p && p.lastAtt && G.ownerOf(p.lastAtt) === e && m.time - (p.lastAttT || -99) < 3) add('đánh đồng minh', 1.5);
+    // GĐ10: quan hệ cốt truyện — bạn bè không ra tay trước; kẻ đánh người mình bảo vệ bị trừng phạt; kẻ thù được ưu tiên
+    if (G.isFriend && G.isFriend(u.heroId, e.heroId) && !me && m.aliveCount() > 3) return false;   // còn 3 người trở xuống: tình bạn cũng phải nhường chỗ cho ngôi vô địch
+    if (G.protects) for (const pid of G.protects(u.heroId)) { const w = m.heroes.find((h) => h.heroId === pid && h.alive); if (w && w.lastAtt && G.ownerOf(w.lastAtt) === e && m.time - (w.lastAttT || -99) < 4) add('kẻ đánh ' + w.hero.name, 2.2); }
+    { const hk = G.hateOf ? G.hateOf(u.heroId, e.heroId) : 0; if (hk) add('mối thù cốt truyện', hk); }
     switch (id) {
       case 'hoabinh': if (!me && !m.pets.some((q) => q.owner === u && q.alive && q.attackTarget === e)) return false; break;
       case 'vosi': if (!me && e.attackTarget && e.attackTarget !== u && e.attackTarget.kind === 'hero') return false; if (!me && e.hpPct < 0.4) return false; break;
@@ -708,6 +712,7 @@
     if (pa === e && backstabReady(m, u, e)) return true;
     if (pa && pa.lastAtt && G.ownerOf(pa.lastAtt) === e && m.time - (pa.lastAttT || -99) < 3 && c.d < c.engR + 6 && c.r > 0.5) return true;   // giúp đồng minh
     if (kamikaze(ai)) return true;
+    if (id === 'cuongloan') return c.d < c.engR + 8 ? true : null;   // GĐ10: Cuồng Loạn — thấy là lao vào
     switch (id) {
       case 'hoabinh': return me && (u.hpPct < 0.7 || m.pets.some((q) => q.owner === u && q.alive && q.attackTarget === e)) ? true : false;
       case 'chuotlui': return me && cornered(ai, e) ? true : false;
@@ -728,6 +733,7 @@
   function retreatHp(ai, base) {
     const u = ai.u, id = u.persId;
     if (kamikaze(ai)) return 0;
+    if (id === 'cuongloan') return 0;                                    // GĐ10: không bao giờ lùi
     if (u.statuses.length && (u.hasKey('buff_hon') || u.hasKey('buff_phoenix'))) return 0;   // GĐ8: có mạng bảo hiểm (Thiên Hồn Chủ / Phượng Hoàng) → không chạy
     if (id === 'thoatxac') return 0.75;
     if (id === 'chuotlui' || id === 'hoabinh') return 0.45;
@@ -739,6 +745,7 @@
   function aggrMul(ai) {
     const u = ai.u, id = u.persId;
     if (kamikaze(ai)) return 3;
+    if (id === 'cuongloan') return 1.8;
     if (u.statuses.length && u.hasKey('buff_minh')) return 2.0;          // GĐ8: Minh Tướng Huyết Trảm — tìm mọi cách kết liễu để hồi đầy máu + giáp
     if (u.statuses.length && (u.hasKey('buff_hon') || u.hasKey('buff_phoenix'))) return 1.5;
     if (id === 'khatnuoc') return 1 + (1 - u.hpPct) * 0.8;               // càng ít máu càng liều
@@ -755,7 +762,7 @@
     const b = fav.length ? fav.filter((id) => u.shOn && u.shOn.has(id)).length / fav.length : 0;
     return a * 0.7 + b * 0.3;
   }
-  const allIn = (ai) => kamikaze(ai) || (ai.u.persId === 'cuongtin' && ai.target && heretics(ai.u).includes(ai.target.heroId));
+  const allIn = (ai) => kamikaze(ai) || ai.u.persId === 'cuongloan' || (ai.u.persId === 'cuongtin' && ai.target && heretics(ai.u).includes(ai.target.heroId));
 
   // ---------- 6) VI MÔ ----------
   function micro(ai, enemies) {

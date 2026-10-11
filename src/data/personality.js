@@ -68,6 +68,9 @@
       w: { farm: 1.2, shop: 1.4, chest: 1.3, loot: 1.5, hunt: 0.7, duel: 0.6, vulture: 0.8 }, stats: { mental: 2, map: 2, farm: 1, fight: -2 }, bag: { hp: 5, trap: 1, hook: 1, flash: 1, ghost: 1 } },
     bipbom:   { name: 'Kẻ Bịp Bợm', icon: '🎭', style: 'balanced', aggr: 1.0, trader: 'cheat', desc: 'Gạ đổi chác / liên minh với bất kỳ ai để lừa: bán mảnh dỏm giá cao, đổi gian, báo tin giả dụ người ta vào bẫy của mình; liên minh tạm thì gần như chắc chắn bịp; ai từng bị lừa thì không tin nữa.',
       w: { loot: 1.4, chest: 1.2, vulture: 1.2, hunt: 0.9, duel: 0.7 }, stats: { mental: 3, refl: 2, disc: -2 }, bag: { trap: 3, ghost: 1, flash: 1, hp: 4 } },
+    // ---- GĐ10 ----
+    cuongloan: { name: 'Cuồng Loạn', icon: '🌋', style: 'aggro', aggr: 1.6, desc: 'Gặp ai đánh nấy, gặp cái gì phá cái đó (tướng, quái, boss); không bao giờ lùi, đánh tới chết.',
+      w: { hunt: 2.0, vulture: 1.4, boss: 1.6, farm: 1.2, duel: 2.0, drop: 1.3, retreat: 0, hide: 0.1, heal: 0.3, zone: 0.7 }, stats: { fight: 3, stam: 2, disc: -5, map: -2 }, bag: { hp: 4, ghost: 1, blood_pot: 2, grapple_dash: 1 } },
     binhthuong: { name: 'Bình Thường', icon: '🙂', style: 'balanced', aggr: 1.0, desc: 'Không có gì đặc biệt: mọi hành động cân bằng, không thiên lệch, không luật riêng.', w: {}, stats: {} },
   };
   // mỗi tướng một tính cách cố định (GĐ9: Zero → Cầu Toàn, Roxie → Thương Nhân, Joker → Kẻ Bịp Bợm; Thực Dụng và Con Bạc Khát Nước
@@ -75,7 +78,7 @@
   const BY_HERO = {
     borg: 'hobao', elara: 'li', chrononeo: 'thamfarm', zero: 'cauton', death: 'amsat', victoria: 'kenken', jack: 'conbac',
     aria: 'hoabinh', valerius: 'vosi', roxie: 'thuongnhan', wukong: 'quayphan', thanhphong: 'cuongtin', lyra: 'chuotlui',
-    koda: 'batnat', clint: 'gaccong', joker: 'bipbom', gideon: 'lanhchua', theron: 'vesi', kazuki: 'doimang',
+    koda: 'cuongloan', clint: 'gaccong', joker: 'bipbom', gideon: 'lanhchua', theron: 'vesi', kazuki: 'doimang',
     percy: 'bacle', vesper: 'thoatxac', raven: 'tientri', ryoma: 'tramtuong', ignatius: 'honloan', alice: 'moicau',
     galo: 'riabao', florian: 'nguyquan',
   };

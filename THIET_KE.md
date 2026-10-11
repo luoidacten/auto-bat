@@ -100,7 +100,7 @@
 - Nhận thức (Đọc Bản Đồ): đối thủ trong 13 đv biết ngay; xa hơn chỉ cập nhật sau độ trễ 0.25–1.75s, mỗi lần có thể bỏ sót. Nghe tiếng giao tranh trong 35–55 đv (theo Đọc Bản Đồ) dù không thấy.
 - **Người chơi thấy hết như trọng tài**: không sương mù, thấy cả vị trí trong bụi, ảo ảnh (đánh dấu ✦) và suy nghĩ của AI.
 
-## 11. Tính cách tướng (GĐ7: 30 tính cách, cố định theo tướng)
+## 11. Tính cách tướng (GĐ7: 31 tính cách, cố định theo tướng)
 | Tính cách | Lối chơi | Độ hổ báo | Trọng số hành động | Chỉ số (nền 13) | Balo mong muốn | Tướng |
 |---|---|---|---|---|---|---|
 | 🔥 Hổ Báo | Thích lao vào đánh, ít chịu rút, hay đi săn. | ×1.25 | hunt ×1.35, vulture ×0.85, farm ×0.9, hide ×0.6, heal ×0.85, retreat ×0.8, boss ×1.1, drop ×1.1, duel ×1.5, loot ×1.1 | Giao Tranh +2, Kỷ Luật -2 | - | Borg |
@@ -115,7 +115,7 @@
 | 🃏 Quấy Nhiễu | Cướp đồ ngay trước mặt người khác, đặt bẫy trêu ngươi, cấu một phát rồi dây móc chuồn. | ×1.05 | loot ×1.8, drop ×1.4, chest ×1.5, vulture ×1.2, hunt ×0.9 | Phản Xạ +3, Kỹ Năng +1, Kỷ Luật -3 | 🪤×3 🪝×2 ⚡×1 hp×4 | Wukong |
 | 📿 Cuồng Tín | Truy sát "dị giáo" (Death) tới cùng trời cuối đất, kể cả ngoài bo. | ×1.2 | hunt ×1.2, zone ×0.8, hide ×0.5 | Tâm Lý +3, Giao Tranh +1, Kỷ Luật -2 | 📜×2 👻×1 hp×5 | Diệp Thanh Phong |
 | 🐀 Chuột Lũi | Sống sót là trên hết: lủi trong bụi, tránh mọi giao tranh, chỉ cắn khi bị dồn vào góc. | ×0.55 | hide ×2, heal ×1.4, retreat ×1.5, zone ×1.3, hunt ×0.15, vulture ×0.3, duel ×0.1, boss ×0.3, drop ×0.3, loot ×0.6 | Đọc Bản Đồ +4, Phản Xạ +2, Giao Tranh -3 | hp×6 🌫×1 👻×2 ⚡×1 | Lyra |
-| 😈 Kẻ Bắt Nạt | Đuổi đánh kẻ có vũ khí kém hơn hoặc dưới 50% máu; gặp vũ khí Vàng/Đỏ hay kẻ mạnh hơn thì giữ khoảng cách. | ×1.15 | hunt ×1.4, vulture ×1.1, duel ×0.5 | Giao Tranh +2, Tâm Lý -3 | 🔥×1 🥀×1 👻×1 | Koda |
+| 😈 Kẻ Bắt Nạt | Đuổi đánh kẻ có vũ khí kém hơn hoặc dưới 50% máu; gặp vũ khí Vàng/Đỏ hay kẻ mạnh hơn thì giữ khoảng cách. | ×1.15 | hunt ×1.4, vulture ×1.1, duel ×0.5 | Giao Tranh +2, Tâm Lý -3 | 🔥×1 🥀×1 👻×1 |  |
 | 🚧 Gác Cổng | Vào bo sớm 30 giây, giữ lối vào; phục kích kẻ chạy bo và dùng khống chế giữ chúng ngoài bão. | ×1.05 | zone ×1.3, hunt ×0.8, farm ×0.9 | Đọc Bản Đồ +3, Kỷ Luật +2 | 🪤×2 🥀×1 hp×5 | Clint |
 | 🎰 Con Bạc Khát Nước | Bỏ bãi quái nhỏ; lao vào cướp thính và boss dù có 3–4 kẻ quanh đó; càng ít máu càng liều. | ×1.2 | drop ×2, boss ×1.9, duel ×1.4, chest ×1.2, hide ×0.5, retreat ×0.7 | Tâm Lý +1, Kỷ Luật -3, Giao Tranh +1 | ☄×2 ⚡×1 🛡×1 |  |
 | 🏰 Lãnh Chúa Cứ Điểm | Chiếm công trình vững gần tâm bo, đặt bẫy ở lối vào, không rời đi tới khi bo ép; ai bước vào 15 đv là dồn hỏa lực. | ×1 | hunt ×0.4, vulture ×0.4, roam ×0.6, duel ×0.3 | Kỷ Luật +3, Thể Lực +2, Phản Xạ -1 | 🪤×3 🛡×1 💚×1 hp×5 | Gideon |
@@ -132,6 +132,7 @@
 | 📐 Cầu Toàn | Phải lên đúng bộ sở trường: luôn theo lối build số 1, không đổi món theo đối thủ; chỉ gắn mảnh hồn yêu thích / hợp build, săn và đổi chác cho bằng đủ bộ; chưa đủ bộ thì ngại đánh lớn. | ×0.95 | farm ×1.25, shop ×1.3, chest ×1.2, loot ×1.4, hunt ×0.85, duel ×0.8, vulture ×0.9 | Kỷ Luật +3, Ăn Quái +2, Phản Xạ -1 | - | Zero |
 | ⚖ Thương Nhân | Buôn bán với bất kỳ ai không đang đánh nhau: gạ đình chiến ngắn để mua mảnh hồn người ta không cần (giá 60%), bán lại cho người cần (giá 130%), bán cả vật phẩm; giữ kho hàng 4 mảnh; giữ chữ tín, không bao giờ bịp; ngại đánh nhau. | ×0.85 | farm ×1.2, shop ×1.4, chest ×1.3, loot ×1.5, hunt ×0.7, duel ×0.6, vulture ×0.8 | Tâm Lý +2, Đọc Bản Đồ +2, Ăn Quái +1, Giao Tranh -2 | hp×5 🪤×1 🪝×1 ⚡×1 👻×1 | Roxie & T-Zero |
 | 🎭 Kẻ Bịp Bợm | Gạ đổi chác / liên minh với bất kỳ ai để lừa: bán mảnh dỏm giá cao, đổi gian, báo tin giả dụ người ta vào bẫy của mình; liên minh tạm thì gần như chắc chắn bịp; ai từng bị lừa thì không tin nữa. | ×1 | loot ×1.4, chest ×1.2, vulture ×1.2, hunt ×0.9, duel ×0.7 | Tâm Lý +3, Phản Xạ +2, Kỷ Luật -2 | 🪤×3 👻×1 ⚡×1 hp×4 | Joker |
+| 🌋 Cuồng Loạn | Gặp ai đánh nấy, gặp cái gì phá cái đó (tướng, quái, boss); không bao giờ lùi, đánh tới chết. | ×1.6 | hunt ×2, vulture ×1.4, boss ×1.6, farm ×1.2, duel ×2, drop ×1.3, retreat ×0, hide ×0.1, heal ×0.3, zone ×0.7 | Giao Tranh +3, Thể Lực +2, Kỷ Luật -5, Đọc Bản Đồ -2 | hp×4 👻×1 🩸×2 🪶×1 | Koda |
 | 🙂 Bình Thường | Không có gì đặc biệt: mọi hành động cân bằng, không thiên lệch, không luật riêng. | ×1 |  |  | - |  |
 
 **Hành động lớn riêng của tính cách mới** (src/sim/ai/persona.js — chỉ tính cách tương ứng mới chấm điểm được):
@@ -532,9 +533,13 @@
 | Ignatius | Dồn Phép / Hồi Chiêu / Pháp Sư Trâu | Hồn Nhiệt Ảnh Truy Mệnh (Vàng), Hồn Thiên Nhãn Xuyên Giới (Đỏ), Hồn Ưng Nhãn (Tím) |
 | Jack "Sáu Lỗ" | Chí Mạng / Xạ Thủ Súng / Tốc Đánh | Hồn Cò Quay Bất Tận (Vàng), Hồn Đạn Cuối Chấn Địa (Tím), Hồn Trảm Quyết Xuyên Tâm (Đỏ) |
 | Joker | Hồi Chiêu / Dồn Phép / Bảo Hộ | Hồn Phá Sóng Nhiễu Loạn (Vàng), Hồn Thấu Thị Thảo Mộc (Tím), Hồn Huyết Tế Toàn Cảnh (Đỏ) |
+| Justus | Dồn Phép / Hồi Chiêu / Pháp Sư Trâu |  |
 | Kazuki | Sát Thủ / Đơn Đấu / Tốc Đánh | Hồn Phong Lôi Liên Kích (Tím), Hồn Vũ Điệu Tử Thần (Vàng), Hồn Thần Tốc Thiên Mệnh (Đỏ) |
+| Kip | Đấu Sĩ / Đơn Đấu / Sát Thủ |  |
 | Koda | Đấu Sĩ / Đơn Đấu / Sát Thủ | Hồn Phi Thân Trảm Kích (Vàng), Hồn Liên Hoàn Trảm (Xanh), Hồn Thần Tốc Thiên Mệnh (Đỏ) |
+| Luca | Dồn Phép / Hồi Chiêu / Pháp Sư Trâu |  |
 | Lyra | Hồi Chiêu / Dồn Phép / Bảo Hộ | Hồn Tiên Tri Vòng Bo (Vàng), Hồn Ưng Nhãn (Tím), Hồn Thiên Nhãn Xuyên Giới (Đỏ) |
+| Olivia | Bảo Hộ / Hồi Chiêu / Hộ Vệ |  |
 | Percy | Tốc Đánh / Chí Mạng / Xuyên Giáp | Hồn Xạ Thủ Xuyên Vân (Vàng), Hồn Xuyên Cực Vạn Dặm (Đỏ), Hồn Tuyệt Đích Bất Suy (Vàng) |
 | Raven | Xuyên Giáp / Chí Mạng / Xạ Thủ Súng | Hồn Định Vị Thiện Xạ (Đỏ), Hồn Tuyệt Đích Bất Suy (Vàng), Hồn Thiên Nhãn Xuyên Giới (Đỏ) |
 | Roxie & T-Zero | Pháp Sư Trâu / Hồi Chiêu / Dồn Phép | Hồn Radar Tàn Tích (Tím), Hồn Tiên Tri Vòng Bo (Vàng), Hồn Thiên Nhãn Xuyên Giới (Đỏ) |
@@ -608,7 +613,7 @@
 | marksman | 560/+88 | 1.2/+0.1 | 320/+40 | 1.6/+0.08 | 60/+3.6 | 26/+3.8 | 30/+1.3 | 0.66/+3% | 3.3 | 6 |
 | support | 570/+88 | 1.4/+0.12 | 380/+45 | 2/+0.1 | 50/+2.6 | 28/+3.9 | 30/+1.5 | 0.62/+1.5% | 3.35 | 5 |
 
-## 16. Tướng (27)
+## 16. Tướng (31)
 Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chiêu giữ nguyên bộ chiêu bản cũ.
 
 ### Alice (alice) — 🎣 Thợ Săn Mồi Câu
@@ -737,6 +742,15 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Ván Cờ Đổi Chiều** (hồi 110/90/70s, 100/100/100 mana): Tung hộp bài lên trời: 45% Lá Toàn Năng (mọi chất cùng lúc lên mục tiêu) • 30% Đại Bác Bài (quét đường thẳng 10 đv) • 20% Tráo Sinh Mệnh (đổi % máu với tướng địch, chênh tối đa 30%) • 4.8% Cơn Ác Mộng (choáng 2.5s, kẻ quanh đó 1.5s) • 0.2% Thần Chết Bịp Bợm (kết liễu lập tức).
 - **Skill phụ — Mượn Tý Nha!** (hồi 0s): Khi ai đó trong tầm nhìn dùng món kích hoạt, vật phẩm tiêu hao hoặc phép bổ trợ, Joker có 10s để dùng bản sao của nó (hồi chiêu 0s).
 
+### Justus (justus) — 🙂 Bình Thường
+- Tầm xa • tài nguyên: không dùng mana • sát thương chính: phép
+- Chỉ số cấp 1: máu 570 (+88), mana 420 (+50), công 52 (+3), giáp 28 (+3.8), KP 32 (+2), tốc đánh 0.63 (+1.5%), tốc chạy 3.35, tầm 5
+- **Nội tại — Đức Tin Cứu Rỗi • Ý Chí Kiên Định • Hộ Vệ Thánh Đình:** Chiêu tốn Đức Tin (100, tự hồi 2.5/giây ngoài giao tranh, 1/giây trong giao tranh); giáp ảo của Justus bị vỡ, được hồi máu hay ban giáp mới: +10 Đức Tin (mỗi 1.5s). Ý Chí Kiên Định (60s): chặn trọn chiêu đầu tiên của tướng địch, rồi tỏa sóng làm chậm 40% trong 4.5 đv 2s. Hộ Vệ Thánh Đình (100s): dưới 25% máu, Thiên Sứ gánh đòn thay (35% máu tối đa của Justus, Justus không thể chết khi Thiên Sứ còn), +50 Đức Tin.
+- **S1 — Tam Kiếm Trừng Phạt** (hồi 9/8.5/8/7.5/7s): Không có thời gian niệm (vừa chạy vừa dùng). Tốn 20 Đức Tin: đánh dấu vòng đỏ bán kính 1.6 đv lên 3 tướng địch gần nhất trong 8 đv; sau 0.25s ba thanh kiếm thánh cắm xuống: sát thương phép và choáng 1s.
+- **S2 — Thánh Quang Hộ Thể** (hồi 12/11/10/9/8.5s): Tốn 25 Đức Tin: Justus và đồng minh trong 6 đv nhận Giáp Ảo = 20% máu tối đa trong 4s và được thanh tẩy mọi khống chế, hiệu ứng xấu, vết thương sâu. Giáp bị phá trước khi hết giờ: hoàn 25 Đức Tin.
+- **S3 — Tia Phán Quyết Liên Tục** (hồi 6/5.5/5/4.5/4s): Chiếu tia laser thánh dài 10 đv (khởi đầu 10 Đức Tin, +6 mỗi giây duy trì, tối đa 4s): vừa chiếu vừa đi chậm (−30%); bị choáng / hóa đá là ngắt. Mỗi 0.5s trúng tướng: sát thương +15% (tối đa +60%). Mỗi giây trúng: Ý Chí Kiên Định hồi nhanh 0.25s × số tướng trúng.
+- **S4 — Trận Địa Thanh Tẩy Vạn Năng** (hồi 90/75/60s): Tốn 40 Đức Tin: cắm Kinh Thánh mở Pháp Trận bán kính 9 đv trong 6s. Kẻ địch trong trận bị thiêu mỗi 0.5s (mỗi nhịp +2 Đức Tin), mất 40% Kháng Phép và 30 Hộ Giáp mỗi giây. Mỗi 1.5s cấp Giáp Ảo 8% máu tối đa cho Justus và đồng minh trong trận, thanh tẩy làm chậm.
+
 ### Kazuki (kazuki) — 💣 Kẻ Đổi Mạng
 - Cận chiến • tài nguyên: không dùng mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 595 (+93), mana 0 (+0), công 63 (+4), giáp 30 (+3.9), KP 32 (+1.8), tốc đánh 0.72 (+2.5%), tốc chạy 3.55, tầm 1.6
@@ -747,7 +761,16 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Vạn Cảnh Trảm Vực** (hồi 110/90/75s): Lướt 6 đv, để lại vùng loạn kiếm bán kính 3 trong 4s: sát thương liên tục, hút nhẹ về tâm, cấm lướt.
 - **Skill phụ — Vô Tướng Nghịch Trảm** (hồi 14s): Thủ thế song kiếm 0.6s. Đỡ trúng đòn đánh hay chiêu của tướng địch phía trước: chặn sát thương, CHOÁNG kẻ đó 1s, lướt xuyên qua để ảo ảnh chém liên hoàn — 2s sau vết chém nổ tung (60 +10/cấp, +60% SMVL) và đẩy văng; hồi ngay Kiếm Thế Quyết, +5 Kiếm Ý. Đỡ hụt: khựng 0.3s.
 
-### Koda (koda) — 😈 Kẻ Bắt Nạt
+### Kip (kip) — 🙂 Bình Thường
+- Cận chiến • tài nguyên: không dùng mana • sát thương chính: vật lý
+- Chỉ số cấp 1: máu 570 (+88), mana 0 (+0), công 63 (+3.9), giáp 27 (+3.6), KP 32 (+1.8), tốc đánh 0.75 (+2.5%), tốc chạy 3.7, tầm 1.4
+- **Nội tại — Gia Tốc Trượt Không Gian:** Mỗi lần lướt / dịch chuyển / dây móc: +15% tốc chạy 2.5s; đòn cận chiến kế tiếp sau dịch chuyển bỏ qua 30% Hộ Giáp và áp sát tức thời trong 4 đv. Thể Phản Xạ Hư Vô (45s): đòn đầu tiên từ kẻ địch ngoài tầm nhìn bị vô hiệu. Đứng trong vùng cảnh báo đỏ: +30% tốc chạy để thoát.
+- **S1 — Vết Nứt Hư Không** (hồi 0.4s): Tốn 1 Điểm Hư Không: dịch chuyển 6 đv theo hướng chỉ định (xuyên vật cản mỏng), để lại Vết Nứt 3s. Trong 3s dùng lại để giật về Vết Nứt, hồi 15% Hộ Giáp và choáng 0.3s kẻ địch quanh đó.
+- **S2 — Phi Đao Tọa Độ** (hồi 12/11/10/9/9s): Phóng phi đao 16 đv. Cắm địa hình: tạo điểm neo 5s, dùng lại để dịch chuyển tới đó. Trúng kẻ địch: sát thương vật lý; dùng lại (5s) để xuyên không ra sau gáy đối thủ, đâm chí mạng và làm chậm 50% 1.5s.
+- **S3 — Vòm Xoáy Bẻ Cong Đạn Đạo** (hồi 15/14/13/12/12s): Tốn 1 Điểm Hư Không: lỗ đen mini bán kính 3.5 đv quanh thân 2s — nuốt mọi đạn đạo tầm xa bay vào; kẻ địch cận chiến bước vào nhận sát thương phép và bị hất văng 4 đv khi vòm xoáy kết thúc.
+- **S4 — Lãnh Địa Đa Chiều: Trò Chơi Trốn Tìm** (hồi 80/65/50s): Tốn 2 Điểm Hư Không: kết giới bán kính 14 đv trong 8s — Vết Nứt không tốn điểm và hồi 1s; mỗi cú dịch chuyển để lại tàn ảnh đánh lừa; mọi đòn đánh thêm 50% xuyên Hộ Giáp. Rời khỏi kết giới thì nó biến mất.
+
+### Koda (koda) — 🌋 Cuồng Loạn
 - Cận chiến • tài nguyên: không dùng mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 570 (+88), mana 0 (+0), công 61 (+3.7), giáp 30 (+3.8), KP 32 (+1.8), tốc đánh 0.7 (+2.5%), tốc chạy 3.6, tầm 1.4
 - **Nội tại — Vết Thương Sâu:** Đòn đánh và chiêu gây 1 tầng Chảy Máu (tối đa 5): mỗi tầng 6 (+1.8/cấp) sát thương vật lý mỗi giây trong 4s.
@@ -757,6 +780,16 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Thú Tính** (hồi 100/85/70s): 5s hóa bóng đen: +50% tốc chạy, đi xuyên người; mỗi lần lướt qua tướng địch gây 1 tầng Chảy Máu (mỗi tướng 1 lần/0.5s).
 - **Skill phụ — Bám Tường** (hồi 12s): Khi đứng cạnh tường/vách đá/rặng cây (1.6 đv): bám lên đó tối đa 3s — không thể bị chọn làm mục tiêu. Bấm lại (hoặc dùng Vồ Mồi): lao xuống tướng địch trong 7 đv nhanh gấp rưỡi, gây 60 (+6/cấp, +60% SMVL) ×1.5 sát thương; Cào Loạn Xạ kế tiếp ×1.5.
 
+### Luca (luca) — 🙂 Bình Thường
+- Tầm xa • tài nguyên: mana • sát thương chính: phép
+- Chỉ số cấp 1: máu 560 (+84), mana 420 (+50), công 52 (+3), giáp 22 (+3.6), KP 30 (+1.4), tốc đánh 0.63 (+1.5%), tốc chạy 3.45, tầm 5
+- **Nội tại — Sân Khấu Náo Nhiệt:** Náo Nhiệt 0–100: đánh trúng tướng +5, chiêu trúng tướng +10, lừa đòn +20, thoát hiểm +15. Mỗi 10 điểm +2% tốc chạy, +3% SMPT; đủ 100 mở khóa Cải Trang Tuyệt Đỉnh. Áo Choàng Thoát Hiểm (120s): lần đầu tụt dưới 10% máu → tàng hình 1.5s, dịch chuyển 4 đv ra xa kẻ địch, +15 Náo Nhiệt; mỗi lần đầy 100 Náo Nhiệt giảm 30s hồi.
+- **S1 — Sân Khấu Mở Ra / Bước Nhảy Ngàn Hoa** (hồi 10/9/8/7/7s, 55/55/55/55/55 mana): Mở Vùng Sân Khấu bán kính 6 đv trong 6s: trong vùng +20% tốc chạy, +15% hút máu phép. Trong sân khấu, S1 thành Bước Nhảy Ngàn Hoa: hồi 1.2s, tốn 25 mana, lướt 2.5 đv phóng cánh hoa hồng thép gây sát thương phép kẻ địch lướt qua.
+- **S2 — Ánh Đèn Rọi Vào Tôi Nè!** (hồi 13/12/11/10/10s, 60/60/60/60/60 mana): Tạo dáng 1.5s ("Trò Lừa Bịp"): đòn đầu tiên của kẻ địch bị triệt tiêu 100%, Luca hóa búp hoa dịch chuyển ra sau lưng kẻ tấn công, câm lặng 1.25s và khiến nạn nhân nhận thêm 20% sát thương phép từ Luca trong 3s (+20 Náo Nhiệt).
+- **S3 — Hoán Vị Ảnh Hồng** (hồi 11/10/9/8/8s, 65/65/65/65/65 mana): Để lại Đóa Hồng Chiếu Ảnh (6s) rồi lao 4.5 đv: kẻ đầu tiên va phải nhận sát thương phép và choáng 0.75s. Trong 6s dùng lại để dịch chuyển về đóa hồng.
+- **S4 — Cải Trang Tuyệt Đỉnh** (hồi 90/75/60s, 100/100/100 mana): Cần 100 Náo Nhiệt. Ném lá bài mạ vàng 8 đv: trúng tướng gây sát thương phép, Luca hóa trang thành tướng đó 15s — S1–S3 được thay bằng chiêu của nạn nhân (SMPT quy đổi thành SMVL nếu sao chép đấu sĩ / xạ thủ), dùng chiêu phụ để lật qua lại hai bộ chiêu. Trong 2s đầu dùng lại để đổi chỗ với nạn nhân. Hết giờ: dịch chuyển về chỗ bắt đầu tung chiêu.
+- **Skill phụ — Hoán Đổi Bộ Chiêu** (hồi 1s): Khi đang Cải Trang: lật qua lại giữa bộ chiêu của Luca và bộ chiêu đang sao chép (hai bộ hồi chiêu độc lập).
+
 ### Lyra (lyra) — 🐀 Chuột Lũi
 - Tầm xa • tài nguyên: mana • sát thương chính: phép
 - Chỉ số cấp 1: máu 550 (+84), mana 420 (+50), công 52 (+3), giáp 22 (+3.6), KP 30 (+1.4), tốc đánh 0.63 (+1.5%), tốc chạy 3.35, tầm 5.5
@@ -765,6 +798,16 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S2 — Sóng Dâng** (hồi 11/10.5/10/9.5/9s, 60/65/70/75/80 mana): Đẩy một con sóng 7 đv (rộng 1.4): 50/80/110/140/170 (+45% SMPT) sát thương phép và đẩy lùi 1.5 đv theo hướng sóng.
 - **S3 — Dòng Chảy** (hồi 14/13/12/11/10s, 60/60/60/60/60 mana): Lyra và đồng minh thấp máu nhất trong 6 đv nhận khiên 50/80/110/140/170 (+35% SMPT) 2.5s và +30% tốc chạy 2s.
 - **S4 — Đại Hồng Thủy** (hồi 110/95/80s, 100/100/100 mana): Gọi cột nước vào điểm trong 10 đv, dâng sau 0.75s: bán kính 3.5, 180/270/360 (+80% SMPT) sát thương phép, hất tung 1s.
+
+### Olivia (olivia) — 🙂 Bình Thường
+- Tầm xa • tài nguyên: mana • sát thương chính: phép
+- Chỉ số cấp 1: máu 575 (+88), mana 380 (+45), công 50 (+2.6), giáp 28 (+3.9), KP 30 (+1.5), tốc đánh 0.62 (+1.5%), tốc chạy 3.35, tầm 5.5
+- **Nội tại — Đức Tin Tự Sinh • Thánh Ý Bảo Hộ • Thánh Niệm:** Đức Tin tự hồi 3/giây (gấp đôi cạnh đồng minh); trên 50 Đức Tin: +50% hồi mana. Mỗi 15s nhận Khiên Phép = 12% máu tối đa + 25% SMPT (chỉ đỡ sát thương phép). Đánh thường là tia phép 5.5 đv (100% SMVL + 30% SMPT), trúng tướng +5 Đức Tin.
+- **S1 — Dây Dẫn Thánh Linh / Trận Pháp Cứu Rỗi** (hồi 11/10/9/8/8s, 60/60/60/60/60 mana): Lên kẻ địch: xích thánh trói chân 1.25–2s và gây sát thương phép. Lên đồng minh: hồi máu tức thì và kéo đồng minh lướt về cạnh Olivia. Có đủ 25 Đức Tin và kẻ địch đứng gần nhau: đặt Thánh Trận ở xa — 1.5s sau kích nổ, trói chân 1.5s mọi kẻ địch trong vùng, hồi máu và thanh tẩy đồng minh trong vùng.
+- **S2 — Thánh Hộ Thể** (hồi 10/9/8/7/7s, 65/65/65/65/65 mana): Tốn 20 Đức Tin: mọi đồng minh trong 5 đv (kể cả Olivia) nhận Giáp Ảo = 25% máu đã mất + 10% SMPT trong 3.5s — càng thấp máu giáp càng dày.
+- **S3 — Thánh Lễ Thanh Trừng** (hồi 14/13/12/11/11s, 80/80/80/80/80 mana): Tốn 30 Đức Tin: vùng Thánh Lễ bán kính 4 đv trong 4s. Đồng minh trong vùng hồi máu mỗi giây, +15–30% sát thương, +25% tốc chạy. Kẻ địch trong vùng bị xóa mọi khiên / cường hóa / tăng tốc khi Thánh Lễ mở và bị thiêu nhẹ liên tục.
+- **S4 — Thánh Linh Ban Phước** (hồi 120/105/90s, 100/100/100 mana): Hồi máu lớn cho mọi đồng minh trên khắp đấu trường (+50% nếu dưới 40% máu), +30% tốc chạy 4s; đồng minh thấp máu nhất nhận Siêu Giáp Ánh Sáng = 35% máu tối đa của Olivia trong 5s.
+- **Skill phụ — Ý Chí Thần Quan** (hồi 20s): Quỳ cầu nguyện tối đa 4s: mỗi giây hồi 4% máu và 5% mana. Bị tướng hoặc quái lớn đánh là ngắt.
 
 ### Percy (percy) — 🐺 Thợ Săn Bắt Lẻ
 - Tầm xa • tài nguyên: mana • sát thương chính: vật lý
@@ -889,9 +932,13 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Ignatius**: 1: a. Hỏa Tốc / b. Thiêu Rụi / c. Bộ Pháp Chớp Nhoáng • 3: a. Biển Lửa Giam Cầm / b. Hư Ảnh Cháy Bùng / c. Đại Hỏa Cầu Phá Đạn • 6: a. Tường Lửa Chắn Lối / b. Kích Nổ Cầu Lửa / c. Hỏa Hồn Bùng Cháy • 9: a. Hỏa Ngục Bất Diệt / b. Thiên Thạch Tận Thế / c. Tia Lửa Ma Thuật • 12: a. Hố Đen Tro Tàn / b. Pháp Sư Trọng Lực / c. Phượng Hoàng Tái Sinh
 - **Jack "Sáu Lỗ"**: 1: a. Tay Cờ Bạc Chuyên Nghiệp / b. Thay Đạn Nhanh / c. Đạn Nặng • 3: a. Tăng Tỷ Lệ Nhà Cái / b. Xả Hết Vốn / c. Thần May Mắn Hộ Mệnh • 6: a. Nạp Đạn Liều Lĩnh / b. Bắn Nhanh / c. Tẩy Bài Cờ Bạc • 9: a. Viên Đạn Sinh Tử / b. Ván Bài Lật Ngửa / c. Tất Tay • 12: a. Cược Tất Tay / b. Thần Bạc Gian Lận / c. Mạng Thứ Hai
 - **Joker**: 1: a. Tay Nhanh Hơn Mắt / b. Trộm Vặt / c. Nhà Cái Kiếm Tiền • 3: a. Bích Độc Đao / b. Tép Ngạt Khí / c. Lừa Tình Tuyệt Đỉnh • 6: a. Vui Thôi Nào! / b. Phi Ba Lá / c. Bài Ảo Đánh Lạc Hướng • 9: a. Đạo Tặc Thần Tốc / b. Bàn Tay Điêu Luyện / c. Bộ Bài Vô Tận • 12: a. Thần Bài Gian Lận / b. Gian Lận Tối Thượng / c. Ván Cược Sinh Tử
+- **Justus**: 1: a. Tâm Niệm Thuần Khiết / b. Ý Chí Cương Nhu / c. Đòn Đánh Cổ Ngữ • 3: a. Kiếm Thánh Rơi Nhanh / b. Hộ Thể Cường Hóa / c. Quang Trận Tiếp Tốc • 6: a. Tia Laser Xuyên Thấu / b. Hộ Vệ Bất Khuất / c. Lời Cầu Nguyện Vô Tận • 9: a. Đức Tin Bất Hoại / b. Hộ Vệ Hồi Sinh / c. Trận Địa Giam Cầm • 12: a. Giáo Hoàng Thánh Đình / b. Vô Tận Hộ Thần / c. Giáo Lý Vững Bền
 - **Kazuki**: 1: a. Tĩnh Tâm / b. Kéo Dài Nhịp / c. Kiếm Phong • 3: a. Phá Giáp Xung Kích / b. Huyết Trảm / c. Thấu Thị • 6: a. Trảm Khí Nghịch Chuyển / b. Vạn Kiếm Quy Nhất / c. Đoạt Mệnh Trảm Đạn • 9: a. Kiếm Vực Giam Cầm / b. Bất Diệt Ý Niệm / c. Bát Hướng Phân Thân • 12: a. Tuyệt Kỹ Iaido / b. Trảm Đoạn Thời Không / c. Đạo Kiếm Hợp Nhất
+- **Kip**: 1: a. Bước Chân Hư Ảo / b. Thấu Thị Không Gian / c. Gia Tốc Dây Móc • 3: a. Cắt Gió Đa Tầng / b. Nuốt Đạn Phản Hồi / c. Lướt Xuyên Tường Dày • 6: a. Đột Kích Điểm Mù / b. Không Gian Nén / c. Vết Nứt Nổ Chậm • 9: a. Trôi Dạt Vô Đích / b. Vết Cắt Xuyên Tủy / c. Cổng Dịch Chuyển • 12: a. Sát Thủ Vô Ảnh / b. Nghịch Đảo Trọng Trường / c. Khe Nứt Bất Tận
 - **Koda**: 1: a. Bản Năng Leo Trèo / b. Móng Vuốt Sắc Bén / c. Cào Cuồng Bạo • 3: a. Vồ Mồi Từ Trên Cao / b. Đứt Gân Toàn Phần / c. Vết Cắn Truy Lùng • 6: a. Cắn Xé Cuồng Loạn / b. Vuốt Quét 360 / c. Đánh Hơi Con Mồi • 9: a. Thú Tính Bất Diệt / b. Cơn Đói Khát Máu / c. Xé Toạc Sinh Mệnh • 12: a. Độn Thổ Rình Rập / b. Sói Đầu Đàn / c. Hộ Chủ Cuồng Bạo
+- **Luca**: 1: a. Khán Giả Cuồng Nhiệt / b. Vạt Áo Trơn Trượt / c. Hương Hoa Gai Góc • 3: a. Ánh Đèn Chói Mắt / b. Hoa Hồng Vĩnh Cửu / c. Vũ Điệu Bão Tố • 6: a. Sân Khấu Mở Rộng / b. Lật Tẩy Bất Ngờ / c. Nghệ Sĩ Đào Thoát • 9: a. Ảo Thuật Hoàn Hảo / b. Hoán Vị Nổ Tung / c. Vỗ Tay Không Dứt • 12: a. Thiên Tài Đạo Diễn / b. Sân Khấu Tử Thần / c. Ngôi Sao Đường Phố
 - **Lyra**: 1: a. Bọt Tốc Hành / b. Linh Lực Thủy Triều / c. Áo Choàng Sương • 3: a. Triều Cường / b. Mạch Nước Ngầm / c. Giáp Bọt Biển • 6: a. Sóng Thần / b. Che Chở / c. Tinh Thủy • 9: a. Xoáy Nước / b. Thủy Lưu Tốc / c. Ngọc Trai Biển Sâu • 12: a. Hồng Thủy Diệt Thế / b. Đại Dương Bao La / c. Nước Mắt Nữ Thần
+- **Olivia**: 1: a. Đức Tin Dồi Dào / b. Thánh Ý Cường Hóa / c. Cầu Nguyện Thanh Tịnh • 3: a. Dây Dẫn Tăng Tốc / b. Thánh Giáp Kháng Bộc Phá / c. Thánh Niệm Xuyên Thấu • 6: a. Thánh Trận Cự Ly Xa / b. Thanh Trừng Triệt Để / c. Khúc Cầu Nguyện Vội Vã • 9: a. Thánh Linh Bất Diệt / b. Thánh Lễ Cuồng Tín / c. Dây Trói Thần Phạt • 12: a. Đại Nữ Tu Tối Cao / b. Cứu Rỗi Tuyệt Đối / c. Ánh Sáng Bền Bỉ
 - **Percy**: 1: a. Bộ Đếm Tinh Vi / b. Tầm Bắn Thần Tốc / c. Cơ Động Lách Trận • 3: a. Dây Cáp Điện Cao Thế / b. Ụ Súng Gia Cố / c. Mũi Tên Gỉ Sét • 6: a. Phát Bắn Bùng Nổ / b. Lưới Điện Trói Buộc / c. Hộp Đạn Dự Trữ • 9: a. Bão Tên Vô Hạn / b. Móc Kép Tinh Xảo / c. Công Nghệ Áp Chế • 12: a. Drone Phòng Vệ / b. Đạn Xuyên Phá / c. Pháo Thủ Biến Hóa
 - **Raven**: 1: a. Nạp Đạn Nhanh / b. Khói Dày / c. Đạn Sơ Tốc Cao • 3: a. Cắt Gân Tầm Xa / b. Khói Độc Thần Kinh / c. Oca Vũ Trang • 6: a. Phát Bắn Bồi / b. Dây Đu Thoát Hiểm / c. Đạn Hợp Kim Titan • 9: a. Kẻ Đi Săn Vô Hình / b. Băng Đạn Mở Rộng / c. Mắt Quạ Tử Thần • 12: a. Thiện Xạ Độc Hành / b. Oca Tự Sát / c. Vọng Âm Đêm Tối
 - **Roxie & T-Zero**: 1: a. Từ Tính / b. Lắp Ráp Nhanh / c. Phản Pháo • 3: a. Vết Dầu Loang / b. Gia Cố Khung Gầm / c. Xung Điện Cao Áp • 6: a. Giáp Phản Lực / b. Bệ Phóng Lò Xo / c. Từ Trường Thu Gom • 9: a. Lõi Quá Tải / b. Tự Động Hóa Tối Tân / c. Cơ Giới Thần Tốc • 12: a. Thiết Vệ Pháo Đài / b. Vòng Xoáy Lửa / c. Cyborg Tự Thân

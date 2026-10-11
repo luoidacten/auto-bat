@@ -193,6 +193,7 @@
     },
     shield(src, tgt, amt, dur) {
       if (!isUnit(tgt) || !tgt.alive) return null;
+      if (tgt.ws && tgt.ws.noShieldT > this.time) return null;   // GĐ10: Thanh Trừng Triệt Để (Olivia) — cấm nhận giáp ảo mới
       if (src && src.stats && src !== tgt) src.stats.heal += amt * 0.5;
       if (src && src.fxl && src.fxl.onAllyCare && src !== tgt && src.team === tgt.team) this.heroHook(src, 'onAllyCare', tgt);
       return this.addStatus(tgt, 'shield', dur, amt, { src });

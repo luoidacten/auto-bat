@@ -70,7 +70,7 @@
         const dps = z.dps;
         if (dps > 0) for (const h of this.heroes) if (h.alive && !h.duel && !this.inZone(h)) {
           h.zoneT = t;
-          this.damage(null, h, h.st.maxHp * dps * 0.5 * (h.statuses.length && h.hasKey('fu_doc') ? 1 - C.FU_DOC : 1) * (1 - Math.min(0.8, h.bonus.zoneRed || 0)), 'true', { tag: 'zone', noHook: true });   // GĐ7: Phù Kháng Độc • GĐ8: mảnh hồn Kháng Độc Bão Tố
+          this.damage(null, h, h.st.maxHp * dps * 0.5 * (h.statuses.length && h.hasKey('fu_doc') ? 1 - C.FU_DOC : 1) * (1 - Math.min(0.85, (h.bonus.zoneRed || 0) + (h.hero.zoneRed || 0) + (h.ws.zoneRed || 0))), 'true', { tag: 'zone', noHook: true });   // GĐ7: Phù Kháng Độc • GĐ8: mảnh hồn Kháng Độc Bão Tố
         }
       }
     },
