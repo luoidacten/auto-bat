@@ -2,7 +2,58 @@
 
 > Tệp này được **sinh tự động** từ mã bằng `node tools/thietke.js`. Đừng sửa tay: sửa trong mã rồi chạy lại lệnh.
 > `node tools/thietke.js --kiemtra` báo lỗi nếu tài liệu lệch với mã.
-> Đơn vị: khoảng cách = **đv** (≈ 1 mét), thời gian = giây giờ game. GĐ6: bỏ hẳn bản MOBA 5v5; trò chơi là **đấu trường sinh tồn 10 tướng đánh đơn**. GĐ6b: bản đồ ×5 diện tích, 6 vùng, trận 30–60 phút, giao tranh dài, bình máu, mảnh hồn, cổng quyết đấu. GĐ8: bản đồ ×2, 8 vùng, 4 ổ boss / 7 boss có cảnh báo, Hộ Giáp & Xuyên Thủng, mảnh hồn 9 chỉ số × 6 bậc. GĐ9: súng & nạp đạn, mảnh hồn Tầm Nhìn / Tầm Đánh / Nạp Đạn / Tốc Đánh, thính giác & truy vết, 3 lối build mỗi tướng, trao đổi & bịp trong liên minh. GĐ9b: **nhà cái & đặt cược** (mục 19).
+> Đơn vị: khoảng cách = **đv** (≈ 1 mét), thời gian = giây giờ game. GĐ6: bỏ hẳn bản MOBA 5v5; trò chơi là **đấu trường sinh tồn 10 tướng đánh đơn**. GĐ6b: bản đồ ×5 diện tích, 6 vùng, trận 30–60 phút, giao tranh dài, bình máu, mảnh hồn, cổng quyết đấu. GĐ8: bản đồ ×2, 8 vùng, 4 ổ boss / 7 boss có cảnh báo, Hộ Giáp & Xuyên Thủng, mảnh hồn 9 chỉ số × 6 bậc. GĐ9: súng & nạp đạn, mảnh hồn Tầm Nhìn / Tầm Đánh / Nạp Đạn / Tốc Đánh, thính giác & truy vết, 3 lối build mỗi tướng, trao đổi & bịp trong liên minh. GĐ9b: **nhà cái & đặt cược** (mục 19). GĐ10: 13 tướng mới/làm lại, AI nhận thức & chọn nhánh theo tiện ích, quan hệ cốt truyện. GĐ11: **bộ não chiến đấu** (mục 13m), bo Ăn Mòn & Vết Thương Sâu (13n), quái lang thang & boss nhỏ (7b), liên minh vĩnh cửu (13o), **Phòng thử nghiệm Sandbox** (20), vũ khí & hiệu ứng riêng từng tướng (18).
+
+## 0. Tổng quan — trò chơi vận hành thế nào
+Đọc mục này trước để hiểu toàn bộ trò chơi; các mục sau là con số chi tiết của từng hệ thống.
+
+### 0.1. Bạn là ai, chơi để làm gì
+- **Kẻ Đặt Cược** là trò chơi *xem & đặt cược*: bạn không điều khiển tướng. 10 tướng do máy điều khiển (AI) thả vào một đấu trường sinh tồn, đánh nhau tới khi chỉ còn 1 người. Bạn đứng ngoài như **trọng tài** — thấy hết bản đồ, thấy cả suy nghĩ của từng tướng — và **đặt cược** để trả món nợ với nhà cái.
+- Một **ván** gồm 3 chặng × 6 trận. Hết mỗi chặng phải đạt chỉ tiêu tiền; chặng cuối phải trả hết nợ. Trả xong thì được tự do và có thể chơi tiếp **vô tận** (chỉ tiêu tăng dần). Chi tiết ở mục 19.
+- Trong mỗi trận: trước trận nhà cái cho **tỷ lệ cược** + tin đồn + câu hỏi đầu (ai sống tới cuối, ai Top 1, Top 3) + **Giao Kèo ×10**; giữa trận nhà cái **dừng trận để hỏi** (ai thắng giao tranh này, ai giết boss, ai lấy thính…); sau trận: thanh toán, cửa hàng charm (cộng dồn), quà có mặt trái, vay nợ, **sổ tiết kiệm** lãi kép.
+- **Nhà cái không trung thực**: có **người của nhà cái** cài trong trận (liên minh ngầm, không đánh nhau), tin đồn giả, điều khoản chữ nhỏ. Kỹ năng của người chơi là *đọc người*: xem tính cách, sức mạnh, máu, đồ, ý định của AI rồi mới đặt.
+
+### 0.2. Các chế độ ở màn hình chính
+- 🎲 **Ván cược** (vòng chơi chính, mục 19) • 👁 **Xem một trận tự do** (không cược) • ⚔ **Solo 1v1** (2 tướng tùy chỉnh cấp, đồ, mảnh hồn trên sàn đấu thu gọn) • ⏩ **Mô phỏng nhanh** (chạy hết trận trong chớp mắt, xem bảng kết quả) • 🧪 **Phòng thử nghiệm Sandbox** (GĐ11, mục 20: thả bù nhìn, đo DPS, bật/tắt hồi chiêu…) • 📜 bản cũ (Legacy).
+
+### 0.3. Một trận diễn ra thế nào (dòng thời gian)
+- **0:00** — 10 tướng (chọn ngẫu nhiên theo hạt giống) xuất hiện ở 10 điểm xuất phát rải trên 5 vùng thường, mỗi tướng cấp 1, 500 vàng, vài bình máu. Bản đồ 612×612 đv sinh theo hạt giống (biome, công trình, bụi, thùng nổ). Mỗi tướng có **tính cách cố định** (mục 11) và **phong cách đánh**.
+- **0:30** — bãi quái mở (mục 7): tướng farm vàng/KN để lên cấp (tối đa 18), mua đồ ở Thương Nhân, nâng **Ý Niệm** (cấp vũ khí) và khảm **mảnh hồn** (mục 13c). Quái lang thang (GĐ11) bắt đầu đi tuần từ giây 90; boss nhỏ từ 5:00.
+- **Trước 30:00** — chết được hồi sinh 1 lần. Sau đó chết là **bị loại**; xếp hạng theo thứ tự bị loại.
+- **Bo** (vùng an toàn, mục 3) co 6 vòng; ngoài bo mất máu theo % và (GĐ11) dính **Ăn Mòn** + **Vết Thương Sâu** (mục 13n) → ép mọi người dồn vào giữa.
+- **Boss lớn** (mục 8) xuất hiện ở 4 ổ theo lịch, chiêu lớn có vùng cảnh báo; hạ được thì nhận bùa lợi, đồ Hoàng Kim. **Thính** (mục 9) rơi từ trời theo đợt. **Rương** (mục 13e), **cổng quyết đấu** 1v1 thưởng lớn (mục 13d).
+- **Kết thúc**: còn 1 người, hoặc hết 60:00 thì những ai còn sống đồng hạng 1.
+
+### 0.4. AI tướng nghĩ thế nào (mỗi nhịp nghĩ 0.06–0.25s)
+1. **Nhận thức** (mục 13k): tầm nhìn 180°, bụi, tàng hình; nghe tiếng giao tranh / tiếng đánh quái trong 35–55 đv; nhớ vị trí cuối của đối thủ để truy vết. Trễ phản xạ, giật mình, hoảng loạn (GĐ10).
+2. **Phản xạ chiến đấu** (GĐ11, mục 13m): bị đánh từ góc khuất → xoay mặt / bắn trả mù; ngoài bo → lướt vào; dùng lại chiêu snapback đúng lúc; né chiêu định hướng & vùng cảnh báo.
+3. **Quyết định lớn — Utility AI** (mục 13): chấm điểm ~20 hành động (farm, săn người, kền kền, tranh boss, tranh thính, chạy bo, núp, uống bình, quyết đấu, săn quái lang thang…) theo **trọng số tính cách**, giữ quán tính tối thiểu.
+4. **Vi mô theo tính cách** (Persona) + **AI riêng của tướng** (ví dụ Raven tìm chỗ bắn tỉa, Luca bọc lót Alice) + **liên minh vĩnh cửu / tạm thời**.
+5. **Giao tranh**: chọn mục tiêu bằng điểm (KS, thù dai, trả đũa, nhánh kết liễu…), đánh giá thế trận theo **sức mạnh**, rồi vi thao tác: phá tụ lực, đọc đòn, chống thả diều, ép bo, combo "múa", giữ cự ly riêng, thả diều, rút lui / Đường Cùng Phản Sát (quay lại khô máu khi không thoát được).
+
+### 0.5. Các hệ thống & nơi đọc chi tiết
+| Hệ thống | Mục | Mã nguồn |
+|---|---|---|
+| Nhịp logic, tất định, hạt giống | 1 | `src/core/*, src/sim/match.js` |
+| Bản đồ, vùng, ổ boss, công trình | 2, 13f | `src/sim/map.js, src/sim/props.js` |
+| Bo + Ăn Mòn + Vết Thương Sâu | 3, 13n | `src/sim/arena.js` |
+| Cấp, KN, hồi sinh, xếp hạng | 4 | `src/sim/match.js, src/sim/arena.js` |
+| Sát thương, khiên, Hộ Giáp, xuyên thủng | 5, 13i | `src/sim/combat.js` |
+| Kinh tế, trang bị | 6, 14 | `src/sim/items.js, src/data/items.js` |
+| Quái rừng, bầy đầu đàn | 7 | `src/sim/neutral.js` |
+| Quái lang thang & 8 boss nhỏ | 7b | `src/sim/roamers.js` |
+| Boss lớn, bùa lợi, đồ Hoàng Kim | 8 | `src/sim/bosses.js` |
+| Thính, rương, balo, bình | 9, 13b, 13e | `src/sim/arena.js, src/sim/bag.js` |
+| Tính cách & AI sinh tồn | 11, 13 | `src/data/personality.js, src/sim/ai/utility.js, persona.js` |
+| Bộ não chiến đấu GĐ11 | 13m | `src/sim/ai/combat_brain.js` |
+| Nhận thức, cây kỹ năng theo tiện ích | 13k, 17 | `src/sim/ai/cognition.js` |
+| Ý Niệm & mảnh hồn | 13c | `src/data/shards.js, src/sim/extras.js` |
+| Quan hệ cốt truyện, liên minh vĩnh cửu | 13o | `src/data/relations.js` |
+| Tướng & chiêu | 16 | `src/data/heroes/*.js` |
+| Nhà cái & đặt cược | 19 | `src/data/bookie.js, src/sim/bookie.js, src/ui/bet_ui.js` |
+| Phòng thử nghiệm Sandbox | 20 | `src/sim/sandbox.js, src/ui/sandbox_ui.js` |
+| Giao diện xem trận, hiệu ứng, vũ khí | 18 | `src/ui/render.js, hud.js, vfx.js, draw_hero.js` |
+- Công cụ: `node tools/mophong.js` (mô phỏng nhiều trận, `--kiemtra` tất định) • `node tools/thu_tuong.js` (thử 1 tướng) • `node tools/tyle.js` (tỷ lệ cược) • `node tools/sandbox_test.js` (5 kịch bản Sandbox, `--dps <tướng> <cấp>`) • `node tools/thietke.js` (sinh tài liệu này) • `node tools/choi_thu.js` (đóng gói bản chơi thử).
 
 ## 1. Nhịp logic & tất định
 - Bước logic cố định 0.05s (20 bước/giây giờ game). AI tướng thao tác mỗi 2 bước (nhịp nghĩ theo Phản Xạ), quyết định lớn (Utility AI) mỗi 0.3–0.5s, lệch pha giữa các tướng.
@@ -54,7 +105,7 @@
 - Quái, boss, thính: xem mục 7–9. Trang bị mua ở Thương Nhân (mục 14).
 
 ## 7. Quái rừng
-- Bãi quái xuất hiện lúc 0:30; vàng/KN quái tăng 3 vàng, 5 KN mỗi phút; quái đuổi tối đa 6.5 đv, 5s không bị đánh thì về chỗ và hồi máu. Thưởng chỉ cho người ra đòn cuối.
+- Bãi quái xuất hiện lúc 0:30; vàng/KN quái tăng 3 vàng, 5 KN mỗi phút; quái đuổi tối đa 10 đv, 8s không bị đánh thì về chỗ và hồi máu. Thưởng chỉ cho người ra đòn cuối.
 | Bãi | Máu (+/phút) | Công (+/phút) | Giáp/KP | Vàng | KN | Hồi sinh |
 |---|---|---|---|---|---|---|
 | Quái Đỏ | 560 (+70) | 17 (+2.5) | 20/20 | 90 | 190 | 90s |
@@ -62,6 +113,36 @@
 | Quái Vàng | 520 (+60) | 15 (+2.5) | 18/18 | 110 | 170 | 90s |
 | Quái nhỏ | 300 (+40) | 10 (+2) | 10/10 | 60 | 140 | 60s |
 - Bùa 90s (người mang bị hạ → bùa sang kẻ hạ gục): Đỏ +12% sát thương, thiêu 6/s • Xanh +6 hồi mana/s, −15% hồi chiêu (tướng không mana −20%) • Vàng +30% vàng nhận, +1.2 vàng/s.
+
+## 7b. Quái GĐ11: dây xích rộng, bầy có đầu đàn, quái lang thang & boss nhỏ
+- **Dây xích rộng hơn, kiên nhẫn hơn**: quái đuổi tối đa 10 đv quanh chỗ đứng, 8s không bị đánh mới chịu về và hồi máu (trước: ngắn hơn, dễ thả diều quái).
+- **Bầy có đầu đàn**: 45% bãi quái nhỏ thành bầy — 1 **đầu đàn** (máu ×2.2, công ×1.4) + 2 con theo (máu ×0.6). Cả bầy luôn đánh **đúng mục tiêu của đầu đàn**; đánh một con là cả bầy quay sang. Con theo chết cho 40% thưởng.
+- **Quái lang thang** (src/sim/roamers.js): từ giây 90, mỗi 75s một nhóm đi tuần (tối đa 6 nhóm cùng lúc) xuất hiện ở vùng hợp phe (theo biome), có đầu nhóm tinh anh. Phát hiện tướng thì đuổi 12–16 đv; tướng vào bụi / tàng hình 3s thì mất dấu. Thưởng: quái thường 35 vàng + 80 KN (8% rơi bình nhỏ), tinh anh 90 vàng + 200 KN, boss nhỏ 250 vàng + 450 KN (cộng thêm theo phút).
+- 💀 **Binh Đoàn Xương** (vùng: Vùng Tử Khí, Núi Đá Đỏ):
+  - **Lính Xương Cầm Khiên** — máu 380, công 16, giáp/KP 30/40, tốc 3: khiên trước mặt −30% sát thương từ phía trước • tinh anh **Đội Trưởng Hài Cốt** (máu 850): khiên trước mặt −30% sát thương từ phía trước, quét nón 2.6 đv mỗi 5s
+  - **Cung Thủ Xương** — máu 300, công 18, giáp/KP 15/35, tốc 3.1, tầm 6.5: đánh xa • tinh anh **Xạ Thủ Hắc Cốt** (máu 620): mỗi đòn xé 15% Hộ Giáp, đánh xa
+  - **Hài Cốt Dẫn Hồn** — máu 320, công 20, giáp/KP 12/45, tốc 3, tầm 6: đánh xa, sát thương phép • tinh anh **Trưởng Lão Vu Cốt** (máu 700): hào quang hồi máu + tăng tốc đồng đội, đánh xa, sát thương phép
+- ☣ **Quái Vật Tận Thế** (vùng: Trạm Khí Độc, Phế Tích Tân Thế):
+  - **Chó Săn Nhiễm Độc** — máu 340, công 17, giáp/KP 15/15, tốc 3.8: đòn độc • tinh anh **Chó Chúa Gai Nhọn** (máu 780): đòn độc, chết thì nổ độc 3 đv
+  - **Bọ Thiết Giáp** — máu 520, công 15, giáp/KP 45/25, tốc 2.6: mai cứng −30% sát thương tầm xa • tinh anh **Bọ Chúa Phun Axit** (máu 900): mai cứng −30% sát thương tầm xa, phun vũng axit, đánh xa
+- 👻 **Ma Hội** (vùng: Rừng Thông, Đầm Lầy Sương):
+  - **Vong Hồn Trôi Dạt** — máu 300, công 15, giáp/KP 10/30, tốc 3.4: −20% tốc đánh 2s • tinh anh **Oan Hồn Thống Khổ** (máu 640): −20% tốc đánh 2s
+  - **Đốm Lửa Ma Trơi** — máu 220, công 14, giáp/KP 5/25, tốc 4: lao vào tự nổ • tinh anh **Hỏa Tinh U Minh** (máu 520): lao vào tự nổ
+  - **Hắc Ảnh Tập Kích** — máu 330, công 20, giáp/KP 15/20, tốc 3.5: đòn đầu từ bụi ×2 • tinh anh **Liêm Hồn Đao Phủ** (máu 700): đòn đầu từ bụi ×2
+  - **Hồn Ma Đánh Lạc Hướng** — máu 300, công 14, giáp/KP 10/30, tốc 3.3: trúng đòn thì tàng hình 1s & dịch chuyển • tinh anh **Ảo Ảnh Ma Cô** (máu 620): trúng đòn thì tàng hình 1s & dịch chuyển
+  - **Quỷ Hồn Gào Thét** — máu 290, công 17, giáp/KP 10/35, tốc 3.2, tầm 6: tiếng gào làm chậm quanh mục tiêu, đánh xa, sát thương phép • tinh anh **Banshee Tiếng Hét** (máu 640): tiếng gào làm chậm quanh mục tiêu, hét câm lặng 1s mỗi 6s, đánh xa, sát thương phép
+- **8 boss nhỏ** (từ 5:00, mỗi 210s, tối đa 2 con cùng lúc; mỗi con 2 kỹ năng có vùng cảnh báo):
+| Boss nhỏ | Phe | Máu (+/phút) | Công (+/phút) | Giáp/KP | Kỹ năng (hồi) |
+|---|---|---|---|---|---|
+| Đao Phủ Hài Cốt | 💀 Binh Đoàn Xương | 2400 (+120) | 70 (+3.5) | 40/25 | Trảm Quyết Tàn Bạo (8s) • Gai Xương Địa Ngục (14s) |
+| Kỵ Sĩ Xương | 💀 Binh Đoàn Xương | 2100 (+110) | 65 (+3.2) | 35/35 | Xung Phong Phá Trận (10s) • Cắm Cờ Tử Thần (16s) |
+| Cự Ma Khung Xương | 💀 Binh Đoàn Xương | 3200 (+150) | 80 (+4) | 50/20 | Ném Khối Hài Cốt (9s) • Lốc Xoáy Khung Xương (18s) |
+| Thực Thể Ghép Xác | ☣ Quái Vật Tận Thế | 2800 (+130) | 75 (+3.8) | 30/30 | Móc Xích Máu Thịt (11s) • Bộc Phá Khí Độc (15s) |
+| Bạo Chúa Hai Đầu | ☣ Quái Vật Tận Thế | 3000 (+140) | 85 (+4.2) | 45/25 | Tiếng Hú Chấn Động (10s) • Bổ Nhào Nghiền Nát (14s) |
+| Nhện Gai Tử Thần | ☣ Quái Vật Tận Thế | 2200 (+110) | 70 (+3.5) | 25/40 | Quấn Kén Khống Chế (9s) • Mưa Gai Axit (13s) |
+| Quái Bùn Sludge | ☣ Quái Vật Tận Thế | 2600 (+120) | 60 (+3) | 35/45 | Phun Pháo Bùn Thải (8s) • Nuốt Chửng & Bắn Trả (16s) |
+| Giáo Chủ Ma Hội | 👻 Ma Hội | 2600 (+125) | 78 (+3.8) | 25/55 | Ma Trận Hút Hồn (10s) • Vạn Hồn Cuồng Nộ (16s) |
+- **Tiếng đánh quái vang 35 đv**: tướng nghe thấy người khác đang đánh quái lang thang/boss nhỏ → có thể kéo tới kền kền hoặc săn người đang yếu. AI có hành động riêng 💀 **Săn quái lang thang** (Utility).
 
 ## 8. Boss (GĐ8: 4 ổ, 7 boss, mọi chiêu lớn đều có vùng cảnh báo)
 | Boss | Ổ | Máu (+/phút) | Công (+/phút) | Giáp/KP | Chiêu có cảnh báo | Thưởng (người ra đòn cuối) |
@@ -157,6 +238,7 @@
 ## 13. AI sinh tồn (2 tầng)
 - **Tầng chiến lược — Utility AI** (mỗi 0.3–0.5s; nguy cấp hoặc đang bị bo đốt thì quyết ngay): chấm điểm từng hành động bằng trung bình nhân các yếu tố (0..1), nhân trọng số tính cách × mất bình tĩnh × chuỗi hạ gục, cộng **động lực làm tiếp việc đang làm 0.35 + 0.1 × Kỷ Luật** (GĐ6b: từ 0.2 lên 0.45; quyết gấp thì một nửa), nhiễu ±(0.02 + 0.08 × mất bình tĩnh); **bốc ngẫu nhiên có trọng số** trong nhóm ≤ 0.12 dưới điểm cao nhất (nhiệt độ 0.03 + 0.05 × (1 − Kỷ Luật) + 0.06 × mất bình tĩnh); chưa đủ thời gian tối thiểu thì chỉ đổi khi việc mới hơn ≥ 0.45. Ghi 3 lựa chọn điểm cao nhất kèm lý do.
   - 🌲 **Ăn quái** (farm, giữ tối thiểu 4s)
+  - 💀 **Săn quái lang thang** (monhunt, giữ tối thiểu 5s)
   - 🎯 **Đi săn** (hunt, giữ tối thiểu 4s)
   - 👑 **Tranh boss** (boss, giữ tối thiểu 5s)
   - 📦 **Tranh thính** (drop, giữ tối thiểu 5s)
@@ -562,6 +644,46 @@
 | Wukong | Đấu Sĩ / Đơn Đấu / Đỡ Đòn | Hồn Trường Nhận Phong Khí (Vàng), Hồn Thần Tốc Thiên Mệnh (Đỏ), Hồn Titan Phá Giới (Đỏ) |
 | Zero | Xạ Thủ Súng / Chí Mạng / Xuyên Giáp | Hồn Đoạt Mệnh Nạp Tức Thì (Vàng), Hồn Đầu Đạn Phá Giáp (Tím), Hồn Kim Thần Tiếp Đạn (Hoàng Kim) |
 
+## 13m. Bộ não chiến đấu (GĐ11 — src/sim/ai/combat_brain.js)
+Lớp vi thao tác chạy trên nền Utility AI, giúp mỗi tướng **dùng tối đa bộ chiêu của mình** và đánh như người thật:
+1. **Phân loại kỹ năng** (Skill Taxonomy): mỗi chiêu được gắn nhóm Damage / Mobility / CrowdControl / Defense / CounterParry và vai phụ, suy ra tự động từ dữ liệu chiêu (chiêu có thể ghi đè bằng `def.tax`). Hiện có 181 chiêu: Bộc phá 73 • Kết liễu 11 • Lướt thoát 33 • Lướt áp sát 35 • Né chiêu 31 • Khống chế cứng 70 • Khống chế mềm 37 • Đẩy / hất văng 27 • Khiên / giáp ảo 40 • Chặn / nuốt đạn 2 • Phản đòn cận chiến 3.
+2. **Kỷ luật bình máu** (Consumable Sanity): khóa uống bình máu / Hộ Vệ khi — đang ngoài bo; đang Solo mà đối thủ còn > 2s khống chế; vừa bị tướng đánh trong 3s; có kẻ địch nhìn thấy mình trong tầm đe dọa mà không có vật cản; kẻ địch trong 12 đv. Chỉ uống khi đã cắt tầm nhìn / nấp sau vật cản / đủ xa (ghi lý do vào thẻ tướng).
+3. **Đường Cùng Phản Sát** (Last Stand): máu < 25%, kẻ đuổi trong 9 đv nhanh hơn mình (hoặc xạ thủ bám tầm), không có bụi / chiêu thoát / vật cản → quay đầu khô máu 3.5s thay vì chạy làm bia.
+4. **Suy luận hướng đòn & trả đũa** (Damage Inference): mỗi đòn trúng ghi lại kẻ đánh và hướng (cận chiến chính xác, tầm xa lệch ±5°, bẫy/vùng = môi trường). Bị đánh từ góc khuất → xoay mặt về hướng đó; có chiêu định hướng thì **bắn trả mù** dọc trục đạn; tướng mỏng lách ngang / tìm bụi; kẻ vừa đánh lén được +1.0 điểm chọn mục tiêu.
+5. **Chống thả diều** (Anti-Kite): cận chiến bị đánh từ xa, đối thủ lùi, ngoài tầm → dùng chiêu **Lướt áp sát** chéo 45° (né trục đạn) hoặc đón đầu, vừa tới nơi thì nối ngay khống chế; hết chiêu thì zíc-zắc vào bụi, không chạy thẳng.
+6. **Solo 1v1 FSM**: NEUTRAL → ENGAGE → RESET → EXECUTE; lực hút về tâm sàn khi quá 70% bán kính (không bị dồn góc), lực tách thân (không chồng lên nhau), luôn quay mặt về đối thủ; tầm xa bị dồn thì dùng chiêu thoát.
+7. **Ép bo** (Zone Warfare): khóa chân kẻ đang ngoài bão bằng khống chế (giữ chúng ngoài bão 2–3s); **gác cổng** — đứng mép trong, không bước ra ngoài đánh; **ring-out** — kẻ địch < 6 đv sát mép thì vòng ra phía trong rồi dùng chiêu đẩy/hất văng ra ngoài bo; ngoài bo máu thấp thì **cấm đứng uống bình**, dùng mọi chiêu cơ động chạy vào.
+8. **Liên minh vĩnh cửu** (mục 13o): bạn đang đánh nhau trong 35 đv → tới bọc lót (Luca mở Sân Khấu chia lửa), rảnh thì đi cùng nhau cách 3–6 đv.
+9. **Luật Snapback chung** (chiêu "dùng lại để về điểm neo": Luca S3, Kip S1/S2…): đang ngoài bo mà điểm neo trong bo → giật về; máu < 40% vừa trúng đòn và điểm neo xa kẻ địch hơn → giật về; bị đuổi sát lúc sắp hết hạn → giật về; còn lại **không phí** (để hết hạn). Luca S4 chỉ đổi chỗ khi có lợi (ring-out, có nhánh choáng, hoặc nạn nhân đứng xa).
+10. **Canh boss theo tính cách**: cả lò ai cũng biết **cửa sổ kết liễu** — sát thương sẵn sàng (×0.8) + Trừng Phạt ≥ máu boss → xả hết kể cả chiêu cuối. Có người khác tranh boss: 🦅 Kền Kền / Ngụy Quân Tử / Gieo Hỗn Loạn đứng ngoài dây xích chờ boss < 20% mới lao vào cướp; Ám Sát / Bắt Nạt / Võ Sĩ / Trảm Tướng / sát thủ quay sang đánh kẻ tranh boss đang < 55% máu.
+11. **Kỷ luật âm thanh khi farm**: có tướng địch trong 35 đv (thấy hoặc vừa nghe tiếng) → khi farm không đốt chiêu lướt / chiêu áp sát lên quái và giữ mana ≥ 40% cho giao tranh sắp tới.
+12. **Gắn hành vi theo nhánh tiến hóa** (Behavior Binding): nhánh có "sau lưng / đánh lén" → cận chiến đi vòng ra sau mục tiêu; "đỡ đòn / phản đòn / thế thủ" → luôn đọc đòn để phản kể cả khi đang khô máu; "mũi kiếm / điểm ngọt / cự ly" → giữ đúng cự ly ngọt; "kết liễu / máu thấp" → +0.8 điểm cho mục tiêu < 35% máu; "không bị ngắt / gồng" → không tự hủy chiêu.
+13. **Ảo ảnh lừa đảo** (src/sim/decoy.js): chủ đang bỏ chạy (máu < 35%) → ảo ảnh chạy hướng ngược lại, lạng lách kéo kẻ đuổi đi sai đường; ảo ảnh < 40% máu → giả vờ tháo chạy như tướng thật sắp chết; còn lại đánh kẻ gần nhất nhưng lạng trái/phải giữa hai đòn.
+
+## 13n. Bo độc nâng cấp: Ăn Mòn & Vết Thương Sâu (GĐ11)
+- **Ăn Mòn**: mỗi 1s ở ngoài bo +1 tầng (tối đa 15); mỗi tầng thêm 0.4% máu tối đa **sát thương chuẩn mỗi giây** (cộng với sát thương bo thường). Chỉ xóa sạch khi ở trong bo liên tục > 3s.
+- **Vết Thương Sâu**: ngoài bo mọi hồi máu (bình, hút máu, chiêu hồi) **giảm 65%** → uống bình ngoài bo gần như phí; AI biết điều này (mục 13m.2, 13m.7).
+
+## 13o. Quan hệ cốt truyện & liên minh vĩnh cửu (src/data/relations.js)
+- **friend**: không ra tay trước (chỉ đánh trả khi bị chính họ đánh); còn ≤ 3 người thì tình bạn nhường chỗ cho ngôi vô địch. **protect**: ai đánh người này (≤ 4s) bị ưu tiên trừng phạt (+2.2 điểm). **hate**: cộng điểm ưu tiên tiêu diệt. **line**: câu thoại khi lần đầu chạm mặt.
+- **eternal — liên minh vĩnh cửu** (GĐ11): không bao giờ đánh nhau, không săn nhau, không làm kền kền nhau, chung phe "đồng minh" cho mọi chiêu hỗ trợ; tới bọc lót khi người kia giao tranh trong 35 đv; **chỉ khi còn đúng 2 người** mới phân thắng bại.
+| Tướng | Bạn | Bảo vệ | Vĩnh cửu | Thù (hệ số) |
+|---|---|---|---|---|
+| Luca | Alice | Alice | Alice | Dr. Caelus 0.6, Dr. Vector 0.6 |
+| Alice | Luca, Mirage | Luca | Luca | — |
+| Mirage | Alice, Luca | Alice, Vesper | — | Dr. Caelus 0.8, Dr. Vector 0.6 |
+| Kip | Aria & Oktava | Aria & Oktava | — | Dr. Caelus 0.7 |
+| Aria & Oktava | Kip | — | — | — |
+| Olivia | Justus, Ariston, Valerius | Justus | — | — |
+| Justus | Olivia, Ariston, Valerius | Olivia | — | Vesper 1, Death 1, Dr. Caelus 1 |
+| Ariston | Justus, Olivia, Valerius | Justus, Olivia | — | Vesper 1.8, Diệp Thanh Phong 1.8, Dahlia 1.2 |
+| Dr. Caelus | — | — | — | Luca 1.2 |
+| Dr. Vector | — | — | — | Luca 1, Alice 0.6, Mirage 0.8, Dahlia 0.8 |
+| Boran | — | — | — | Dr. Caelus 2.2, Roxie & T-Zero 2.2, Raven 0.8, Kip 0.8 |
+| Ratok | Borg | — | — | — |
+| Borg | Ratok | — | — | — |
+| Dahlia | — | — | — | Aria & Oktava 0.8, Victoria 0.8, Roxie & T-Zero 0.8 |
+
 ## 14. Trang bị
 - 47 món hoàn chỉnh, tối đa 6 ô. Mỗi món có phôi (40% giá, 40% chỉ số). **Chỉ mua được ở Thương Nhân** (AI tự đi shop khi đủ tiền). Bán lại 50%.
 | Món | Loại | Giá | Chỉ số / hiệu ứng |
@@ -627,7 +749,7 @@
 Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chiêu giữ nguyên bộ chiêu bản cũ.
 
 ### Alice (alice) — 🎣 Thợ Săn Mồi Câu
-- Tầm xa • tài nguyên: mana • sát thương chính: phép
+- Tầm xa • vũ khí: gloves • tài nguyên: mana • sát thương chính: phép
 - Chỉ số cấp 1: máu 590 (+84), mana 420 (+50), công 52 (+3), giáp 26 (+3.6), KP 30 (+1.4), tốc đánh 0.63 (+1.5%), tốc chạy 3.5, tầm 8
 - **Nội tại — Náo Nhiệt:** Đánh thường gây sát thương phép (tầm 8 đv). Náo Nhiệt (0–100) tích khi đánh trúng tướng (+8) và khi ảo ảnh bị phá (+25); Phi Dao tự tiêu 5, Lướt Đâm tự tiêu 10 để cường hóa. Bị Lừa Rồi Nha!: ảo ảnh bị phá thì phát nổ. Thoát Hiểm Ảo Ảnh & Sân Khấu Cuối Cùng (180s): đòn chí tử bị chặn — tàng hình 1.5s, hồi 25% máu, làm mới mọi hồi chiêu, +100 Náo Nhiệt, tăng mạnh Công Phép và tốc chạy 8s, ảo ảnh nổ mạnh hơn 25% và rộng gấp đôi.
 - **S1 — Phi Dao Ảo Thuật** (hồi 5/4.75/4.5/4.25/4s, 45/50/55/60/65 mana): Phi dao 7 đv. Tốn 5 Náo Nhiệt: phóng 8/10/12/14/20 dao tỏa 360°, mỗi dao 50/60/70/90/100% sát thương.
@@ -637,7 +759,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Tẩu Thoát, Ohh!** (hồi 12s): Đổi chỗ với ảo ảnh xa kẻ địch nhất.
 
 ### Aria & Oktava (aria) — 🕊 Hòa Bình
-- Tầm xa • tài nguyên: mana • sát thương chính: phép
+- Tầm xa • vũ khí: voice • tài nguyên: mana • sát thương chính: phép
 - Chỉ số cấp 1: máu 595 (+88), mana 380 (+45), công 50 (+2.6), giáp 28 (+3.9), KP 32 (+1.5), tốc đánh 0.62 (+1.5%), tốc chạy 3.35, tầm 5
 - **Nội tại — Bóng Hình Âm Vang & Hòa Âm:** Oktava (Người Bảo Hộ) đi theo Aria, có máu riêng (45% máu Aria), chết thì hồi lại sau 45s. Ai đánh Aria thì Oktava nhắm kẻ đó và đuổi tới khi cách Aria quá xa (14 đv) hoặc bị Aria thu hồi (Aria rút lui, hoặc Oktava sắp chết). 3 nốt (S1/S2/S3, dùng CHUNG hồi chiêu 3.5s) liên tiếp thành 1 Bản Nhạc — nốt tan biến nếu 5s không gõ thêm, cường hóa theo nốt được bấm nhiều nhất: Đỏ — Oktava dậm to, Aria nổ 3 lần, lần cuối CHOÁNG • Xanh — 3 đợt sóng âm: trúng 1 làm chậm, 2 trói chân, 3 MÊ HOẶC (tự đi về phía Oktava) • Vàng — Oktava dậm thẳng xuống chỗ Aria đẩy lùi cực mạnh, cả đội gần đó nhận khiên kèm Hồi Phục • đều nhau — Hòa Âm Hỗn Hợp (cả ba, yếu hơn). Đánh xong 3 Bản Nhạc thì mở Bản Giao Hưởng Tử Thần.
 - **S1 — Nốt Đỏ — Tấn Công** (hồi 4/3.75/3.5/3.25/3s, 35/38/41/44/47 mana): Oktava NHẢY DẬM vào kẻ địch gần nhất (trong 9 đv; không có thì vào điểm chỉ định) — sát thương bán kính 2.2 và hất lùi; Aria phát sóng âm quanh mình (bán kính 2.5). 3 nốt dùng chung hồi chiêu.
@@ -647,7 +769,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Gắn Kết** (hồi 16s): Nhảy lên cưỡi Oktava 5s: di chuyển bằng gã khổng lồ, mọi sát thương nhắm vào Aria do Oktava gánh. Cần Oktava còn sống.
 
 ### Ariston (ariston) — 📿 Cuồng Tín
-- Cận chiến • tài nguyên: mana • sát thương chính: vật lý
+- Cận chiến • vũ khí: cleaver • tài nguyên: mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 640 (+98), mana 300 (+40), công 60 (+3.6), giáp 34 (+4.2), KP 32 (+2), tốc đánh 0.62 (+2%), tốc chạy 3.45, tầm 2.5
 - **Nội tại — Đức Tin & Phán Quyết • Hộ Vệ Thánh Đình • Đại Kiếm Trọng Lực:** Nhận sát thương từ tướng / quái: +4 Đức Tin (+10 nếu đòn mất >10% máu); đồng minh trong 10 đv bị đánh: +3. Mỗi 20 Đức Tin: +6% sát thương, +8 Giáp / Kháng Phép. 100 Đức Tin: giảm 15% sát thương nhận và mở khóa Đại Phán Quyết; tụt 5/giây sau 6s ngoài giao tranh. Dưới 50% máu: giáp ảo 25% máu tối đa 4s (90s). Tốc đánh cố định, % tốc đánh cộng thêm quy đổi thành sát thương; đòn đánh quét vòng cung lan 50% sang kẻ đứng cạnh.
 - **S1 — Thiết Trảm: Liệt Đao** (hồi 8/7.5/7/6.5/6s, 45/45/45/45/45 mana): Quét vòng cung 160° tầm 3.5 đv: sát thương vật lý nặng, làm chậm 35% 1.5s. Trong 2s dùng lại (Liệt Đao): nhảy vọt tới điểm cách 4.5 đv (cảnh báo đỏ bán kính 2.2 đv 0.45s), bổ đao nứt sàn: sát thương lớn và choáng 1s.
@@ -656,8 +778,8 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Đại Phán Quyết** (hồi 90/75/60s, 100/100/100 mana): Cần 100 Đức Tin (tiêu hết): khóa một tướng địch trong 6 đv, cảnh báo đỏ 0.5s rồi chém trảm quyết — sát thương vật lý lớn CỘNG sát thương chuẩn bằng 45% tổng sát thương mục tiêu đó đã gây cho Ariston trong 5s trước; phá 100% Hộ Giáp của nạn nhân.
 
 ### Bạch Diệp (bachdiep) — 🎯 Kẻ Trảm Tướng
-- Tầm xa • tài nguyên: mana • sát thương chính: phép
-- Chỉ số cấp 1: máu 580 (+90), mana 460 (+58), công 52 (+3), giáp 28 (+3.8), KP 32 (+1.8), tốc đánh 0.63 (+1.5%), tốc chạy 3.45, tầm 4.5
+- Tầm xa • vũ khí: flysword • tài nguyên: mana • sát thương chính: phép
+- Chỉ số cấp 1: máu 550 (+84), mana 460 (+58), công 52 (+3), giáp 28 (+3.8), KP 32 (+1.8), tốc đánh 0.63 (+1.5%), tốc chạy 3.45, tầm 4.5
 - **Nội tại — Vạn Kiếm Triệu • Mưa Kiếm Thức Thời:** Đánh thường gây sát thương phép. Mỗi phi kiếm Loạn Trảm trúng: +1 Kiếm; mỗi 5 đòn đánh trúng: +1 Kiếm. KHÔNG GIỚI HẠN số kiếm; mỗi kiếm +1% sát thương phép mọi đòn (tối đa +60%). Rời giao tranh 4s: mất 2 kiếm mỗi giây. Mỗi 10s, đòn đánh kế tiếp thành Mưa Kiếm: 6 phi kiếm rơi xuống bán kính 2 đv, làm chậm 30% 1.5s.
 - **S1 — Kiếm Vũ: Loạn Trảm** (hồi 0.25s, 25 mana): Hồi 0.25s. Phóng chuỗi phi kiếm bay thẳng 7.5 đv: số kiếm = 1 + 2 × số lần kích hoạt liên tiếp (trong 2s). Tốn 25 mana, mỗi lần liên tiếp +15 mana. Mỗi kiếm trúng: +1 Kiếm Khí; kiếm sau trúng cùng mục tiêu gây 50% và phá 20 Hộ Giáp.
 - **S2 — Kiếm Trận Vạn Cổ** (hồi 2s, 30 mana): Bật / tắt: chọn vùng trong 8 đv (bán kính 3.5); sau 0.3s kiếm cổ rơi mỗi 0.35s: sát thương phép, chậm 25%, đốt Hộ Giáp. Tốn 30 mana, sau đó 20 mana mỗi giây.
@@ -665,7 +787,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Thiên Kiếm Trận** (hồi 90/75/60s, 100 mana): Chọn 1 trong 3 thế: • Lục Tinh Kiếm Trận (nhiều địch): bán kính 7.5, sát thương phép lớn + choáng 1s; Bạch Diệp đứng trong trận: −30% tiêu hao mana, +30% kháng mọi sát thương, +20% Công Phép 6s. • Phong Ấn Kiếm Vực (một đối thủ trong 6 đv): giam cả hai trong kiếm giới 4s, Bạch Diệp hồi 35 mana/giây, mỗi 0.5s 2 phi kiếm đâm xuống (+1 Kiếm mỗi nhịp). • Thiên Vũ Thăng Hoa (ít mana): +10 Kiếm, +70% tốc đánh 8s, hồi 40% mana, đòn đánh bắn 2 tia xé 30% Hộ Giáp.
 
 ### Boran (boran) — 🌋 Cuồng Loạn
-- Cận chiến • tài nguyên: không dùng mana • sát thương chính: vật lý
+- Cận chiến • vũ khí: axes • tài nguyên: không dùng mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 600 (+94), mana 0 (+0), công 62 (+3.8), giáp 31 (+3.8), KP 32 (+1.8), tốc đánh 0.7 (+2.5%), tốc chạy 3.55, tầm 1.6
 - **Nội tại — Huyết Mạch Băng Cổ • Thể Trọng Băng Hóa:** Chém trúng +8 Nộ Khí, nhận sát thương +4; tụt dần sau 5s ngoài giao tranh. Mỗi 10 Nộ: +2.5% tốc đánh, +1.5% tốc chạy. 100 Nộ (Thấu Cốt): đòn đánh thêm 15% sát thương chuẩn, hút máu 15%. Giảm 30% sát thương bo. Hộ Giáp vỡ: Kiên Cường (không thể bị hất tung / cản phá) 2.5s (40s).
 - **S1 — Song Rìu Phi Phao** (hồi 9/8.5/8/7.5/7.5s): Ném liên tiếp 2 rìu bay thẳng 12 đv: rìu 1 gây sát thương vật lý và làm chậm 40% 2s; rìu 2 trúng cùng mục tiêu thì choáng 1s. Trong 2.5s dùng lại: giật xích kéo thân mình bay tới nạn nhân, tung cú đạp gây sát thương và nhặt rìu (hồi 3s hồi chiêu).
@@ -674,7 +796,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Thức Tỉnh Cổ Thần: Băng Ma Thao Túng** (hồi 85/70/55s): Cần ít nhất 50 Nộ Khí (tiêu sạch): hóa dã thú cổ đại 10s — miễn khống chế cứng, mọi đòn đánh và chiêu thêm 40% xuyên Hộ Giáp; hạ gục / hỗ trợ hạ gục tướng: +4s và hồi đầy máu.
 
 ### Borg (borg) — 🔥 Hổ Báo
-- Cận chiến • tài nguyên: không dùng mana • sát thương chính: vật lý
+- Cận chiến • vũ khí: fist • tài nguyên: không dùng mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 640 (+100), mana 0 (+0), công 63 (+3.8), giáp 33 (+4.2), KP 32 (+1.9), tốc đánh 0.68 (+2.2%), tốc chạy 3.5, tầm 1.45
 - **Nội tại — Huyết Chiến:** Càng ít máu càng đánh đau (tối đa +35% khi dưới 30% máu); dưới 30% máu đòn đánh gây thiêu đốt. Đấm Móc: cứ đòn đánh thường thứ 3 hất tung 0.3s.
 - **S1 — Chộp & Quật** (hồi 12/11.5/11/10.5/10s): Lao tới 4 đv chộp tướng đầu tiên chạm phải, quật ra sau lưng: sát thương và choáng 1s.
@@ -683,7 +805,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Đấu Trường La Mã** (hồi 120/100/80s): Dựng võ đài bán kính 4.5 đv quanh mình trong 4s: kẻ địch bên trong không ra được; Borg giảm 25% sát thương nhận.
 
 ### Dr. Caelus (caelus) — 💰 Thực Dụng
-- Tầm xa • tài nguyên: mana • sát thương chính: phép
+- Tầm xa • vũ khí: orb • tài nguyên: mana • sát thương chính: phép
 - Chỉ số cấp 1: máu 545 (+84), mana 420 (+50), công 52 (+3), giáp 22 (+3.6), KP 30 (+1.4), tốc đánh 0.63 (+1.5%), tốc chạy 3.35, tầm 5.8
 - **Nội tại — Thuật Toán Sinh Tồn • Nhãn Cảm Lượng Tử:** Kẻ địch di chuyển / lướt trong 35 đv: +2 Điểm Xác Suất mỗi giây. Mỗi 25 điểm: giảm 5% sát thương nhận. Đủ 100 (Quá Tải Phân Tích): chiêu kế tiếp không tốn năng lượng và +25% sát thương phép. Đòn đánh lén đầu tiên từ kẻ rình trong bụi / trên cao không bao giờ bất ngờ được hắn (giảm 50%, mỗi 20s).
 - **S1 — Ma Trận Khóa Tọa Độ** (hồi 12/11/10/9/9s, 50/50/50/50/50 mana): Cắm Quả Cầu Lượng Tử xuống điểm cách tối đa 14 đv: lưới điện cảnh báo 0.6s rồi kích hoạt ma trận bán kính 4 đv — kẻ địch bên trong nhận sát thương phép và choáng 1.25s. Ma trận tồn tại 3.5s: kẻ địch trong vùng bị bẻ gãy lướt / dây móc.
@@ -692,7 +814,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Nghịch Đảo Dữ Liệu Thời Không** (hồi 90/75/60s, 100/100/100 mana): Khóa một kẻ địch trong 16 đv (hoặc chính mình): sau 0.5s, mục tiêu bị cưỡng chế dịch chuyển về đúng vị trí và lượng Máu / Hộ Giáp của 3.5s trước — kẻ vừa uống bình hay vừa đu dây trốn bị giật về họng súng; dùng lên bản thân là mạng bảo hiểm.
 
 ### Chrono & Neo (chrononeo) — 🌾 Tham Farm
-- Tầm xa • tài nguyên: mana • sát thương chính: vật lý
+- Tầm xa • vũ khí: dual • tài nguyên: mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 560 (+88), mana 320 (+40), công 60 (+3.7), giáp 26 (+3.8), KP 30 (+1.3), tốc đánh 0.68 (+3%), tốc chạy 3.3, tầm 6
 - **Nội tại — Hai Thời Đại:** Hai thế, mỗi thế một băng đạn (tăng theo cấp): Chrono 4→10 viên nặng (×1.5 sát thương, −25% tốc đánh, xuyên 20% giáp, nạp 2.5s) • Neo 10→20 viên nhẹ, mỗi lần bóp cò bắn 2 viên liên tiếp (mỗi viên ×0.75 sát thương), +25% tốc đánh, +8% tốc chạy, nạp 1.5s.
 - **S1 — Phát Bắn Cường Hóa** (hồi 6/5.5/5/4.5/4s, 40/40/40/40/40 mana): Chrono: 1 viên nặng xuyên thấu 8 đv, đẩy lùi 1.5 đv • Neo: 2 viên nhanh, làm chậm 30% 1s.
@@ -702,7 +824,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Chuyển Thế** (hồi 4s): Đổi thế. Sang Chrono: sóng đẩy lùi 1.5 đv quanh người + giảm 25% sát thương 1s • Sang Neo: +40% tốc chạy 1.5s.
 
 ### Clint (clint) — 🚧 Gác Cổng
-- Tầm xa • tài nguyên: mana • sát thương chính: vật lý
+- Tầm xa • vũ khí: shotgun • tài nguyên: mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 655 (+98), mana 300 (+38), công 69 (+4), giáp 33 (+4), KP 32 (+1.8), tốc đánh 0.75 (+2.5%), tốc chạy 3.5, tầm 3.4
 - **Nội tại — 2 Viên Đạn:** Đánh thường là phát súng săn tỏa nón: càng gần càng đau (×1.25 khi sát người, ×0.8 khi ở xa), kẻ địch khác trong nón nhận 35%. Chỉ có 2 viên, tự nạp 1.0s/viên.
 - **S1 — Báng Súng** (hồi 6/5.5/5/4.5/4s, 35/35/35/35/35 mana): Đập báng súng, làm chậm 30% 1.5s; trúng thì nạp 1 viên.
@@ -711,7 +833,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Dragon's Breath** (hồi 100/85/70s, 100/100/100 mana): Nạp 2 viên đạn rồng trong 6s: mỗi phát phun lửa nón dài 6 đv, thiêu đốt và đẩy lùi.
 
 ### Dahlia (dahlia) — 🎭 Ngụy Quân Tử
-- Tầm xa • tài nguyên: mana • sát thương chính: phép
+- Tầm xa • vũ khí: blackcane • tài nguyên: mana • sát thương chính: phép
 - Chỉ số cấp 1: máu 555 (+88), mana 400 (+48), công 52 (+3), giáp 25 (+3.7), KP 30 (+1.4), tốc đánh 0.63 (+1.5%), tốc chạy 3.45, tầm 5
 - **Nội tại — Náo Nhiệt & Cuồng Nhiệt • Chiếc Mũ Thoát Hiểm • Ảo Ảnh Chết Chóc • Gậy Đen:** Có ai lướt / dịch chuyển gần đó: +5 Náo Nhiệt; quái, vật triệu hồi, ảo ảnh bị hạ: +8; có đơn vị không phải tướng trong 6 đv: +3/giây. Đủ 100 → Cuồng Nhiệt 8s: +40% tốc đánh, +25% sát thương phép, +20% tốc chạy, cường hóa mọi chiêu. Tụt xuống 50% máu (90s): mũ cao chụp xuống, Dahlia dịch chuyển 5.5 đv, chiếc mũ phát nổ choáng 1s quanh chỗ cũ. Ảo ảnh của Dahlia tự đánh (35%) và khi tan để lại khói độc 3.5s (mù, độc, gọt Hộ Giáp). Đánh thường gây sát thương phép, đòn thứ 3 liên tiếp nổ lan 2 đv.
 - **S1 — Thoát Nguy** (hồi 9/8.5/8/7.5/7s, 50/50/50/50/50 mana): Hoán đổi vị trí tức thì với một đơn vị không phải tướng (quái, vật triệu hồi, ảo ảnh) trong 8 đv; tàng hình 1.5s, +30% tốc đánh và +20% sát thương phép 3s. Cuồng Nhiệt: chụp Mũ Đen lên tối đa 3 đơn vị không phải tướng trong 6 đv, biến chúng thành bản sao Dahlia 6s. Trong Sân Khấu Chết Chóc: thành Hư Ảnh Bước (dịch chuyển 2.5 đv, tàng hình 0.75s, hồi 1.2s).
@@ -720,7 +842,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Sân Khấu Chết Chóc** (hồi 90/75/60s, 100/100/100 mana): Cắm gậy mở vũ đài bóng tối bán kính 9 đv trong 7s: Thoát Nguy thành Hư Ảnh Bước; +60% tốc đánh, +30% sát thương đòn đánh; mỗi 10 đòn trúng (của Dahlia và ảo ảnh) sinh một ảo ảnh mới cạnh mục tiêu; ảo ảnh trong sân khấu +50% máu và đánh chắc chắn gây độc.
 
 ### Death (death) — 🗡 Ám Sát
-- Cận chiến • tài nguyên: mana • sát thương chính: phép
+- Cận chiến • vũ khí: scythe • tài nguyên: mana • sát thương chính: phép
 - Chỉ số cấp 1: máu 675 (+102), mana 360 (+42), công 66 (+3.8), giáp 32 (+4.1), KP 32 (+1.7), tốc đánh 0.67 (+2.2%), tốc chạy 3.5, tầm 2.2
 - **Nội tại — Lưỡi Hái Tử Thần:** Đánh thường quét vòng cung (kẻ địch khác trong vùng nhận 50%). Trúng bằng lưỡi (phần ngoài của tầm) +15% sát thương và hồi 10 (+2/cấp) máu; trúng kẻ vừa bị kéo thì hất tung 0.5s.
 - **S1 — Lưỡi Hái Đoạt Mệnh** (hồi 14/13/12/11/10s, 60/65/70/75/80 mana): Quăng liềm 7 đv; trúng kẻ đầu tiên thì gây sát thương phép và giật nó về cạnh Death.
@@ -729,7 +851,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Gọi Hồn** (hồi 120/100/80s, 100/100/100 mana): Đánh dấu một tướng trong 5 đv: 2 bóng ma bắt chước đòn của Death trong 5s (mọi sát thương Death gây lên nó lặp lại thêm 40% dạng phép), mục tiêu bị làm chậm 20%.
 
 ### Elara (elara) — 🪨 Lì Lợm
-- Tầm xa • tài nguyên: mana • sát thương chính: vật lý
+- Tầm xa • vũ khí: bow • tài nguyên: mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 560 (+88), mana 320 (+40), công 54 (+3.6), giáp 26 (+3.8), KP 30 (+1.3), tốc đánh 0.65 (+3%), tốc chạy 3.3, tầm 6.2
 - **Nội tại — Linh Hoạt:** +20% tốc chạy khi đang lùi xa khỏi địch. 5s không tấn công thì đòn kế tiếp được Tập Trung: +25% sát thương, tên bay nhanh hơn.
 - **S1 — Liên Xạ** (hồi 7/6.5/6/5.5/5s, 40/40/40/40/40 mana): Bắn 3 mũi tên liên tiếp vào mục tiêu, mỗi mũi 50% sát thương đánh thường + 15/25/35/45./55
@@ -739,8 +861,8 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Tên Hình Nón** (hồi 10s, 30 mana): Bắn 3 mũi tên tỏa hình nón (3.4 đv): mỗi mũi 30 (+6/cấp, +35% SMVL) sát thương và đẩy lùi kẻ áp sát 1.6 đv — tạo khoảng trống để kéo cung.
 
 ### Florian (florian) — 🎭 Ngụy Quân Tử
-- Cận chiến • tài nguyên: mana • sát thương chính: vật lý
-- Chỉ số cấp 1: máu 590 (+92), mana 300 (+38), công 63 (+3.9), giáp 29 (+3.8), KP 32 (+1.8), tốc đánh 0.7 (+2.8%), tốc chạy 3.55, tầm 1.75
+- Cận chiến • vũ khí: rapier • tài nguyên: mana • sát thương chính: vật lý
+- Chỉ số cấp 1: máu 590 (+92), mana 300 (+38), công 60 (+3.6), giáp 29 (+3.8), KP 32 (+1.8), tốc đánh 0.7 (+2.8%), tốc chạy 3.55, tầm 1.75
 - **Nội tại — Đâm Lao & Tứ Ấn:** Cứ 3.5s, đòn đánh thường kế tiếp thành cú lao tới mục tiêu (tới 3.5 đv ngoài tầm), +20 (+4/cấp, +30% SMVL) sát thương — mục tiêu có ấn thì lao thẳng tới hướng ấn gần nhất. Ấn (từ Tứ Ấn): đánh trúng từ ĐÚNG HƯỚNG để phá — mỗi ấn giảm 1.5s mọi hồi chiêu và làm chậm 60% 1s. Phá 3/4 ấn: CHOÁNG 1.1s, đòn kế tiếp đẩy cực mạnh (+40% sát thương), Florian hồi 5% máu.
 - **S1 — Tứ Ấn** (hồi 7/6.5/6/5.5/5s, 50/50/50/50/50 mana): Ném dấu ấn 7 đv: trúng kẻ địch đầu tiên thì gây sát thương và đặt 4 ấn Đông–Tây–Nam–Bắc trong 5s. Chỉ hồi chiêu khi ấn đã hết; ném trượt thì hồi chiêu giảm 50%.
 - **S2 — Phân Ảnh** (hồi 7/6.5/6/5.5/5s, 40/40/40/40/40 mana): Phân ảnh xuất hiện cách 6 đv rồi lao ngược về phía Florian: kẻ trúng chịu sát thương, bị kéo về phía Florian và chậm 30% 1.5s. Đang Kiếm Thế: Florian dịch chuyển ra sau lưng mục tiêu rồi lao xuyên qua.
@@ -749,7 +871,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Lướt** (hồi 3s): Lướt rất ngắn (2.4 đv) theo bất kỳ hướng nào, né mọi sát thương khi lướt. Dùng để vòng ra đúng hướng ấn hoặc tránh chiêu định hướng.
 
 ### Galo (galo) — 🌪 Bóng Ma Rìa Bão
-- Tầm xa • tài nguyên: không dùng mana • sát thương chính: phép
+- Tầm xa • vũ khí: flask • tài nguyên: không dùng mana • sát thương chính: phép
 - Chỉ số cấp 1: máu 565 (+88), mana 0 (+0), công 55 (+3.2), giáp 28 (+3.8), KP 30 (+1.6), tốc đánh 0.66 (+2.2%), tốc chạy 3.5, tầm 4.5
 - **Nội tại — Độc Tiêu Xương:** Đòn độc găm tầng Tiêu Xương (tối đa 6, 4s): mỗi tầng −4% giáp và kháng phép, kèm độc nhẹ. Dạng Người: đánh tầm xa, chiêu tốn 3–5% máu hiện tại. Dạng Quái Thú (skill phụ): cận chiến, chiêu không tốn máu.
 - **S1 — Ném Lọ Độc / Song Trảo** (hồi 5/5/5/5/5s): Người: ném lọ độc tới điểm trong 7 đv, nổ bán kính 1.8, găm 2 tầng (4% máu; HC 5s). Thú: 2 nhát cào trước mặt, mỗi nhát 1 tầng (HC 3s).
@@ -759,7 +881,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Quá Liều! / Tiếng Hú Tử Thần** (hồi 40s): Người: uống cạn bình độc hóa Quái Thú 15s — cận chiến, +15 giáp/kháng phép, +SMVL, +8% tốc chạy, lá chắn 100 (+20/cấp), chiêu không tốn máu và đổi bộ S1–S3; hết dạng: Vã Thuốc (chậm 30% 2s), hồi 40s. Thú: Tiếng Hú Tử Thần — sóng âm CHOÁNG diện rộng 1s (bán kính 3.5) và 40 (+10/cấp, +40% SMPT) sát thương phép (hồi 12s).
 
 ### Gideon (gideon) — 🏰 Lãnh Chúa Cứ Điểm
-- Cận chiến • tài nguyên: mana • sát thương chính: vật lý
+- Cận chiến • vũ khí: greatsword • tài nguyên: mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 575 (+98), mana 300 (+40), công 58 (+3.6), giáp 34 (+3.6), KP 32 (+2), tốc đánh 0.66 (+2%), tốc chạy 3.4, tầm 2.7
 - **Nội tại — Điểm Ngọt & Đại Trường Kiếm:** Đại Trường Kiếm: tầm đánh 2.7 đv; tốc đánh CỐ ĐỊNH — mọi % tốc đánh cộng thêm (cấp, đồ, mảnh hồn, bùa) chuyển thành % sát thương đòn đánh. Điểm Ngọt: trúng bằng mũi kiếm (30% ngoài cùng tầm) +30% sát thương và làm chậm 20%; trúng bằng cán (sát thân) −30%. Kháng đẩy: bị đẩy lùi / kéo ngắn hơn 30%.
 - **S1 — Quét Ngang** (hồi 7/6.5/6/5.5/5s, 45/45/45/45/45 mana): Gồng 0.5/0.5/0.5/0.75/1s (dùng lại để vung sớm): giảm 40% sát thương nhận vào, miễn choáng, hấp thụ đòn đánh để tăng tới 10/20/25/30/40% sát thương. Rồi chém vòng cung 180° phía trước. Điểm Ngọt áp dụng.
@@ -769,7 +891,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Cán Kiếm** (hồi —s, 25 mana): Húc chuôi kiếm vào kẻ địch sát người (tầm 1.9): 30 (+6/cấp, +40% Công Vật Lý) sát thương, choáng 0.4/0.6/0.8s (theo cấp) và đẩy văng ra đúng 2.7 đv — vào thẳng Điểm Ngọt của Bổ Dọc. Hồi 9 → 8/7/6s theo cấp.
 
 ### Ignatius (ignatius) — 🔥 Gieo Rắc Hỗn Loạn
-- Tầm xa • tài nguyên: mana • sát thương chính: phép
+- Tầm xa • vũ khí: staff • tài nguyên: mana • sát thương chính: phép
 - Chỉ số cấp 1: máu 540 (+84), mana 420 (+50), công 52 (+3), giáp 22 (+3.6), KP 30 (+1.4), tốc đánh 0.63 (+1.5%), tốc chạy 3.35, tầm 5.5
 - **Nội tại — Hỏa Ấn:** Mọi chiêu gây Thiêu Đốt (cộng dồn 3, mỗi tầng 7 +2/cấp sát thương phép/giây trong 3s). Có thể vừa đi vừa niệm phép.
 - **S1 — Cầu Lửa** (hồi 5.5/5/4.5/4/3.5s, 50/55/60/65/70 mana): Ném cầu lửa 7.5 đv, nổ lan bán kính 1.8.
@@ -779,8 +901,8 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Vòng Lửa** (hồi 12s, 40 mana): Bùng một vòng lửa quanh người (bán kính 2.4): 30 (+8/cấp, +30% SMPT) sát thương phép, thiêu đốt và đẩy kẻ áp sát ra xa 2 đv — tạo chỗ để tích Đại Hỏa Cầu.
 
 ### Jack "Sáu Lỗ" (jack) — 🎲 Con Bạc
-- Tầm xa • tài nguyên: mana • sát thương chính: vật lý
-- Chỉ số cấp 1: máu 560 (+88), mana 320 (+40), công 61 (+3.8), giáp 26 (+3.8), KP 30 (+1.3), tốc đánh 0.72 (+3%), tốc chạy 3.3, tầm 5.5
+- Tầm xa • vũ khí: revolver • tài nguyên: mana • sát thương chính: vật lý
+- Chỉ số cấp 1: máu 600 (+92), mana 320 (+40), công 64 (+4), giáp 26 (+3.8), KP 30 (+1.3), tốc đánh 0.74 (+3%), tốc chạy 3.3, tầm 5.8
 - **Nội tại — Gieo Xúc Xắc:** Ổ 6 viên, nạp 2s; mỗi lần nạp gieo xúc xắc: ⚀ tự mất 4% máu • ⚁–⚄ cả ổ +5/10/15/20% sát thương • ⚅ cả ổ chí mạng và choáng 0.25s.
 - **S1 — Quạt Cò** (hồi 8/7.5/7/6.5/6s, 45/45/45/45/45 mana): Xả hết đạn còn lại theo hình nón (5 đv), mỗi viên 70% SMVL + 10/15/20/25/30. Rồi nạp đạn.
 - **S2 — Cò Quay Nga** (hồi 18/17/16/15/14s, 60/60/60/60/60 mana): Nạp 1 Viên Định Mệnh rồi xoay ổ: một trong 6 phát kế tiếp gây 350% SMVL sát thương chuẩn và choáng 1s; trong lúc đó không dùng được Quạt Cò và Lăn Né.
@@ -788,7 +910,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Nhà Cái Trả Thưởng** (hồi 100/85/70s, 100/100/100 mana): 6s mọi đòn đánh là ⚅ (chí mạng + choáng 0.25s); hạ gục tướng trong lúc đó: +4% sát thương tới hết trận (tối đa 5 lần) và hoàn 50% hồi chiêu.
 
 ### Joker (joker) — 🎭 Kẻ Bịp Bợm
-- Tầm xa • tài nguyên: mana • sát thương chính: phép
+- Tầm xa • vũ khí: cards • tài nguyên: mana • sát thương chính: phép
 - Chỉ số cấp 1: máu 540 (+84), mana 420 (+50), công 52 (+3), giáp 22 (+3.6), KP 30 (+1.4), tốc đánh 0.63 (+1.5%), tốc chạy 3.35, tầm 5.2
 - **Nội tại — Bịp Bợm:** Phi Bài 25%, Rút Bài và Tráo Bài 10% được nhân đôi. Lá Rô/Cơ gắn Ấn Mặt Trời, lá Bích/Tép gắn Ấn Mặt Trăng: một tướng mang đủ 2 Mặt Trời + 2 Mặt Trăng thì choáng 1.5s. Joker luôn giữ một lá bài (Phi Bài ném lá đang giữ). Giả Ngây Ngô: né hoàn toàn đòn đánh thường của tướng nam (cục súc Borg/Koda/Clint 30% • lão luyện Gideon/Valerius/Ryoma/Kazuki 10% • còn lại 16%); tướng nữ chỉ 3%.
 - **S1 — Phi Bài Sắc Cạnh** (hồi 4/4/3.75/3.5/3.25s, 40/45/50/55/60 mana): Ném lá bài đang giữ 7 đv, áp hiệu ứng theo chất: ♠ sát thương lớn • ♣ khống chế ngẫu nhiên • ♦ nổ lan • ♥ hồi máu đồng minh quanh Joker • 🃏 đổi chỗ với mục tiêu.
@@ -798,7 +920,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Mượn Tý Nha!** (hồi 0s): Khi ai đó trong tầm nhìn dùng món kích hoạt, vật phẩm tiêu hao hoặc phép bổ trợ, Joker có 10s để dùng bản sao của nó (hồi chiêu 0s).
 
 ### Justus (justus) — 📿 Cuồng Tín
-- Tầm xa • tài nguyên: không dùng mana • sát thương chính: phép
+- Tầm xa • vũ khí: tome • tài nguyên: không dùng mana • sát thương chính: phép
 - Chỉ số cấp 1: máu 570 (+88), mana 420 (+50), công 52 (+3), giáp 28 (+3.8), KP 32 (+2), tốc đánh 0.63 (+1.5%), tốc chạy 3.35, tầm 5
 - **Nội tại — Đức Tin Cứu Rỗi • Ý Chí Kiên Định • Hộ Vệ Thánh Đình:** Chiêu tốn Đức Tin (100, tự hồi 2.5/giây ngoài giao tranh, 1/giây trong giao tranh); giáp ảo của Justus bị vỡ, được hồi máu hay ban giáp mới: +10 Đức Tin (mỗi 1.5s). Ý Chí Kiên Định (60s): chặn trọn chiêu đầu tiên của tướng địch, rồi tỏa sóng làm chậm 40% trong 4.5 đv 2s. Hộ Vệ Thánh Đình (100s): dưới 25% máu, Thiên Sứ gánh đòn thay (35% máu tối đa của Justus, Justus không thể chết khi Thiên Sứ còn), +50 Đức Tin.
 - **S1 — Tam Kiếm Trừng Phạt** (hồi 9/8.5/8/7.5/7s): Không có thời gian niệm (vừa chạy vừa dùng). Tốn 20 Đức Tin: đánh dấu vòng đỏ bán kính 1.6 đv lên 3 tướng địch gần nhất trong 8 đv; sau 0.25s ba thanh kiếm thánh cắm xuống: sát thương phép và choáng 1s.
@@ -807,7 +929,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Trận Địa Thanh Tẩy Vạn Năng** (hồi 90/75/60s): Tốn 40 Đức Tin: cắm Kinh Thánh mở Pháp Trận bán kính 9 đv trong 6s. Kẻ địch trong trận bị thiêu mỗi 0.5s (mỗi nhịp +2 Đức Tin), mất 40% Kháng Phép và 30 Hộ Giáp mỗi giây. Mỗi 1.5s cấp Giáp Ảo 8% máu tối đa cho Justus và đồng minh trong trận, thanh tẩy làm chậm.
 
 ### Kazuki (kazuki) — 💣 Kẻ Đổi Mạng
-- Cận chiến • tài nguyên: không dùng mana • sát thương chính: vật lý
+- Cận chiến • vũ khí: twinblades • tài nguyên: không dùng mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 595 (+93), mana 0 (+0), công 63 (+4), giáp 30 (+3.9), KP 32 (+1.8), tốc đánh 0.72 (+2.5%), tốc chạy 3.55, tầm 1.6
 - **Nội tại — Song Kiếm Vô Niệm:** Đánh thường luân phiên tay trái (nhanh, 85%) / tay phải (nặng, 125%). Ý Niệm (0–100) tự hồi 2/giây, chiêu tốn Ý Niệm (S1 10 • S2 15 • S3 25). Kiếm Ý (0–10): +1 mỗi Kiếm Thế Quyết, +5 mỗi lần Nghịch Trảm thành công — đủ 5 thì Kiếm Thế Quyết đổi thành Loạn Vũ Hư Ảnh.
 - **S1 — Tả Trảm** (hồi 3/3/3/3/3s): Chém nhanh hình nón, gạt đạn nhỏ bay tới. Ghi nhịp "A" cho Kiếm Thế Quyết. Tốn 10 Ý Niệm.
@@ -817,7 +939,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Vô Tướng Nghịch Trảm** (hồi 14s): Thủ thế song kiếm 0.6s. Đỡ trúng đòn đánh hay chiêu của tướng địch phía trước: chặn sát thương, CHOÁNG kẻ đó 1s, lướt xuyên qua để ảo ảnh chém liên hoàn — 2s sau vết chém nổ tung (60 +10/cấp, +60% SMVL) và đẩy văng; hồi ngay Kiếm Thế Quyết, +5 Kiếm Ý. Đỡ hụt: khựng 0.3s.
 
 ### Kip (kip) — 🃏 Quấy Nhiễu
-- Cận chiến • tài nguyên: không dùng mana • sát thương chính: vật lý
+- Cận chiến • vũ khí: voidknife • tài nguyên: không dùng mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 600 (+90), mana 0 (+0), công 68 (+4.1), giáp 27 (+3.6), KP 32 (+1.8), tốc đánh 0.75 (+2.5%), tốc chạy 3.7, tầm 1.4
 - **Nội tại — Gia Tốc Trượt Không Gian:** Mỗi lần lướt / dịch chuyển / dây móc: +15% tốc chạy 2.5s; đòn cận chiến kế tiếp sau dịch chuyển bỏ qua 30% Hộ Giáp và áp sát tức thời trong 4 đv. Thể Phản Xạ Hư Vô (45s): đòn đầu tiên từ kẻ địch ngoài tầm nhìn bị vô hiệu. Đứng trong vùng cảnh báo đỏ: +30% tốc chạy để thoát.
 - **S1 — Vết Nứt Hư Không** (hồi 0.4s): Tốn 1 Điểm Hư Không: dịch chuyển 6 đv theo hướng chỉ định (xuyên vật cản mỏng), để lại Vết Nứt 3s. Trong 3s dùng lại để giật về Vết Nứt, hồi 15% Hộ Giáp và choáng 0.3s kẻ địch quanh đó.
@@ -826,8 +948,8 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Lãnh Địa Đa Chiều: Trò Chơi Trốn Tìm** (hồi 80/65/50s): Tốn 2 Điểm Hư Không: kết giới bán kính 14 đv trong 8s — Vết Nứt không tốn điểm và hồi 1s; mỗi cú dịch chuyển để lại tàn ảnh đánh lừa; mọi đòn đánh thêm 50% xuyên Hộ Giáp. Rời khỏi kết giới thì nó biến mất.
 
 ### Koda (koda) — 🌋 Cuồng Loạn
-- Cận chiến • tài nguyên: không dùng mana • sát thương chính: vật lý
-- Chỉ số cấp 1: máu 570 (+88), mana 0 (+0), công 61 (+3.7), giáp 30 (+3.8), KP 32 (+1.8), tốc đánh 0.7 (+2.5%), tốc chạy 3.6, tầm 1.4
+- Cận chiến • vũ khí: claw • tài nguyên: không dùng mana • sát thương chính: vật lý
+- Chỉ số cấp 1: máu 620 (+96), mana 0 (+0), công 65 (+4), giáp 33 (+3.8), KP 32 (+1.8), tốc đánh 0.72 (+2.5%), tốc chạy 3.65, tầm 1.45
 - **Nội tại — Vết Thương Sâu:** Đòn đánh và chiêu gây 1 tầng Chảy Máu (tối đa 5): mỗi tầng 6 (+1.8/cấp) sát thương vật lý mỗi giây trong 4s.
 - **S1 — Cào Loạn Xạ** (hồi 5/4.5/4/3.5/3s): 2 nhát cào nhanh trước mặt, mỗi nhát gây 1 tầng Chảy Máu. Vừa lao xuống từ tường: ×1.5.
 - **S2 — Xé Toạc** (hồi 9/8.5/8/7.5/7s): Kích nổ toàn bộ Chảy Máu trên mục tiêu thành sát thương tức thì. Đủ 5 tầng: làm chậm 60% 1.5s và cộng 10% máu đã mất.
@@ -836,8 +958,8 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Bám Tường** (hồi 12s): Khi đứng cạnh tường/vách đá/rặng cây (1.6 đv): bám lên đó tối đa 3s — không thể bị chọn làm mục tiêu. Bấm lại (hoặc dùng Vồ Mồi): lao xuống tướng địch trong 7 đv nhanh gấp rưỡi, gây 60 (+6/cấp, +60% SMVL) ×1.5 sát thương; Cào Loạn Xạ kế tiếp ×1.5.
 
 ### Luca (luca) — 🎰 Con Bạc Khát Nước
-- Tầm xa • tài nguyên: mana • sát thương chính: phép
-- Chỉ số cấp 1: máu 600 (+90), mana 420 (+50), công 52 (+3), giáp 22 (+3.6), KP 30 (+1.4), tốc đánh 0.63 (+1.5%), tốc chạy 3.45, tầm 5
+- Tầm xa • vũ khí: cane • tài nguyên: mana • sát thương chính: phép
+- Chỉ số cấp 1: máu 700 (+104), mana 420 (+50), công 52 (+3), giáp 26 (+3.6), KP 32 (+1.4), tốc đánh 0.63 (+1.5%), tốc chạy 3.5, tầm 5
 - **Nội tại — Sân Khấu Náo Nhiệt:** Náo Nhiệt 0–100: đánh trúng tướng +5, chiêu trúng tướng +10, lừa đòn +20, thoát hiểm +15. Mỗi 10 điểm +2% tốc chạy, +3% SMPT; đủ 100 mở khóa Cải Trang Tuyệt Đỉnh. Áo Choàng Thoát Hiểm (120s): lần đầu tụt dưới 10% máu → tàng hình 1.5s, dịch chuyển 4 đv ra xa kẻ địch, +15 Náo Nhiệt; mỗi lần đầy 100 Náo Nhiệt giảm 30s hồi.
 - **S1 — Sân Khấu Mở Ra / Bước Nhảy Ngàn Hoa** (hồi 10/9/8/7/7s, 55/55/55/55/55 mana): Mở Vùng Sân Khấu bán kính 6 đv trong 6s: trong vùng +20% tốc chạy, +15% hút máu phép. Trong sân khấu, S1 thành Bước Nhảy Ngàn Hoa: hồi 1.2s, tốn 25 mana, lướt 2.5 đv phóng cánh hoa hồng thép gây sát thương phép kẻ địch lướt qua.
 - **S2 — Ánh Đèn Rọi Vào Tôi Nè!** (hồi 13/12/11/10/10s, 60/60/60/60/60 mana): Tạo dáng 1.5s ("Trò Lừa Bịp"): đòn đầu tiên của kẻ địch bị triệt tiêu 100%, Luca hóa búp hoa dịch chuyển ra sau lưng kẻ tấn công, câm lặng 1.25s và khiến nạn nhân nhận thêm 20% sát thương phép từ Luca trong 3s (+20 Náo Nhiệt).
@@ -846,7 +968,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Hoán Đổi Bộ Chiêu** (hồi 1s): Khi đang Cải Trang: lật qua lại giữa bộ chiêu của Luca và bộ chiêu đang sao chép (hai bộ hồi chiêu độc lập).
 
 ### Lyra (lyra) — 🐀 Chuột Lũi
-- Tầm xa • tài nguyên: mana • sát thương chính: phép
+- Tầm xa • vũ khí: tidestaff • tài nguyên: mana • sát thương chính: phép
 - Chỉ số cấp 1: máu 550 (+84), mana 420 (+50), công 52 (+3), giáp 22 (+3.6), KP 30 (+1.4), tốc đánh 0.63 (+1.5%), tốc chạy 3.35, tầm 5.5
 - **Nội tại — Thủy Triều:** Đánh thường gây sát thương phép và làm chậm 15% 1s. Chiêu trúng tướng địch tích 1 tầng Thủy Triều (4s); đủ 3 tầng: trói chân 0.75s (mỗi mục tiêu 1 lần/6s).
 - **S1 — Bong Bóng Nước** (hồi 6/5.5/5/4.5/4s, 50/55/60/65/70 mana): Bắn bong bóng 8 đv: 60/95/130/165/200 (+60% SMPT) sát thương phép lên kẻ đầu tiên trúng, làm chậm 25% 1s. Mục tiêu đã bị làm chậm từ trước: thành choáng 1s.
@@ -855,7 +977,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Đại Hồng Thủy** (hồi 110/95/80s, 100/100/100 mana): Niệm 0.75s (vùng cảnh báo), gọi cột nước vào điểm trong 10/20/30 đv: bán kính 3.5/5/8, 180/270/360 (+80% SMPT) sát thương phép, hất tung 1s. Để lại vực xoáy 4s: hút nhẹ về tâm, chậm 40%, sát thương mỗi 0.5s và tích Thủy Triều; Lyra và đồng minh trong xoáy hồi 3% máu mỗi giây.
 
 ### Mirage (mirage) — 🎭 Kẻ Bịp Bợm
-- Tầm xa • tài nguyên: không dùng mana • sát thương chính: phép
+- Tầm xa • vũ khí: wand • tài nguyên: không dùng mana • sát thương chính: phép
 - Chỉ số cấp 1: máu 550 (+86), mana 420 (+50), công 52 (+3), giáp 24 (+3.6), KP 30 (+1.4), tốc đánh 0.63 (+1.5%), tốc chạy 3.45, tầm 5.2
 - **Nội tại — Hiện Diện Náo Nhiệt • Đại Thoát Hiểm • Đòn Đánh Ảo Ấn:** Chiêu tốn Náo Nhiệt (thay mana) — chỉ cần có mặt trên sàn đấu là +4 Náo Nhiệt mỗi giây (+50% khi ở gần Alice / Luca). Dưới 25% máu (120s): tàng hình 2.5s, dịch chuyển 5 đv, để lại 4 phân ảnh chạy toán loạn. Đánh thường gây sát thương phép và găm Ảo Ấn 5s; đòn / chiêu kế tiếp kích nổ thêm 6% máu tối đa.
 - **S1 — Tàn Ảnh Lướt Xuyên** (hồi 10/9.5/9/8.5/8s): Tốn 20 Náo Nhiệt: vào trạng thái Tàn Ảnh 2s (không thể bị chọn, +35% tốc chạy), lướt 3 đv và để lại ảo ảnh tĩnh ở điểm xuất phát. Kẻ địch bị lướt xuyên qua bị găm Dấu Ấn; hết Tàn Ảnh, dấu ấn nổ bằng 40% sát thương nạn nhân đã nhận trong lúc bị găm. Dùng lại trong 2s: giật về ảo ảnh và kích nổ sớm.
@@ -865,7 +987,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Biến Ảnh / Phân Hình** (hồi —s): Sẵn sàng: tạo một ảo ảnh tĩnh 8s tại chỗ. Khi đã có ảo ảnh: đổi vị trí tức thì với ảo ảnh an toàn nhất. Hồi 12s → 4s theo cấp.
 
 ### Olivia (olivia) — 📿 Cuồng Tín
-- Tầm xa • tài nguyên: mana • sát thương chính: phép
+- Tầm xa • vũ khí: lightstaff • tài nguyên: mana • sát thương chính: phép
 - Chỉ số cấp 1: máu 575 (+88), mana 380 (+45), công 50 (+2.6), giáp 28 (+3.9), KP 30 (+1.5), tốc đánh 0.62 (+1.5%), tốc chạy 3.35, tầm 5.5
 - **Nội tại — Đức Tin Tự Sinh • Thánh Ý Bảo Hộ • Thánh Niệm:** Đức Tin tự hồi 3/giây (gấp đôi cạnh đồng minh); trên 50 Đức Tin: +50% hồi mana. Mỗi 15s nhận Khiên Phép = 12% máu tối đa + 25% SMPT (chỉ đỡ sát thương phép). Đánh thường là tia phép 5.5 đv (100% SMVL + 30% SMPT), trúng tướng +5 Đức Tin.
 - **S1 — Dây Dẫn Thánh Linh / Trận Pháp Cứu Rỗi** (hồi 11/10/9/8/8s, 60/60/60/60/60 mana): Lên kẻ địch: xích thánh trói chân 1.25–2s và gây sát thương phép. Lên đồng minh: hồi máu tức thì và kéo đồng minh lướt về cạnh Olivia. Có đủ 25 Đức Tin và kẻ địch đứng gần nhau: đặt Thánh Trận ở xa — 1.5s sau kích nổ, trói chân 1.5s mọi kẻ địch trong vùng, hồi máu và thanh tẩy đồng minh trong vùng.
@@ -875,7 +997,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Ý Chí Thần Quan** (hồi 20s): Quỳ cầu nguyện tối đa 4s: mỗi giây hồi 4% máu và 5% mana. Bị tướng hoặc quái lớn đánh là ngắt.
 
 ### Percy (percy) — 🐺 Thợ Săn Bắt Lẻ
-- Tầm xa • tài nguyên: mana • sát thương chính: vật lý
+- Tầm xa • vũ khí: crossbow • tài nguyên: mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 560 (+88), mana 320 (+40), công 54 (+3.3), giáp 26 (+3.8), KP 30 (+1.3), tốc đánh 0.7 (+3%), tốc chạy 3.62, tầm 6
 - **Nội tại — Dồn Dập:** Sát thương gốc yếu nhưng chạy nhanh. Mỗi phát bắn trúng (đánh thường hoặc tên Trận Địa) +10% sát thương (tối đa 8 tầng = +80%); 2.5s không bắn trúng thì mất hết.
 - **S1 — Trận Địa Nỏ** (hồi 8/7.5/7/6.5/6s, 50/50/50/50/50 mana): ĐỨNG YÊN mở trận địa bán kính [10, 15, 18, 20, 25] tối đa [5, 8, 8, 8, 10]s: mỗi 0.15s tự bắn một mũi tên (24% SMVL, cộng Dồn Dập) vào kẻ địch gần nhất trong vùng. Di chuyển thì dừng (Lướt Chiến Thuật dời trận địa theo). Chỉ hồi chiêu khi trận địa kết thúc.
@@ -884,8 +1006,8 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Liên Châu** (hồi 80/70/60s, 100/100/100 mana): 4s: mỗi phát đánh thường và mỗi loạt Trận Địa bắn ra 3 mũi tên thay vì 1 (mũi phụ 60%).
 
 ### Ratok (ratok) — 🔥 Hổ Báo
-- Cận chiến • tài nguyên: mana • sát thương chính: vật lý
-- Chỉ số cấp 1: máu 660 (+100), mana 300 (+40), công 60 (+3.6), giáp 34 (+4.2), KP 32 (+2), tốc đánh 0.66 (+2%), tốc chạy 3.4, tầm 1.8
+- Cận chiến • vũ khí: hookchain • tài nguyên: mana • sát thương chính: vật lý
+- Chỉ số cấp 1: máu 720 (+108), mana 300 (+40), công 66 (+4), giáp 34 (+4.2), KP 32 (+2), tốc đánh 0.66 (+2%), tốc chạy 3.5, tầm 1.8
 - **Nội tại — Ràng Buộc Thép • Thiết Phá:** +12 Giáp và +12 Kháng Phép với mỗi tướng địch trong 4 đv; từ 3 tướng địch trở lên: +25% kháng hiệu ứng. Mỗi 12s đòn đánh kế tiếp được cường hóa: thêm 6% máu tối đa sát thương vật lý và choáng 0.75s; mỗi đòn đánh trúng giảm 1s hồi chiêu nội tại này.
 - **S1 — Móc Sắt Rỉ Sét** (hồi 14/13/12/11/11s, 70/70/70/70/70 mana): Phóng móc xích 8.5 đv: trúng kẻ đầu tiên gây sát thương vật lý và móc chặt 1s (kẻ bị móc không đi xa hơn được). Dùng lại trong lúc móc: giật mạnh kéo nạn nhân bay về sát Ratok, thêm sát thương và làm chậm 30% 1.5s.
 - **S2 — Bộc Phá Húc** (hồi 10/9.5/9/8.5/8.5s, 50/50/50/50/50 mana): Lao 3.5 đv húc văng kẻ đầu tiên: sát thương vật lý, choáng 0.75s. Nếu có kẻ đang dính Móc Sắt: thành Đột Kích Điểm Nổ — co xích lao thẳng tới nạn nhân bất kể khoảng cách, dậm nổ choáng 1.25s mọi kẻ địch quanh đó.
@@ -893,7 +1015,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Tàn Phá Thế Giới** (hồi 100/85/70s, 100/100/100 mana): Quay đại xích rồi cắm móc neo vào điểm cách tối đa 11 đv (cảnh báo đỏ 0.75s), sau đó kéo thân mình bay như đạn pháo tới, dộng sập mặt đất: sát thương vật lý lớn diện rộng và hất tung 1.5s.
 
 ### Raven (raven) — ⛰ Tiên Tri Địa Hình
-- Tầm xa • tài nguyên: mana • sát thương chính: vật lý
+- Tầm xa • vũ khí: rifle • tài nguyên: mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 550 (+88), mana 320 (+40), công 55 (+3.3), giáp 26 (+3.8), KP 30 (+1.3), tốc đánh 0.6 (+2.5%), tốc chạy 3.35, tầm 7.2
 - **Nội tại — Sát Thủ Chuyên Nghiệp:** Hai băng đạn độc lập (bản Legacy): SÚNG TRƯỜNG 30 viên (mỗi phát 3 viên, nạp 3s) — mục tiêu càng xa đạn càng mạnh (tối đa +25% từ 8 đv) • SÚNG TỈA 5 viên (nạp 6s, mỗi viên ×1.6 sát thương). Thấy kẻ địch ngoài tầm súng trường thì đứng lại NGẮM: tầm +7.5; khi quạ Oca còn sống, tầm gần như vô hạn — bắn bất cứ kẻ nào Oca / Raven nhìn thấy, liên tục tới khi Oca bị hạ. Di chuyển là thôi ngắm. Chỉ nạp khi bắn cạn băng; tốc đánh và Tốc Nạp rút ngắn thời gian nạp.
 - **S1 — Bắn Tỉa Xuyên Phá** (hồi 10/9.5/9/8.5/8s, 50/55/60/65/70 mana): Ngắm 0.75s rồi bắn 1 phát tầm cực xa (14 đv). Bị áp sát (dưới 2.2 đv): lăn lùi 3 đv (né đòn khi lăn) rồi mới bóp cò. Mục tiêu bị Oca đánh dấu: đạn xuyên địa hình và phá lá chắn.
@@ -902,7 +1024,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Màn Đêm Vĩnh Cửu** (hồi 120/100/80s, 100/100/100 mana): 5s: tầm nhìn mọi tướng đối phương co còn 40%; Raven tàng hình (nổ súng thì lộ 1.2s), đạn +30% sát thương.
 
 ### Roxie & T-Zero (roxie) — ⚖ Thương Nhân
-- Tầm xa • tài nguyên: không dùng mana • sát thương chính: phép
+- Tầm xa • vũ khí: wrench • tài nguyên: không dùng mana • sát thương chính: phép
 - Chỉ số cấp 1: máu 590 (+94), mana 420 (+50), công 58 (+3), giáp 28 (+3.6), KP 30 (+1.4), tốc đánh 0.63 (+1.5%), tốc chạy 3.35, tầm 5
 - **Nội tại — Bánh Răng & Sáng Tạo:** Bánh răng liên tục rơi quanh Roxie (mỗi 4s một cái, tối đa 4 cái nằm chờ) — đi qua là nhặt; quái và tướng bị hạ gần Roxie cũng rơi bánh răng. Mỗi bánh răng +3% tốc chạy (tối đa 9). Ụ Pháo tốn 2 bánh răng; Gia Công tốn 3 bánh răng để ghép 1 Mảnh cơ giới; đủ 3 Mảnh thì gọi được Thiết Vệ T-Zero.
 - **S1 — Khai Hỏa / Pháo Kích** (hồi 3/3/3/3/3s): Đủ 2 bánh răng (và chưa đủ ụ): dựng Ụ Pháo tại điểm trong 5 đv (tự bắn 20s, tối đa 1 ụ). Còn lại: bắn 1 viên pháo 7 đv. Cưỡi T-Zero: Đấm — nón 2.5 đv đẩy lùi.
@@ -912,8 +1034,8 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Gia Công / Tự Hủy** (hồi 3s): Gia Công: dùng 3 bánh răng ghép 1 Mảnh cơ giới (tối đa 3) — đủ 3 Mảnh thì gọi được Thiết Vệ T-Zero. Khi đang lái T-Zero hoặc T-Zero đang tự hành: Tự Hủy — T-Zero phát nổ bán kính 3.5 (sát thương theo cấp S4).
 
 ### Ryoma (ryoma) — 🎯 Kẻ Trảm Tướng
-- Cận chiến • tài nguyên: không dùng mana • sát thương chính: vật lý
-- Chỉ số cấp 1: máu 560 (+86), mana 0 (+0), công 60 (+3.7), giáp 30 (+3.8), KP 32 (+1.8), tốc đánh 0.7 (+2.5%), tốc chạy 3.55, tầm 1.6
+- Cận chiến • vũ khí: katana • tài nguyên: không dùng mana • sát thương chính: vật lý
+- Chỉ số cấp 1: máu 540 (+82), mana 0 (+0), công 57 (+3.4), giáp 30 (+3.8), KP 32 (+1.8), tốc đánh 0.7 (+2.5%), tốc chạy 3.55, tầm 1.6
 - **Nội tại — Liên Hoàn:** Nhất Đao, Đột Thích, Thuấn Bộ mỗi chiêu có 2 lượt dùng. Cứ 2 chiêu liên tiếp trong 2s kích hoạt Combo theo cặp: AA chém tròn rộng • AB lướt chém rồi chém tròn nhỏ • AC hư ảnh cùng chém tròn • BB đâm thêm nhát nữa gây CHOÁNG • BC phóng dư ảnh lao tới • CC gió xoáy làm chậm (A = Nhất Đao, B = Đột Thích, C = Thuấn Bộ). Mỗi Combo hồi 1 lượt Nhất Đao, nạp 1 Kiếm Khí (tối đa 3) và giảm 3s hồi chiêu Vô Ảnh Trảm.
 - **S1 — Nhất Đao** (hồi 4/3.75/3.5/3.25/3s): Chém hình vòng cung trước mặt. 2 lượt dùng.
 - **S2 — Đột Thích** (hồi 7/6.5/6/5.5/5s): Đâm thẳng 4 đv. 2 lượt dùng.
@@ -922,7 +1044,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Kiếm Khí** (hồi 1s): Chỉ dùng được khi có Kiếm Khí (mỗi Combo nạp 1, tối đa 3): chém ra một luồng kiếm khí xuyên thấu 7 đv — 25 (+6/cấp, +80% SMVL) sát thương, PHÁ HỦY đạn của đối thủ trên đường bay.
 
 ### Diệp Thanh Phong (thanhphong) — 📿 Cuồng Tín
-- Tầm xa • tài nguyên: không dùng mana • sát thương chính: phép
+- Tầm xa • vũ khí: fan • tài nguyên: không dùng mana • sát thương chính: phép
 - Chỉ số cấp 1: máu 560 (+88), mana 420 (+50), công 52 (+3), giáp 24 (+3.6), KP 30 (+1.4), tốc đánh 0.63 (+1.5%), tốc chạy 3.45, tầm 4.8
 - **Nội tại — Khí Áp Phong Vũ:** Thước Gió 0–100 (S1 kéo −15, S2 đẩy +15). Thuận (≤35): +15% tốc chạy, Giáp Phong Hộ chặn 1 đòn mỗi 10s • Bão Hòa (36–64): đòn đánh và chiêu gây Gió Mê, đủ 3 tầng thì ngủ 1s • Nghịch (≥65): +20% sát thương.
 - **S1 — Toàn Phong Quy** (hồi 7/6.5/6/5.5/5s): Lốc xoáy thẳng 7 đv hất tung 0.6s (gió −15). Thuận: thành vực xoáy giữ kẻ địch 1.5s ở cuối đường • Nghịch: Thanh Phong lướt theo lốc.
@@ -932,7 +1054,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Nghịch Chuyển Canh Khí** (hồi 12s): Thuận ↔ Nghịch (đảo thước gió). Ở Bão Hòa: kích nổ cơn gió (đẩy lùi kẻ địch quanh mình 2 đv) và thanh tẩy khống chế.
 
 ### Theron (theron) — 🛡 Vệ Sĩ Thầm Lặng
-- Cận chiến • tài nguyên: mana • sát thương chính: vật lý
+- Cận chiến • vũ khí: spear • tài nguyên: mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 585 (+91), mana 300 (+38), công 61 (+3.7), giáp 31 (+4), KP 32 (+1.8), tốc đánh 0.66 (+2.2%), tốc chạy 3.5, tầm 2.3
 - **Nội tại — Xuyên Phá:** Đòn đâm xuyên: kẻ địch phía sau mục tiêu trong tầm nhận 50%; 20% sát thương đánh thường là sát thương chuẩn.
 - **S1 — Liên Hoàn Đâm** (hồi 6/5.5/5/4.5/4s, 40/40/40/40/40 mana): Đứng đâm 3 nhát thẳng 4.5 đv, mỗi nhát 35/50/65/80/95 (+40% SMVL).
@@ -942,7 +1064,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Quét Chân** (hồi 12s, 30 mana): Quét thương tầm thấp 360° (bán kính 2.6): 35 (+7/cấp, +50% SMVL) sát thương, kẻ địch trúng chiêu bị NGÃ 0.5s (ngắt chiêu đang niệm).
 
 ### Tsukiyo (tsukiyo) — 🗡 Ám Sát
-- Tầm xa • tài nguyên: mana • sát thương chính: vật lý
+- Tầm xa • vũ khí: ninja • tài nguyên: mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 565 (+88), mana 100 (+10), công 62 (+3.8), giáp 27 (+3.7), KP 30 (+1.4), tốc đánh 0.7 (+2.6%), tốc chạy 3.55, tầm 5.5
 - **Nội tại — Thích Ứng Cận – Viễn • Tam Đại Nhẫn Thuật • Nhẫn Đạo Toàn Giác:** Dùng Nội Năng (100 +10/cấp, tự hồi 10/giây) thay mana. Mục tiêu xa hơn 2 đv: ném phi tiêu; gần: song đao chém (+20%). Đòn đánh trúng tướng +8 Nội Năng; S1/S2 trúng tướng +15. Mỗi chiêu theo 1 trong 3 nhánh: Kỹ Thuật (phép, khống chế), Tất Sát (vật lý, dồn sát thương), Bí Thuật (tốc độ, phản đòn). Nhẫn Đạo: 120 Công Phép → phi tiêu thêm phép và hiệu ứng ngẫu nhiên, nhát chém gắn Dấu Ấn Hắc Ám; 90 Công Vật Lý thêm → ném 3 phi tiêu / chém 2 nhát (4s); 35% tốc đánh + tốc chạy thêm → né 1 đòn cận chiến và chém phản 1 đòn tầm xa (12s mỗi loại).
 - **S1 — Nhẫn Thuật Nhất** (hồi —s, 50 mana): 🔮 Hỏa Cầu Chi Thuật: cầu lửa bay 7.5 đv, nổ bán kính 2.5 sát thương phép lớn + thiêu đốt 3s. ⚔ Loạn Vũ Phi Tiêu: +60% tốc đánh 5s, mỗi đòn ném thêm 2 phi tiêu tách góc; hết giờ xả loạt phi tiêu tìm diệt theo số đã ném. 🌪 Thuấn Trảm: lướt 4.5 đv chém trên đường, +35% tốc chạy 1.5s (tích 3 lần, hồi 1 lần mỗi 8s).
@@ -951,7 +1073,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Nhẫn Thuật Tối Thượng** (hồi 90/75/60s, 100 mana): 🔮 Hắc Nguyệt Diệt Thế Cầu: cảnh báo bán kính 8; sau 2/1.5/1s quả cầu bóng tối nổ — sát thương phép cực lớn, choáng 1.5s, mù 3s. ⚔ Huyền Ảnh Ám Bộ: 5/6/8s +40% tốc chạy, mỗi đòn đánh gọi Hư Ảnh chém bồi 50%, mọi đòn làm chậm 30%. 🌪 Song Ảnh Xuất Trận: gọi 1/1/2 phân thân lao lên trước, thừa hưởng 50% chỉ số, tồn tại 12/16/20s.
 
 ### Valerius (valerius) — ⚔ Võ Sĩ Danh Dự
-- Cận chiến • tài nguyên: mana • sát thương chính: vật lý
+- Cận chiến • vũ khí: swordshield • tài nguyên: mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 640 (+98), mana 300 (+40), công 60 (+3.6), giáp 34 (+4.2), KP 32 (+2), tốc đánh 0.66 (+2%), tốc chạy 3.45, tầm 1.7
 - **Nội tại — Công Thủ:** Giảm 6% sát thương nhận. Mỗi lần trúng đòn của tướng tích 1 Phản Kích (tối đa 3): đòn đánh kế tiếp +12 (+2/cấp) sát thương mỗi tầng.
 - **S1 — Chém Vòng Cung** (hồi 7/6.5/6/5.5/5s, 40/40/40/40/40 mana): Chém hình quạt 130° trước mặt, làm chậm 20% trong 1s.
@@ -961,7 +1083,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Cuồng Phong** (hồi 10s, 30 mana): +45% tốc chạy trong 1.5s và chém một vòng quanh người (bán kính 2.4): 40 (+8/cấp, +40% SMVL) sát thương, làm chậm 30% trong 1.5s.
 
 ### Dr. Vector (vector) — 📐 Cầu Toàn
-- Tầm xa • tài nguyên: mana • sát thương chính: vật lý
+- Tầm xa • vũ khí: laser • tài nguyên: mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 555 (+86), mana 330 (+42), công 54 (+3.2), giáp 26 (+3.8), KP 30 (+1.3), tốc đánh 0.62 (+2.5%), tốc chạy 3.3, tầm 8
 - **Nội tại — Laser Gun • Tính Toán Tuyệt Đối:** Đánh thường là tia laser bắn tức thời, xuyên mọi mục tiêu thẳng hàng (mục tiêu sau nhận 65%). Ổ 8 viên, cạn đạn nạp 1.8s. Sẵn 40% chí mạng, 20% xuyên giáp và 25% Xuyên Thủng Hộ Giáp.
 - **S1 — Nạp Năng Lượng Tái Kích** (hồi 8/7.5/7/6.5/6s, 40/40/40/40/40 mana): Nạp đầy 8 viên ngay lập tức. 3 phát kế tiếp +35% sát thương, xuyên thấu không suy hao; phát thứ 3 chắc chắn chí mạng.
@@ -970,7 +1092,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Pháo Laser Quét Hư Không** (hồi 85/70/55s, 100/100/100 mana): Ghim chân tụ lực 0.6s rồi bắn chùm laser dài 16 đv rộng 2 đv xuyên địa hình: sát thương vật lý cực lớn (350/520/700 + 130% Công Vật Lý), bỏ qua 50% giáp, thiêu 300 Hộ Giáp. Mục tiêu dính Dấu Ấn Từ Tính: nổ thêm sát thương chuẩn và chậm 60% 2s.
 
 ### Vesper (vesper) — 👻 Thoát Xác
-- Cận chiến • tài nguyên: mana • sát thương chính: vật lý
+- Cận chiến • vũ khí: dagger • tài nguyên: mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 560 (+86), mana 300 (+36), công 64 (+4), giáp 27 (+3.6), KP 30 (+1.4), tốc đánh 0.78 (+3%), tốc chạy 3.65, tầm 1.35
 - **Nội tại — Đâm Sau Lưng:** Đòn đánh và chiêu từ sau lưng mục tiêu +40% sát thương và câm lặng 0.75s (mỗi mục tiêu 1 lần mỗi 8s). Đòn Đánh Bất Ngờ: đòn đầu tiên khi đối thủ không thấy Vesper gây ×2 sát thương, gây độc rút máu và Khóa Họng (choáng 1s). Đánh thường là những nhát chém nhanh.
 - **S1 — Phi Dao Ảnh Bộ** (hồi 9/8.5/8/7.5/7s, 45/45/45/45/45 mana): Ném dao độc 7/8/9/9/10 đv: sát thương vật lý, câm lặng 1/1/1/1.25/1.5s, độc và làm chậm 3/5/6/6/8s. Trúng thì trong 5s dùng lại để dịch chuyển ra sau lưng mục tiêu.
@@ -979,8 +1101,8 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **S4 — Bão Phi Đao Tuyệt Diệt** (hồi 100/85/70s, 100/100/100 mana): Phóng 10/20/40 phi dao bao trùm bán kính 6/8/10 đv, Vesper tàng hình 5s. Dùng lại: dịch chuyển ra sau lưng tướng địch thấp máu nhất bị trúng dao. Cấp tối đa: đánh dấu mọi mục tiêu trúng dao, Hư Ảnh lao tới đâm xuyên từng kẻ. Đòn Trảm Quyết: đòn đánh kế tiếp trong 3s gây ×2 (×3 nếu mục tiêu dưới 50% máu). Tung khi chưa bị phát hiện: bỏ qua 50% giáp và 100% Hộ Giáp, đánh mạnh hơn lên nạn nhân dưới 25% máu.
 
 ### Victoria (victoria) — 🦅 Kền Kền
-- Cận chiến • tài nguyên: mana • sát thương chính: vật lý
-- Chỉ số cấp 1: máu 580 (+88), mana 380 (+45), công 56 (+3.2), giáp 28 (+3.9), KP 30 (+1.5), tốc đánh 0.62 (+1.5%), tốc chạy 3.35, tầm 2.4
+- Cận chiến • vũ khí: flag • tài nguyên: mana • sát thương chính: vật lý
+- Chỉ số cấp 1: máu 630 (+96), mana 380 (+45), công 60 (+3.6), giáp 32 (+3.9), KP 30 (+1.5), tốc đánh 0.62 (+1.5%), tốc chạy 3.35, tầm 2.4
 - **Nội tại — Quân Lệnh & Cờ Chiến:** 3 Lính Tinh Nhuệ hộ vệ và chiến đấu cùng Victoria (chết thì 30s sau hồi sinh). Ưu tiên thế Cờ: Victoria và lính đánh cận chiến càn lướt, lính +25% tốc chạy và kháng khống chế. Hào quang (đồng minh trong 6 đv): 🚩 Cờ +12% tốc chạy, −25% thời gian bị khống chế • 🔥 AR +10% sát thương • 🔫 Lục +giáp/kháng phép.
 - **S1 — Hỏa Lực Theo Dạng** (hồi 6/5.5/5/4.5/4s, 40/40/40/40/40 mana): 🔫 Lục: 1 phát súng lục mạnh • 🔥 AR: loạt 5 viên hình nón • 🚩 Cờ: quét cờ hình vành khuyên (1.5–3.5 đv) làm chậm 30%.
 - **S2 — Thiết Lập Thế Trận** (hồi 12/11.5/11/10.5/10s, 60/60/60/60/60 mana): 🔫 Lục: lướt 3 đv + lá chắn • 🔥 AR: lựu đạn bán kính 2 đẩy lùi • 🚩 Cờ: cắm cờ trong 6 đv — đẩy lùi 1.5 đv và choáng 0.75s, tạo Vùng Đất Quân Lệnh 5s (đồng minh bên trong +15% tốc đánh).
@@ -989,7 +1111,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Chuyển Đổi Quân Lệnh** (hồi 4s): Xoay Cờ → AR → Lục. Ưu tiên thế Cờ càn lướt cận chiến: gọi pháo kích • Sang AR: ném flash làm mù 1s • Sang Lục: lướt 2.5 đv + lá chắn.
 
 ### Wukong (wukong) — 🃏 Quấy Nhiễu
-- Cận chiến • tài nguyên: không dùng mana • sát thương chính: vật lý
+- Cận chiến • vũ khí: pole • tài nguyên: không dùng mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 615 (+97), mana 0 (+0), công 65 (+3.9), giáp 31 (+4), KP 32 (+1.8), tốc đánh 0.68 (+2.4%), tốc chạy 3.55, tầm 2
 - **Nội tại — Côn Thức Vũ:** Côn Thức (0–100) tích khi đánh trúng (+6), bị tướng đánh (+4), chiêu trúng tướng (+8). Đủ 50: chiêu kế tiếp được cường hóa; đủ 100: cường hóa tối đa. Chiêu cường hóa gắn Khí Ấn lên tướng trúng (tối đa 2, 4s).
 - **S1 — Toàn Phong Côn** (hồi 7/6.5/6/5.5/5s): Xoay côn 0.5s quanh người (2 nhịp), gạt đạn nhỏ bay tới. Cường hóa: hút kẻ địch vào tâm.
@@ -999,7 +1121,7 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - **Skill phụ — Định Thân Thuật** (hồi 20s): Chỉ dùng được lên tướng địch trong 5 đv đang có 2 Khí Ấn: hóa đá 1.5s.
 
 ### Zero (zero) — 📐 Cầu Toàn
-- Tầm xa • tài nguyên: mana • sát thương chính: vật lý
+- Tầm xa • vũ khí: pistol • tài nguyên: mana • sát thương chính: vật lý
 - Chỉ số cấp 1: máu 560 (+88), mana 320 (+40), công 71 (+4.2), giáp 26 (+3.8), KP 30 (+1.3), tốc đánh 0.68 (+2.8%), tốc chạy 3.3, tầm 6.2
 - **Nội tại — Vũ Trang Hiện Đại:** Đánh thường dùng băng 9 viên; hết đạn phải nạp 1.6s. Đạn mạnh.
 - **S1 — Khóa Mục Tiêu** (hồi 10/9.5/9/8.5/8s, 30/30/30/30/30 mana): Đánh dấu một tướng trong 9 đv trong 6s: +10% sát thương đánh thường lên nó và lộ hình. Bắn trúng 5 lần thì S3 kế tiếp được cường hóa.
@@ -1103,3 +1225,66 @@ Mỗi trận chọn ngẫu nhiên 10 tướng khác nhau theo hạt giống. Chi
 - Thông báo: 🦅 KỀN KỀN! • HẠ GỤC KÉP/BA… • CHIẾN CÔNG ĐẦU • CHẤM DỨT CHUỖI (kèm vàng truy nã) • "X BỊ LOẠI — hạng n"; bo bắt đầu co, thính sắp rơi / bị lấy, boss xuất hiện / cường hóa / bị hạ. Bảng xếp hạng (📋/Tab) và màn kết quả sau trận.
 - GĐ8: bản đồ 8 vùng (Vùng Tử Khí: đất tro tím, cây chết, bia mộ, bụi gai; Trạm Khí Độc: vũng độc, sắt vụn, bồn khí có vạch cảnh báo, đường ống, nắp xả phun khói), 4 ổ boss mỗi ổ một kiểu sàn, đếm ngược + tên boss sắp ra; mỗi boss một dáng riêng (cánh lửa, rồng, hồn ma, giáp sắt, thú vàng, kiếm sư) + vòng tụ chiêu; vùng cảnh báo tròn / vành khăn / chữ nhật / hình nón (tô đậm dần tới lúc nổ); thanh Hộ Giáp bạc trên thanh máu; biểu tượng bùa lợi boss trên đầu; thẻ tướng có Hộ Giáp, chí mạng, may mắn, hồi chiêu, hút máu, kháng, xuyên thủng, bùa lợi boss, đồ Hoàng Kim, mảnh hồn đang gắn ✅ / cất túi 💤; dòng sự kiện boss xuất hiện / bị đánh (cả bản đồ biết) / bị hạ / thoát chết nhờ bùa / nhận đồ Hoàng Kim.
 - GĐ9: thẻ tướng có 🔫 đạn / đang nạp / Tốc Nạp, 🧭 lối build đang theo (món đã có ✔), ❤ mảnh hồn yêu thích (✅ đang gắn / 💤 cất / · chưa có), 🌳 **cây kỹ năng đã nâng** (chạm để mở: từng mốc cấp 1/3/6/9/12, nhánh đã mở ✅, nhánh đã chọn nhưng chưa đủ cấp 🔒, mốc thêm cấp 15/18 ✨); dòng sự kiện 🔄 trao đổi / 💰 mua bán / 🃏 bịp / 🤨 nhìn thấu / 😤 vỡ lẽ, 💠 mảnh hồn văng ra; tiếng gọi trên đầu ("🔄 Đổi mảnh hồn không?", "📣 Bên kia có rương…", "👣 Truy vết").
+- **GĐ11 — vũ khí & hiệu ứng riêng từng tướng**: mỗi tướng cầm vũ khí riêng (bảng dưới; tướng tay không: Borg đấm, Koda vuốt, Aria giọng hát, Alice găng tay), đạn đánh thường riêng (nước của Lyra, ánh thánh của Olivia/Justus, khối dữ liệu của Caelus, mảnh gương của Mirage, cánh hồng đen của Dahlia, đạn thời gian cam/lam của Chrono & Neo, plasma của Zero, lưỡi gió của Thanh Phong, lá bài của Luca/Joker…), đòn cận chiến đặc trưng theo vũ khí (đại kiếm chém rộng + tia ở mũi kiếm, katana hai vệt mảnh, song kiếm vệt chéo, lưỡi hái cung tím, dao găm đâm + giọt độc, phi đao hư không vết nứt tím, côn xoáy, song rìu + vụn băng, đại bản đao vàng, móc xích, kiếm khiên chớp khiên, cờ chiến đâm giáo) và **dấu ấn tung chiêu** (hạt + vầng sáng màu riêng mỗi tướng).
+| Vũ khí (gfx) | Tướng |
+|---|---|
+| axes | Boran |
+| blackcane | Dahlia |
+| bow | Elara |
+| cane | Luca |
+| cards | Joker |
+| claw | Koda |
+| cleaver | Ariston |
+| crossbow | Percy |
+| dagger | Vesper |
+| dual | Chrono & Neo |
+| fan | Diệp Thanh Phong |
+| fist | Borg |
+| flag | Victoria |
+| flask | Galo |
+| flysword | Bạch Diệp |
+| gloves | Alice |
+| greatsword | Gideon |
+| hookchain | Ratok |
+| katana | Ryoma |
+| laser | Dr. Vector |
+| lightstaff | Olivia |
+| ninja | Tsukiyo |
+| orb | Dr. Caelus |
+| pistol | Zero |
+| pole | Wukong |
+| rapier | Florian |
+| revolver | Jack "Sáu Lỗ" |
+| rifle | Raven |
+| scythe | Death |
+| shotgun | Clint |
+| spear | Theron |
+| staff | Ignatius |
+| swordshield | Valerius |
+| tidestaff | Lyra |
+| tome | Justus |
+| twinblades | Kazuki |
+| voice | Aria & Oktava |
+| voidknife | Kip |
+| wand | Mirage |
+| wrench | Roxie & T-Zero |
+- **GĐ11 — Sandbox**: lớp vẽ hitbox (vòng xanh/đỏ), nón nhìn 180°, vòng tầm đánh & từng chiêu (có nhãn), vòng lồng Solo vàng nét đứt.
+
+## 20. Phòng thử nghiệm Sandbox (GĐ11 — src/sim/sandbox.js, src/ui/sandbox_ui.js)
+- Màn hình chính → 🧪 **Phòng thử nghiệm**: chọn tướng, cấp (1/3/6/9/12/18), các bù nhìn cần thả → vào bản đồ thật (vách đá, bụi, công trình) nhưng **không quái, không rương, không bo, không ai chết** (về 0 máu thì hồi đầy, ghi "☠ hạ gục" vào nhật ký). Tướng thử do AI thật điều khiển, tự dùng chiêu lên bù nhìn.
+- **Bù nhìn** (đội đối thủ, không liên minh / mua bán):
+  - 🎯 **Bao Cát Tĩnh** — Đứng im, không đánh trả; 2s không trúng đòn thì hồi đầy máu. Đo DPS, tầm chiêu.
+  - 🛡 **Bù Nhìn Siêu Giáp** — 1000 máu + 1500 Hộ Giáp, 0 giáp (chế độ 2: 100 giáp & kháng phép, 0 Hộ Giáp). Đo xuyên giáp / phá Hộ Giáp / sát thương chuẩn.
+  - 🔫 **Máy Xả Đạn** — Bắn tỉa đơn / liên thanh 20 viên / cầu năng lượng chậm có cảnh báo. Test né, phản đạn, thế thân.
+  - 🏃 **Bù Nhìn Thả Diều** — Giữ cự ly 6–8 đv, chạy zíc-zắc. Test bắt lẻ, làm chậm, trói, khóa lướt.
+  - 👻 **Bù Nhìn Ẩn Thân** — Tàng hình rình rập rồi hiện hình đánh bất ngờ. Test radar, giật mình, chiêu bộc phá.
+  - ⚔ **Đối thủ tướng thật** — bất kỳ tướng nào, AI đầy đủ (test giữ cự ly, Solo).
+- **Lệnh cho tướng thử** 🎮: 🤖 AI tự đánh (mặc định) • ⏸ **Đứng yên, không làm gì** (làm bia để test chiêu/bù nhìn bắn vào) • 🗡 **Chỉ đánh thường** • **S1 / S2 / S3 / S4 / chiêu phụ: CHỈ dùng đúng chiêu đó** — tự tiến vào tầm chiêu rồi tung lên mục tiêu gần nhất, không đánh thường, không dùng chiêu khác (chiêu chưa học thì mở tạm cấp 1; chiêu dùng lại như snapback cũng được bấm). Kết hợp ⏱ Không Hồi Chiêu để spam một chiêu.
+- **Bảng điều khiển** (phím tắt): 🛡 Bất Tử • ⏱ Không Hồi Chiêu (F1) • ♾ Vô Hạn Tài Nguyên (F2: mana, đạn, thanh riêng) • nhảy cấp 1→3→6→9→12→18 (F3) • đổi tướng tại chỗ (F4) • lớp vẽ gỡ lỗi (F5): hitbox, nón nhìn 180°, vòng tầm đánh & tầm từng chiêu • tốc độ 0.1x / 0.25x / 0.5x / 1x / 2x (F6) • 🔒 Lồng Solo đường kính 14 đv • ☣ Bo giả lập (18 → 6 đv trong 25s, sát thương bo vòng 3 + Ăn Mòn) • chế độ Máy Xả Đạn • đổi Siêu Giáp (Hộ Giáp ↔ giáp thường) • 🧹 dọn bù nhìn.
+- **Bảng đo**: DPS 1s gần nhất • DPS trung bình cả chuỗi (chuỗi kết thúc sau 3s không đánh) • đòn cao nhất • tổng, số đòn, số chí mạng • phân rã Vật Lý / Phép / Chuẩn / Hộ Giáp vỡ / Khiên (con số + %) • đồng hồ khống chế (Choáng, Trói, Chậm, Câm lặng, Hất tung…) • nhật ký từng đòn dạng `[mm:ss.cs] S1 Tên Chiêu → 240 Vật Lý (CHÍ MẠNG!) → 40 Hộ Giáp vỡ → 0.60s Choáng`.
+- **5 kịch bản kiểm thử mẫu** (chạy trong giao diện hoặc `node tools/sandbox_test.js`, mỗi dòng ✔/✘):
+  - **Điểm Ngọt & Đẩy Cán Kiếm (Gideon)** — tướng Gideon, bù nhìn: Bao Cát Tĩnh.
+  - **Bắn xuyên vách & Radar (Dr. Vector)** — tướng Dr. Vector, bù nhìn: Bao Cát Tĩnh.
+  - **Nuốt đạn liên hoàn (Kip — Vòm Xoáy vs Máy Xả Đạn liên thanh)** — tướng Kip, bù nhìn: Máy Xả Đạn, Máy Xả Đạn chế độ burst.
+  - **Tích tầng vô hạn (Không Hồi Chiêu)** — tướng Ryoma, bù nhìn: Bao Cát Tĩnh, bật Không Hồi Chiêu.
+  - **Hoán vị về điểm neo (Luca S3) & ảo ảnh tự đánh (Alice)** — tướng Luca, bù nhìn: Bao Cát Tĩnh.

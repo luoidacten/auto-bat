@@ -1,0 +1,64 @@
+══════════ BÁO CÁO MÔ PHỎNG ĐẤU TRƯỜNG ══════════
+Số trận: 48 (văng: 0) • chạy 342.8s • trung bình 26.80s/trận/luồng
+
+THỜI LƯỢNG: trung bình 34.5 phút • trung vị 33.6 • ngắn nhất 22.8 • dài nhất 48.8 • mục tiêu 30–60 (bo 6 đóng lúc 46:30, hết giờ 60:00)
+  <30: 10% | 30–40: 75% | 40–50: 15% | 50–60: 0% | hết 60:00: 0%
+  Lần đầu hai tướng đánh nhau: giữa 108s (25% 79s • 75% 134s)
+  Hết giờ (người còn sống đồng hạng 1): 0 trận • có đồng hạng 1: 0 trận
+  Thời điểm bị loại (phút): 25% 10.5 • giữa 17.5 • 75% 24.6
+
+GIAO TRANH: 16.6 lần hạ gục/trận (0.48/phút) • kền kền 4% số mạng (mục tiêu 20–30%)
+  Chết trong bo: 0.60/trận • đã dùng lượt hồi sinh: 9.1 người/trận
+  Boss bị hạ: 4.06/trận • thính được lấy: 3.9/6 mỗi trận
+  Giao tranh kết thúc "chết": 20.1/trận • thời lượng 25% 15s • giữa 30s • 75% 51s • 90% 92s • 29 chiêu/giao tranh (mục tiêu 20–120s)
+  Giao tranh kết thúc "tách": 5.3/trận • thời lượng 25% 7s • giữa 16s • 75% 32s • 90% 57s • 35 chiêu/giao tranh (mục tiêu 20–120s)
+  Cổng quyết đấu: 3.3 cổng/trận • 0.4 trận quyết đấu/trận • thời lượng giữa 30s (25% 25s • 75% 34s)
+  Bình đã uống: 88/trận • mảnh hồn: 4.8/trận • nhà vô địch có mảnh hồn bậc cao nhất trung bình 4.6
+  Mảnh hồn rơi khi bị hạ: 21.3/trận • được nhặt lại: 6.7/trận
+
+TƯỚNG (hạng trung bình; kỳ vọng ~5.5; vô địch kỳ vọng ~10%):
+  Tướng        Tính cách  Trận  Hạng TB  Vô địch  Top 3   Mạng  Chết  Kền kền  Cấp
+  vector       cauton       11     2.9     27%    82%    3.1   1.7     0.2  12.0 ⚠
+  ariston      cuongtin      8     3.0     50%    63%    5.5   1.1     0.0  12.5 ⚠
+  aria         hoabinh      12     3.0      8%    75%    0.9   1.6     0.0  13.8 ⚠
+  lyra         chuotlui     12     3.1      0%    75%    0.1   1.7     0.0  11.2 ⚠
+  mirage       bipbom       11     3.3      9%    73%    1.2   1.6     0.0   7.8 ⚠
+  florian      nguyquan      7     3.7     57%    57%    5.4   1.0     0.0  13.1
+  vesper       thoatxac     14     3.8     36%    36%    3.6   1.6     0.3  11.1
+  elara        li           11     3.9      9%    36%    1.6   1.8     0.0  11.3
+  joker        bipbom        8     4.1     25%    38%    0.8   1.8     0.0   8.9
+  roxie        thuongnhan    12     4.2     17%    33%    1.4   1.6     0.1   8.0
+  bachdiep     tramtuong    10     4.2     40%    50%    5.4   1.6     0.1  12.1
+  wukong       quayphan     14     4.3      7%    57%    2.1   1.9     0.1   9.9
+  alice        moicau       13     4.6     15%    38%    1.5   1.7     0.1   9.4
+  olivia       cuongtin     12     4.8      8%    42%    0.9   1.7     0.0   7.4
+  chrononeo    thamfarm     14     4.9     14%    36%    1.1   1.8     0.0   8.9
+  dahlia       nguyquan     12     5.0      0%    33%    1.6   2.1     0.0   9.5
+  ryoma        tramtuong    14     5.3     43%    43%    5.4   1.4     0.0  11.7
+  kazuki       doimang      10     5.3     10%    40%    1.8   1.9     0.0  10.7
+  gideon       lanhchua     13     5.3     15%    31%    1.2   1.8     0.1   9.5
+  clint        gaccong      14     5.4      7%    36%    0.9   1.9     0.1   7.6
+  thanhphong   cuongtin     11     5.5      0%     0%    1.5   2.1     0.0   9.4
+  zero         cauton       13     5.5      8%    23%    1.9   1.8     0.0   8.3
+  raven        tientri      11     5.6      0%    36%    0.5   2.0     0.0   4.8
+  percy        bacle         9     5.7     22%    22%    2.6   1.9     0.2   9.3
+  caelus       thucdung     13     5.8      0%    23%    1.1   1.9     0.0   9.0
+  victoria     kenken        9     6.0      0%    11%    1.4   2.0     0.2   9.0
+  boran        cuongloan     9     6.0     11%    11%    3.7   2.0     0.1  10.2
+  tsukiyo      amsat        13     6.1      8%    15%    1.5   1.9     0.1   8.3
+  borg         hobao        12     6.2      0%     8%    0.8   1.9     0.1   6.6
+  kip          quayphan     20     6.3      0%    20%    1.1   1.9     0.1   7.8
+  galo         riabao       11     6.6      0%    18%    0.9   1.9     0.1   7.7
+  ratok        hobao        11     7.0      0%     9%    0.6   1.9     0.0   5.9
+  valerius     vosi         17     7.1      0%    18%    0.4   2.1     0.1   6.5
+  koda         cuongloan    11     7.3      0%     0%    2.2   2.0     0.1   7.1
+  theron       vesi         14     7.3      0%    14%    0.8   2.0     0.1   7.1
+  luca         khatnuoc     17     7.5      0%     0%    0.8   2.2     0.2   5.8
+  jack         conbac       11     7.5      0%     9%    1.0   2.0     0.2   6.6 ⚠
+  death        amsat        14     7.6      0%     7%    1.4   2.1     0.2   6.6 ⚠
+  justus       cuongtin     16     7.7      0%    13%    0.3   2.0     0.0   4.9 ⚠
+  ignatius     honloan       6     8.8      0%     0%    0.5   2.0     0.0   6.8 ⚠
+
+TÍNH CÁCH: hoabinh hạng 3.0, vô địch 8%, 0.9 mạng (🦅0.0) • chuotlui hạng 3.1, vô địch 0%, 0.1 mạng (🦅0.0) • bipbom hạng 3.6, vô địch 16%, 1.0 mạng (🦅0.0) • thoatxac hạng 3.8, vô địch 36%, 3.6 mạng (🦅0.3) • li hạng 3.9, vô địch 9%, 1.6 mạng (🦅0.0) • thuongnhan hạng 4.2, vô địch 17%, 1.4 mạng (🦅0.1) • cauton hạng 4.3, vô địch 17%, 2.5 mạng (🦅0.1) • nguyquan hạng 4.5, vô địch 21%, 3.0 mạng (🦅0.0) • moicau hạng 4.6, vô địch 15%, 1.5 mạng (🦅0.1) • tramtuong hạng 4.8, vô địch 42%, 5.4 mạng (🦅0.0) • thamfarm hạng 4.9, vô địch 14%, 1.1 mạng (🦅0.0) • doimang hạng 5.3, vô địch 10%, 1.8 mạng (🦅0.0) • lanhchua hạng 5.3, vô địch 15%, 1.2 mạng (🦅0.1) • gaccong hạng 5.4, vô địch 7%, 0.9 mạng (🦅0.1) • quayphan hạng 5.5, vô địch 3%, 1.6 mạng (🦅0.1) • tientri hạng 5.6, vô địch 0%, 0.5 mạng (🦅0.0) • cuongtin hạng 5.6, vô địch 11%, 1.6 mạng (🦅0.0) • bacle hạng 5.7, vô địch 22%, 2.6 mạng (🦅0.2) • thucdung hạng 5.8, vô địch 0%, 1.1 mạng (🦅0.0) • kenken hạng 6.0, vô địch 0%, 1.4 mạng (🦅0.2) • hobao hạng 6.6, vô địch 0%, 0.7 mạng (🦅0.0) • riabao hạng 6.6, vô địch 0%, 0.9 mạng (🦅0.1) • cuongloan hạng 6.7, vô địch 5%, 2.9 mạng (🦅0.1) • amsat hạng 6.9, vô địch 4%, 1.4 mạng (🦅0.1) • vosi hạng 7.1, vô địch 0%, 0.4 mạng (🦅0.1) • vesi hạng 7.3, vô địch 0%, 0.8 mạng (🦅0.1) • khatnuoc hạng 7.5, vô địch 0%, 0.8 mạng (🦅0.2) • conbac hạng 7.5, vô địch 0%, 1.0 mạng (🦅0.2) • honloan hạng 8.8, vô địch 0%, 0.5 mạng (🦅0.0)
+
+LỖI TRONG TRẬN: 0 trận có lỗi kích hoạt

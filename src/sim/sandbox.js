@@ -108,11 +108,11 @@
       this.duelSt = { gate: null, nextAt: 1e12, n: 0, history: [] }; this.soulOrbs = []; this.orbN = 0;
       this.sbx = {
         god: !!cfg.god, noCd: !!cfg.noCd, infRes: !!cfg.infRes, hitbox: false, fov: false, rings: false,
-        spitMode: cfg.spitMode || 'snipe', armorMode: 'ga', cage: null, zone: false,
+        spitMode: cfg.spitMode || 'snipe', armorMode: 'ga', cmd: cfg.cmd || 'auto', cage: null, zone: false,
         hero: null, anchor: p0, dummies: [], log: [], hits: [], cc: {}, sum: { phys: 0, magic: 0, true: 0, shield: 0, ga: 0, n: 0, peak: 0, crit: 0 }, t0: null, tLast: 0,
       };
       const h = this.heroes[0];
-      if (h) { this.sbx.hero = h; this.blinkTo(h, p0); }
+      if (h) { this.sbx.hero = h; this.blinkTo(h, p0); this.sbWrap(h); }
       for (const k of cfg.dummies || ['static']) this.sbSpawn(k);
     },
     blinkTo(u, p) { u.x = p.x; u.y = p.y; u.navP = null; u.dash = null; u.goal = null; },
@@ -154,7 +154,7 @@
       if (old) { old.alive = false; old.sbGone = true; this.heroes = this.heroes.filter((h) => h !== old); this.units = this.units.filter((x) => x !== old); this.pets = this.pets.filter((x) => x.owner !== old); }
       const u = this.spawnHero({ hero: id, team: 0, level: level || (old ? old.level : 9) }, 0, p);
       this.heroes.splice(this.heroes.indexOf(u), 1); this.heroes.unshift(u);
-      S.hero = u; this.sbResetMetrics();
+      S.hero = u; this.sbWrap(u); this.sbResetMetrics();
       this.sbLog(`🔁 ${u.hero.name} • cấp ${u.level}`);
       return u;
     },
@@ -194,6 +194,38 @@
     sbResetMetrics() { const S = this.sbx; S.hits = []; S.cc = {}; S.sum = { phys: 0, magic: 0, true: 0, shield: 0, ga: 0, n: 0, peak: 0, crit: 0 }; S.t0 = null; S.log = S.log.slice(-6); },
     sbLog(txt) { const S = this.sbx; S.log.push({ t: this.time, txt }); if (S.log.length > 80) S.log.splice(0, S.log.length - 80); },
 
+    // ---------------- LỆNH CHO TƯỚNG THỬ ----------------
+    // cmd: 'auto' (AI tự đánh) • 'idle' (đứng yên, không làm gì) • 'atk' (chỉ đánh thường) • 's1'|'s2'|'s3'|'s4'|'sub' (CHỈ dùng chiêu đó)
+    sbWrap(u) {
+      const m = this, ai = u.ai, own = ai.think;
+      ai.think = function () {
+        const S = m.sbx, c = S && S.cmd;
+        if (!c || c === 'auto') return own.call(this);
+        u.goal = null; u.attackTarget = null;
+        if (c === 'idle') return;
+        const t = m.sbTarget(u); if (!t) return;
+        if (c === 'atk') { u.attackTarget = t; return; }
+        const def = u.hero.skills[c]; if (!def || u.cast || u.dash) return;
+        if (u.ranks[c] < 1) { u.ranks[c] = 1; if (m.sbx.cmdWarn !== c) { m.sbx.cmdWarn = c; m.sbLog(`ℹ ${c.toUpperCase()} chưa học — mở tạm cấp 1 để thử`); } }
+        const R = (def.ai && (def.ai.rangeFn ? def.ai.rangeFn(m, u) : def.ai.range)) || 3, aim = def.ai && def.ai.aim;
+        const d = Math.hypot(t.x - u.x, t.y - u.y);
+        if (aim !== 'self' && d > R + t.r) { u.goal = { x: t.x, y: t.y }; return; }   // tiến vào tầm chiêu (không đánh thường)
+        u.face(t.x, t.y);
+        if (m.canCast(u, c)) { m.castSkill(u, c, t, { x: t.x, y: t.y }); return; }
+        if (u.recast[c] && u.recast[c].until > m.time) m.castSkill(u, c, t, { x: t.x, y: t.y });   // chiêu dùng lại (snapback, đổi chỗ…)
+      };
+    },
+    sbTarget(u) {
+      let best = null, bd = 1e9;
+      for (const h of this.heroes) if (h.alive && h.team !== u.team) { const d = Math.hypot(h.x - u.x, h.y - u.y); if (d < bd) { bd = d; best = h; } }
+      return best;
+    },
+    sbCmd(c) {
+      const S = this.sbx; S.cmd = c;
+      const h = S.hero; if (h) { h.goal = null; h.attackTarget = null; }
+      const nm = c === 'auto' ? 'AI tự đánh' : c === 'idle' ? 'Đứng yên, không làm gì' : c === 'atk' ? 'Chỉ đánh thường' : `Chỉ dùng ${c.toUpperCase()} — ${h && h.hero.skills[c] ? h.hero.skills[c].name : '?'}`;
+      this.sbLog('🎮 Lệnh: ' + nm);
+    },
     // ---------------- MỖI BƯỚC ----------------
     sbTick() {
       const S = this.sbx, h = S.hero; if (!h) return;

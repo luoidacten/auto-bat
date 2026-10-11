@@ -89,7 +89,7 @@
   H.def({
     id: 'florian', name: 'Florian', color: '#e0e0ff', gfx: 'rapier', kit: 'fighter', pos: ['top', 'mid'], dmgType: 'phys',
     ranged: false, r: 0.6, resource: 'mana',
-    stats: { hp: 590, hpG: 92, mp: 300, mpG: 38, mpr: 1.5, mprG: 0.08, ad: 63, adG: 3.9, armor: 29, armorG: 3.8, as: 0.7, asG: 0.028, ms: 3.55, range: 1.75 },
+    stats: { hp: 590, hpG: 92, mp: 300, mpG: 38, mpr: 1.5, mprG: 0.08, ad: 60, adG: 3.6, armor: 29, armorG: 3.8, as: 0.7, asG: 0.028, ms: 3.55, range: 1.75 },
     passive: {
       name: 'Đâm Lao & Tứ Ấn',
       desc: 'Cứ 3.5s, đòn đánh thường kế tiếp thành cú lao tới mục tiêu (tới 3.5 đv ngoài tầm), +20 (+4/cấp, +30% SMVL) sát thương — mục tiêu có ấn thì lao thẳng tới hướng ấn gần nhất. Ấn (từ Tứ Ấn): đánh trúng từ ĐÚNG HƯỚNG để phá — mỗi ấn giảm 1.5s mọi hồi chiêu và làm chậm 60% 1s. Phá 3/4 ấn: CHOÁNG 1.1s, đòn kế tiếp đẩy cực mạnh (+40% sát thương), Florian hồi 5% máu.',

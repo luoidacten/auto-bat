@@ -37,7 +37,7 @@
   H.def({
     id: 'ryoma', name: 'Ryoma', color: '#ff5a7a', gfx: 'katana', kit: 'fighter', pos: ['mid', 'top'], dmgType: 'phys',
     ranged: false, r: 0.62, resource: 'none',
-    stats: { hp: 560, hpG: 86, ad: 60, adG: 3.7, armor: 30, as: 0.7, ms: 3.55, range: 1.6 },
+    stats: { hp: 540, hpG: 82, ad: 57, adG: 3.4, armor: 30, as: 0.7, ms: 3.55, range: 1.6 },
     passive: {
       name: 'Liên Hoàn',
       desc: 'Nhất Đao, Đột Thích, Thuấn Bộ mỗi chiêu có 2 lượt dùng. Cứ 2 chiêu liên tiếp trong 2s kích hoạt Combo theo cặp: AA chém tròn rộng • AB lướt chém rồi chém tròn nhỏ • AC hư ảnh cùng chém tròn • BB đâm thêm nhát nữa gây CHOÁNG • BC phóng dư ảnh lao tới • CC gió xoáy làm chậm (A = Nhất Đao, B = Đột Thích, C = Thuấn Bộ). Mỗi Combo hồi 1 lượt Nhất Đao, nạp 1 Kiếm Khí (tối đa 3) và giảm 3s hồi chiêu Vô Ảnh Trảm.',

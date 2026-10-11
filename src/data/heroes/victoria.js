@@ -70,7 +70,7 @@
   H.def({
     id: 'victoria', name: 'Victoria', color: '#e04a4a', gfx: 'flag', kit: 'support', pos: ['sup', 'mid'], dmgType: 'phys',
     ranged: false, projSpeed: 24, projKind: 'bullet', r: 0.58, resource: 'mana',
-    stats: { range: 2.4, ad: 56, adG: 3.2, hp: 580 },
+    stats: { range: 2.4, ad: 60, adG: 3.6, hp: 630, hpG: 96, armor: 32 },
     passive: {
       name: 'Quân Lệnh & Cờ Chiến',
       desc: '3 Lính Tinh Nhuệ hộ vệ và chiến đấu cùng Victoria (chết thì 30s sau hồi sinh). Ưu tiên thế Cờ: Victoria và lính đánh cận chiến càn lướt, lính +25% tốc chạy và kháng khống chế. Hào quang (đồng minh trong 6 đv): 🚩 Cờ +12% tốc chạy, −25% thời gian bị khống chế • 🔥 AR +10% sát thương • 🔫 Lục +giáp/kháng phép.',

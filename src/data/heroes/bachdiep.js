@@ -22,7 +22,7 @@
   H.def({
     id: 'bachdiep', name: 'Bạch Diệp', color: '#bfe8ff', gfx: 'flysword', kit: 'mage', pos: ['mid'], dmgType: 'magic',
     ranged: true, projSpeed: 22, projKind: 'sword', r: 0.56, resource: 'mana',
-    stats: { range: 4.5, hp: 580, hpG: 90, mp: 460, mpG: 58, armor: 28, armorG: 3.8, mr: 32, mrG: 1.8, ms: 3.45 },
+    stats: { range: 4.5, hp: 550, hpG: 84, mp: 460, mpG: 58, armor: 28, armorG: 3.8, mr: 32, mrG: 1.8, ms: 3.45 },
     gauge: (u) => ({ v: u.ws.sw || 0, max: Math.max(10, Math.ceil((u.ws.sw || 0) / 10) * 10), label: 'Kiếm Khí', color: '#bfe8ff' }),
     passive: {
       name: 'Vạn Kiếm Triệu • Mưa Kiếm Thức Thời',

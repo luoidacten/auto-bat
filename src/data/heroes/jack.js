@@ -23,7 +23,7 @@
     ranged: true, projSpeed: 28, projKind: 'bullet', r: 0.6, resource: 'mana',
     gun: (m, u) => ({ n: u.ws.ammo, max: mag(u), rl: u.ws.rl, rlMax: u.ws.rlMax || 2 }),
     gunSet(m, u, n) { u.ws.ammo = n; if (n > 0 && u.ws.rl > 0) { u.ws.rl = 0; H.reloadDone(m, u); u.atkT = Math.min(u.atkT, 0.15); } },
-    stats: { range: 5.5, ad: 61, adG: 3.8, as: 0.72, asG: 0.03 },
+    stats: { range: 5.8, ad: 64, adG: 4.0, hp: 600, hpG: 92, as: 0.74, asG: 0.03 },
     passive: {
       name: 'Gieo Xúc Xắc',
       desc: 'Ổ 6 viên, nạp 2s; mỗi lần nạp gieo xúc xắc: ⚀ tự mất 4% máu • ⚁–⚄ cả ổ +5/10/15/20% sát thương • ⚅ cả ổ chí mạng và choáng 0.25s.',

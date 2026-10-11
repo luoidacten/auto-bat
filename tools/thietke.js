@@ -20,7 +20,47 @@ p('# THIẾT KẾ — KẺ ĐẶT CƯỢC: mọi con số của đấu trường
 p('');
 p('> Tệp này được **sinh tự động** từ mã bằng `node tools/thietke.js`. Đừng sửa tay: sửa trong mã rồi chạy lại lệnh.');
 p('> `node tools/thietke.js --kiemtra` báo lỗi nếu tài liệu lệch với mã.');
-p('> Đơn vị: khoảng cách = **đv** (≈ 1 mét), thời gian = giây giờ game. GĐ6: bỏ hẳn bản MOBA 5v5; trò chơi là **đấu trường sinh tồn 10 tướng đánh đơn**. GĐ6b: bản đồ ×5 diện tích, 6 vùng, trận 30–60 phút, giao tranh dài, bình máu, mảnh hồn, cổng quyết đấu. GĐ8: bản đồ ×2, 8 vùng, 4 ổ boss / 7 boss có cảnh báo, Hộ Giáp & Xuyên Thủng, mảnh hồn 9 chỉ số × 6 bậc. GĐ9: súng & nạp đạn, mảnh hồn Tầm Nhìn / Tầm Đánh / Nạp Đạn / Tốc Đánh, thính giác & truy vết, 3 lối build mỗi tướng, trao đổi & bịp trong liên minh. GĐ9b: **nhà cái & đặt cược** (mục 19).');
+p('> Đơn vị: khoảng cách = **đv** (≈ 1 mét), thời gian = giây giờ game. GĐ6: bỏ hẳn bản MOBA 5v5; trò chơi là **đấu trường sinh tồn 10 tướng đánh đơn**. GĐ6b: bản đồ ×5 diện tích, 6 vùng, trận 30–60 phút, giao tranh dài, bình máu, mảnh hồn, cổng quyết đấu. GĐ8: bản đồ ×2, 8 vùng, 4 ổ boss / 7 boss có cảnh báo, Hộ Giáp & Xuyên Thủng, mảnh hồn 9 chỉ số × 6 bậc. GĐ9: súng & nạp đạn, mảnh hồn Tầm Nhìn / Tầm Đánh / Nạp Đạn / Tốc Đánh, thính giác & truy vết, 3 lối build mỗi tướng, trao đổi & bịp trong liên minh. GĐ9b: **nhà cái & đặt cược** (mục 19). GĐ10: 13 tướng mới/làm lại, AI nhận thức & chọn nhánh theo tiện ích, quan hệ cốt truyện. GĐ11: **bộ não chiến đấu** (mục 13m), bo Ăn Mòn & Vết Thương Sâu (13n), quái lang thang & boss nhỏ (7b), liên minh vĩnh cửu (13o), **Phòng thử nghiệm Sandbox** (20), vũ khí & hiệu ứng riêng từng tướng (18).');
+p('');
+p('## 0. Tổng quan — trò chơi vận hành thế nào');
+p('Đọc mục này trước để hiểu toàn bộ trò chơi; các mục sau là con số chi tiết của từng hệ thống.');
+p('');
+p('### 0.1. Bạn là ai, chơi để làm gì');
+p('- **Kẻ Đặt Cược** là trò chơi *xem & đặt cược*: bạn không điều khiển tướng. 10 tướng do máy điều khiển (AI) thả vào một đấu trường sinh tồn, đánh nhau tới khi chỉ còn 1 người. Bạn đứng ngoài như **trọng tài** — thấy hết bản đồ, thấy cả suy nghĩ của từng tướng — và **đặt cược** để trả món nợ với nhà cái.');
+p(`- Một **ván** gồm ${G.BET.stages.length} chặng × ${G.BET.perStage} trận. Hết mỗi chặng phải đạt chỉ tiêu tiền; chặng cuối phải trả hết nợ. Trả xong thì được tự do và có thể chơi tiếp **vô tận** (chỉ tiêu tăng dần). Chi tiết ở mục 19.`);
+p('- Trong mỗi trận: trước trận nhà cái cho **tỷ lệ cược** + tin đồn + câu hỏi đầu (ai sống tới cuối, ai Top 1, Top 3) + **Giao Kèo ×10**; giữa trận nhà cái **dừng trận để hỏi** (ai thắng giao tranh này, ai giết boss, ai lấy thính…); sau trận: thanh toán, cửa hàng charm (cộng dồn), quà có mặt trái, vay nợ, **sổ tiết kiệm** lãi kép.');
+p('- **Nhà cái không trung thực**: có **người của nhà cái** cài trong trận (liên minh ngầm, không đánh nhau), tin đồn giả, điều khoản chữ nhỏ. Kỹ năng của người chơi là *đọc người*: xem tính cách, sức mạnh, máu, đồ, ý định của AI rồi mới đặt.');
+p('');
+p('### 0.2. Các chế độ ở màn hình chính');
+p('- 🎲 **Ván cược** (vòng chơi chính, mục 19) • 👁 **Xem một trận tự do** (không cược) • ⚔ **Solo 1v1** (2 tướng tùy chỉnh cấp, đồ, mảnh hồn trên sàn đấu thu gọn) • ⏩ **Mô phỏng nhanh** (chạy hết trận trong chớp mắt, xem bảng kết quả) • 🧪 **Phòng thử nghiệm Sandbox** (GĐ11, mục 20: thả bù nhìn, đo DPS, bật/tắt hồi chiêu…) • 📜 bản cũ (Legacy).');
+p('');
+p('### 0.3. Một trận diễn ra thế nào (dòng thời gian)');
+p(`- **0:00** — 10 tướng (chọn ngẫu nhiên theo hạt giống) xuất hiện ở ${MAP.spawns.length} điểm xuất phát rải trên 5 vùng thường, mỗi tướng cấp 1, ${C.GOLD_START} vàng, vài bình máu. Bản đồ ${C.MAP}×${C.MAP} đv sinh theo hạt giống (biome, công trình, bụi, thùng nổ). Mỗi tướng có **tính cách cố định** (mục 11) và **phong cách đánh**.`);
+p(`- **${mm(C.CAMP_FIRST)}** — bãi quái mở (mục 7): tướng farm vàng/KN để lên cấp (tối đa ${C.MAX_LVL}), mua đồ ở Thương Nhân, nâng **Ý Niệm** (cấp vũ khí) và khảm **mảnh hồn** (mục 13c). Quái lang thang (GĐ11) bắt đầu đi tuần từ giây ${C.ROAM.first}; boss nhỏ từ ${mm(C.ROAM.bossFirst)}.`);
+p(`- **Trước ${mm(C.REVIVE_UNTIL)}** — chết được hồi sinh 1 lần. Sau đó chết là **bị loại**; xếp hạng theo thứ tự bị loại.`);
+p(`- **Bo** (vùng an toàn, mục 3) co ${C.ZONE.length} vòng; ngoài bo mất máu theo % và (GĐ11) dính **Ăn Mòn** + **Vết Thương Sâu** (mục 13n) → ép mọi người dồn vào giữa.`);
+p(`- **Boss lớn** (mục 8) xuất hiện ở 4 ổ theo lịch, chiêu lớn có vùng cảnh báo; hạ được thì nhận bùa lợi, đồ Hoàng Kim. **Thính** (mục 9) rơi từ trời theo đợt. **Rương** (mục 13e), **cổng quyết đấu** 1v1 thưởng lớn (mục 13d).`);
+p(`- **Kết thúc**: còn 1 người, hoặc hết ${mm(C.MATCH_TIME)} thì những ai còn sống đồng hạng 1.`);
+p('');
+p('### 0.4. AI tướng nghĩ thế nào (mỗi nhịp nghĩ 0.06–0.25s)');
+p('1. **Nhận thức** (mục 13k): tầm nhìn 180°, bụi, tàng hình; nghe tiếng giao tranh / tiếng đánh quái trong 35–55 đv; nhớ vị trí cuối của đối thủ để truy vết. Trễ phản xạ, giật mình, hoảng loạn (GĐ10).');
+p('2. **Phản xạ chiến đấu** (GĐ11, mục 13m): bị đánh từ góc khuất → xoay mặt / bắn trả mù; ngoài bo → lướt vào; dùng lại chiêu snapback đúng lúc; né chiêu định hướng & vùng cảnh báo.');
+p('3. **Quyết định lớn — Utility AI** (mục 13): chấm điểm ~20 hành động (farm, săn người, kền kền, tranh boss, tranh thính, chạy bo, núp, uống bình, quyết đấu, săn quái lang thang…) theo **trọng số tính cách**, giữ quán tính tối thiểu.');
+p('4. **Vi mô theo tính cách** (Persona) + **AI riêng của tướng** (ví dụ Raven tìm chỗ bắn tỉa, Luca bọc lót Alice) + **liên minh vĩnh cửu / tạm thời**.');
+p('5. **Giao tranh**: chọn mục tiêu bằng điểm (KS, thù dai, trả đũa, nhánh kết liễu…), đánh giá thế trận theo **sức mạnh**, rồi vi thao tác: phá tụ lực, đọc đòn, chống thả diều, ép bo, combo "múa", giữ cự ly riêng, thả diều, rút lui / Đường Cùng Phản Sát (quay lại khô máu khi không thoát được).');
+p('');
+p('### 0.5. Các hệ thống & nơi đọc chi tiết');
+p('| Hệ thống | Mục | Mã nguồn |');
+p('|---|---|---|');
+for (const [a, b, c] of [
+  ['Nhịp logic, tất định, hạt giống', '1', 'src/core/*, src/sim/match.js'], ['Bản đồ, vùng, ổ boss, công trình', '2, 13f', 'src/sim/map.js, src/sim/props.js'], ['Bo + Ăn Mòn + Vết Thương Sâu', '3, 13n', 'src/sim/arena.js'],
+  ['Cấp, KN, hồi sinh, xếp hạng', '4', 'src/sim/match.js, src/sim/arena.js'], ['Sát thương, khiên, Hộ Giáp, xuyên thủng', '5, 13i', 'src/sim/combat.js'], ['Kinh tế, trang bị', '6, 14', 'src/sim/items.js, src/data/items.js'],
+  ['Quái rừng, bầy đầu đàn', '7', 'src/sim/neutral.js'], ['Quái lang thang & 8 boss nhỏ', '7b', 'src/sim/roamers.js'], ['Boss lớn, bùa lợi, đồ Hoàng Kim', '8', 'src/sim/bosses.js'],
+  ['Thính, rương, balo, bình', '9, 13b, 13e', 'src/sim/arena.js, src/sim/bag.js'], ['Tính cách & AI sinh tồn', '11, 13', 'src/data/personality.js, src/sim/ai/utility.js, persona.js'], ['Bộ não chiến đấu GĐ11', '13m', 'src/sim/ai/combat_brain.js'],
+  ['Nhận thức, cây kỹ năng theo tiện ích', '13k, 17', 'src/sim/ai/cognition.js'], ['Ý Niệm & mảnh hồn', '13c', 'src/data/shards.js, src/sim/extras.js'], ['Quan hệ cốt truyện, liên minh vĩnh cửu', '13o', 'src/data/relations.js'],
+  ['Tướng & chiêu', '16', 'src/data/heroes/*.js'], ['Nhà cái & đặt cược', '19', 'src/data/bookie.js, src/sim/bookie.js, src/ui/bet_ui.js'], ['Phòng thử nghiệm Sandbox', '20', 'src/sim/sandbox.js, src/ui/sandbox_ui.js'],
+  ['Giao diện xem trận, hiệu ứng, vũ khí', '18', 'src/ui/render.js, hud.js, vfx.js, draw_hero.js']]) p(`| ${a} | ${b} | \`${c}\` |`);
+p('- Công cụ: `node tools/mophong.js` (mô phỏng nhiều trận, `--kiemtra` tất định) • `node tools/thu_tuong.js` (thử 1 tướng) • `node tools/tyle.js` (tỷ lệ cược) • `node tools/sandbox_test.js` (5 kịch bản Sandbox, `--dps <tướng> <cấp>`) • `node tools/thietke.js` (sinh tài liệu này) • `node tools/choi_thu.js` (đóng gói bản chơi thử).');
 p('');
 p('## 1. Nhịp logic & tất định');
 p(`- Bước logic cố định ${C.TICK}s (${Math.round(1 / C.TICK)} bước/giây giờ game). AI tướng thao tác mỗi ${C.AI_TICK} bước (nhịp nghĩ theo Phản Xạ), quyết định lớn (Utility AI) mỗi 0.3–0.5s, lệch pha giữa các tướng.`);
@@ -72,6 +112,29 @@ p('| Bãi | Máu (+/phút) | Công (+/phút) | Giáp/KP | Vàng | KN | Hồi sin
 p('|---|---|---|---|---|---|---|');
 for (const d of Object.values(C.CAMP)) p(`| ${d.name} | ${d.hp} (+${d.hpMin}) | ${d.ad} (+${d.adMin}) | ${d.armor}/${d.mr} | ${d.gold} | ${d.xp} | ${d.respawn}s |`);
 p(`- Bùa ${C.BUFF_TIME}s (người mang bị hạ → bùa sang kẻ hạ gục): Đỏ +${C.BUFF.red.dmgAmp * 100}% sát thương, thiêu ${C.BUFF.red.burn}/s • Xanh +${C.BUFF.blue.mpr} hồi mana/s, −${C.BUFF.blue.cdr * 100}% hồi chiêu (tướng không mana −${C.BUFF.blue.cdrNoMana * 100}%) • Vàng +${C.BUFF.gold.goldPct * 100}% vàng nhận, +${C.BUFF.gold.perSec} vàng/s.`);
+p('');
+// ===== GĐ11 =====
+p('## 7b. Quái GĐ11: dây xích rộng, bầy có đầu đàn, quái lang thang & boss nhỏ');
+p(`- **Dây xích rộng hơn, kiên nhẫn hơn**: quái đuổi tối đa ${C.LEASH} đv quanh chỗ đứng, ${C.LEASH_RESET}s không bị đánh mới chịu về và hồi máu (trước: ngắn hơn, dễ thả diều quái).`);
+p(`- **Bầy có đầu đàn**: ${pc(C.PACK.chance)} bãi quái nhỏ thành bầy — 1 **đầu đàn** (máu ×${C.PACK.leadHp}, công ×${C.PACK.leadAd}) + ${C.PACK.n} con theo (máu ×${C.PACK.memHp}). Cả bầy luôn đánh **đúng mục tiêu của đầu đàn**; đánh một con là cả bầy quay sang. Con theo chết cho 40% thưởng.`);
+p(`- **Quái lang thang** (src/sim/roamers.js): từ giây ${C.ROAM.first}, mỗi ${C.ROAM.every}s một nhóm đi tuần (tối đa ${C.ROAM.maxGroups} nhóm cùng lúc) xuất hiện ở vùng hợp phe (theo biome), có đầu nhóm tinh anh. Phát hiện tướng thì đuổi ${C.ROAM.chase[0]}–${C.ROAM.chase[1]} đv; tướng vào bụi / tàng hình ${C.ROAM.loseBush}s thì mất dấu. Thưởng: quái thường ${C.ROAM.reward.normal.gold} vàng + ${C.ROAM.reward.normal.xp} KN (${pc(C.ROAM.reward.normal.pot)} rơi bình nhỏ), tinh anh ${C.ROAM.reward.elite.gold} vàng + ${C.ROAM.reward.elite.xp} KN, boss nhỏ ${C.ROAM.reward.boss.gold} vàng + ${C.ROAM.reward.boss.xp} KN (cộng thêm theo phút).`);
+{
+  const T = G.ROAM_T, F = G.ROAM_FACTION, B = G.ROAM_BOSS;
+  const TR = { front: (v) => `khiên trước mặt −${pc(v)} sát thương từ phía trước`, sweep: () => 'quét nón 2.6 đv mỗi 5s', shred: (v) => `mỗi đòn xé ${pc(v)} Hộ Giáp`, aura: () => 'hào quang hồi máu + tăng tốc đồng đội',
+    poison: () => 'đòn độc', burst: () => 'chết thì nổ độc 3 đv', shell: () => 'mai cứng −30% sát thương tầm xa', acid: () => 'phun vũng axit', slowAs: () => '−20% tốc đánh 2s',
+    kamikaze: () => 'lao vào tự nổ', bushCrit: () => 'đòn đầu từ bụi ×2', mirror: () => 'trúng đòn thì tàng hình 1s & dịch chuyển', wail: () => 'tiếng gào làm chậm quanh mục tiêu', scream: () => 'hét câm lặng 1s mỗi 6s',
+    ranged: () => 'đánh xa', magic: () => 'sát thương phép' };
+  const tr = (o) => Object.keys(TR).filter((k) => o[k]).map((k) => TR[k](o[k])).join(', ') || '—';
+  for (const [fk, Fa] of Object.entries(F)) {
+    p(`- ${Fa.icon} **${Fa.name}** (vùng: ${Fa.bio.map((b) => (MAP.REGIONS.find((R) => R.bio === b) || {}).name || ('biome ' + b)).join(', ')}):`);
+    for (const k of Fa.types) { const t = T[k]; p(`  - **${t.name}** — máu ${t.hp}, công ${t.ad}, giáp/KP ${t.armor}/${t.mr}, tốc ${t.ms}${t.range > 2 ? ', tầm ' + t.range : ''}: ${tr(t)} • tinh anh **${t.elite.name}** (máu ${t.elite.hp}): ${tr(Object.assign({}, t, t.elite))}`); }
+  }
+  p(`- **8 boss nhỏ** (từ ${mm(C.ROAM.bossFirst)}, mỗi ${C.ROAM.bossEvery}s, tối đa ${C.ROAM.maxBoss} con cùng lúc; mỗi con 2 kỹ năng có vùng cảnh báo):`);
+  p('| Boss nhỏ | Phe | Máu (+/phút) | Công (+/phút) | Giáp/KP | Kỹ năng (hồi) |');
+  p('|---|---|---|---|---|---|');
+  for (const b of Object.values(B)) p(`| ${b.name} | ${F[b.fac].icon} ${F[b.fac].name} | ${b.hp} (+${b.hpMin}) | ${b.ad} (+${b.adMin}) | ${b.armor}/${b.mr} | ${b.sk.map((s) => `${s.name} (${s.cd}s)`).join(' • ')} |`);
+  p('- **Tiếng đánh quái vang 35 đv**: tướng nghe thấy người khác đang đánh quái lang thang/boss nhỏ → có thể kéo tới kền kền hoặc săn người đang yếu. AI có hành động riêng 💀 **Săn quái lang thang** (Utility).');
+}
 p('');
 p('## 8. Boss (GĐ8: 4 ổ, 7 boss, mọi chiêu lớn đều có vùng cảnh báo)');
 const BS = G.BOSSES, BF = G.BOSS_BUFFS, GO = G.GOLDEN, LP = G.LAIR_PLAN;
@@ -248,6 +311,38 @@ p('| Tướng | 3 lối build | Mảnh hồn yêu thích |');
 p('|---|---|---|');
 for (const id of Object.keys(G.HEROES).sort()) p(`| ${G.HEROES[id].name} | ${G.buildsOf(id).map((b) => b.name).join(' / ')} | ${G.favShards(id).map((s) => (G.SHARDS[s] ? `${G.SHARDS[s].n} (${G.SOUL_TIER[G.SHARDS[s].t].name})` : s)).join(', ')} |`);
 p('');
+p('## 13m. Bộ não chiến đấu (GĐ11 — src/sim/ai/combat_brain.js)');
+p('Lớp vi thao tác chạy trên nền Utility AI, giúp mỗi tướng **dùng tối đa bộ chiêu của mình** và đánh như người thật:');
+{
+  let nS = 0; const cnt = {};
+  for (const h of Object.values(G.HEROES)) for (const k of ['s1', 's2', 's3', 's4', 'sub']) { const d = h.skills[k]; if (!d) continue; nS++; const t = G.Brain.tax(d, k); for (const s of Object.keys(t.sub)) cnt[s] = (cnt[s] || 0) + 1; }
+  const NM = { BurstDamage: 'Bộc phá', ExecuteDamage: 'Kết liễu', EscapeDash: 'Lướt thoát', GapCloser: 'Lướt áp sát', SkillshotDodge: 'Né chiêu', HardCC: 'Khống chế cứng', SoftCC: 'Khống chế mềm', Knock: 'Đẩy / hất văng', ShieldBarrier: 'Khiên / giáp ảo', ProjectileParry: 'Chặn / nuốt đạn', MeleeRiposte: 'Phản đòn cận chiến' };
+  p(`1. **Phân loại kỹ năng** (Skill Taxonomy): mỗi chiêu được gắn nhóm Damage / Mobility / CrowdControl / Defense / CounterParry và vai phụ, suy ra tự động từ dữ liệu chiêu (chiêu có thể ghi đè bằng \`def.tax\`). Hiện có ${nS} chiêu: ${Object.keys(NM).filter((k) => cnt[k]).map((k) => `${NM[k]} ${cnt[k]}`).join(' • ')}.`);
+}
+p('2. **Kỷ luật bình máu** (Consumable Sanity): khóa uống bình máu / Hộ Vệ khi — đang ngoài bo; đang Solo mà đối thủ còn > 2s khống chế; vừa bị tướng đánh trong 3s; có kẻ địch nhìn thấy mình trong tầm đe dọa mà không có vật cản; kẻ địch trong 12 đv. Chỉ uống khi đã cắt tầm nhìn / nấp sau vật cản / đủ xa (ghi lý do vào thẻ tướng).');
+p(`3. **Đường Cùng Phản Sát** (Last Stand): máu < 25%, kẻ đuổi trong 9 đv nhanh hơn mình (hoặc xạ thủ bám tầm), không có bụi / chiêu thoát / vật cản → quay đầu khô máu 3.5s thay vì chạy làm bia.`);
+p('4. **Suy luận hướng đòn & trả đũa** (Damage Inference): mỗi đòn trúng ghi lại kẻ đánh và hướng (cận chiến chính xác, tầm xa lệch ±5°, bẫy/vùng = môi trường). Bị đánh từ góc khuất → xoay mặt về hướng đó; có chiêu định hướng thì **bắn trả mù** dọc trục đạn; tướng mỏng lách ngang / tìm bụi; kẻ vừa đánh lén được +1.0 điểm chọn mục tiêu.');
+p('5. **Chống thả diều** (Anti-Kite): cận chiến bị đánh từ xa, đối thủ lùi, ngoài tầm → dùng chiêu **Lướt áp sát** chéo 45° (né trục đạn) hoặc đón đầu, vừa tới nơi thì nối ngay khống chế; hết chiêu thì zíc-zắc vào bụi, không chạy thẳng.');
+p('6. **Solo 1v1 FSM**: NEUTRAL → ENGAGE → RESET → EXECUTE; lực hút về tâm sàn khi quá 70% bán kính (không bị dồn góc), lực tách thân (không chồng lên nhau), luôn quay mặt về đối thủ; tầm xa bị dồn thì dùng chiêu thoát.');
+p('7. **Ép bo** (Zone Warfare): khóa chân kẻ đang ngoài bão bằng khống chế (giữ chúng ngoài bão 2–3s); **gác cổng** — đứng mép trong, không bước ra ngoài đánh; **ring-out** — kẻ địch < 6 đv sát mép thì vòng ra phía trong rồi dùng chiêu đẩy/hất văng ra ngoài bo; ngoài bo máu thấp thì **cấm đứng uống bình**, dùng mọi chiêu cơ động chạy vào.');
+p('8. **Liên minh vĩnh cửu** (mục 13o): bạn đang đánh nhau trong 35 đv → tới bọc lót (Luca mở Sân Khấu chia lửa), rảnh thì đi cùng nhau cách 3–6 đv.');
+p('9. **Luật Snapback chung** (chiêu "dùng lại để về điểm neo": Luca S3, Kip S1/S2…): đang ngoài bo mà điểm neo trong bo → giật về; máu < 40% vừa trúng đòn và điểm neo xa kẻ địch hơn → giật về; bị đuổi sát lúc sắp hết hạn → giật về; còn lại **không phí** (để hết hạn). Luca S4 chỉ đổi chỗ khi có lợi (ring-out, có nhánh choáng, hoặc nạn nhân đứng xa).');
+p('10. **Canh boss theo tính cách**: cả lò ai cũng biết **cửa sổ kết liễu** — sát thương sẵn sàng (×0.8) + Trừng Phạt ≥ máu boss → xả hết kể cả chiêu cuối. Có người khác tranh boss: 🦅 Kền Kền / Ngụy Quân Tử / Gieo Hỗn Loạn đứng ngoài dây xích chờ boss < 20% mới lao vào cướp; Ám Sát / Bắt Nạt / Võ Sĩ / Trảm Tướng / sát thủ quay sang đánh kẻ tranh boss đang < 55% máu.');
+p('11. **Kỷ luật âm thanh khi farm**: có tướng địch trong 35 đv (thấy hoặc vừa nghe tiếng) → khi farm không đốt chiêu lướt / chiêu áp sát lên quái và giữ mana ≥ 40% cho giao tranh sắp tới.');
+p('12. **Gắn hành vi theo nhánh tiến hóa** (Behavior Binding): nhánh có "sau lưng / đánh lén" → cận chiến đi vòng ra sau mục tiêu; "đỡ đòn / phản đòn / thế thủ" → luôn đọc đòn để phản kể cả khi đang khô máu; "mũi kiếm / điểm ngọt / cự ly" → giữ đúng cự ly ngọt; "kết liễu / máu thấp" → +0.8 điểm cho mục tiêu < 35% máu; "không bị ngắt / gồng" → không tự hủy chiêu.');
+p('13. **Ảo ảnh lừa đảo** (src/sim/decoy.js): chủ đang bỏ chạy (máu < 35%) → ảo ảnh chạy hướng ngược lại, lạng lách kéo kẻ đuổi đi sai đường; ảo ảnh < 40% máu → giả vờ tháo chạy như tướng thật sắp chết; còn lại đánh kẻ gần nhất nhưng lạng trái/phải giữa hai đòn.');
+p('');
+p('## 13n. Bo độc nâng cấp: Ăn Mòn & Vết Thương Sâu (GĐ11)');
+p(`- **Ăn Mòn**: mỗi 1s ở ngoài bo +1 tầng (tối đa ${C.CORROSION.max}); mỗi tầng thêm ${pc(C.CORROSION.per)} máu tối đa **sát thương chuẩn mỗi giây** (cộng với sát thương bo thường). Chỉ xóa sạch khi ở trong bo liên tục > ${C.CORROSION.clear}s.`);
+p(`- **Vết Thương Sâu**: ngoài bo mọi hồi máu (bình, hút máu, chiêu hồi) **giảm ${pc(C.GRIEVOUS)}** → uống bình ngoài bo gần như phí; AI biết điều này (mục 13m.2, 13m.7).`);
+p('');
+p('## 13o. Quan hệ cốt truyện & liên minh vĩnh cửu (src/data/relations.js)');
+p('- **friend**: không ra tay trước (chỉ đánh trả khi bị chính họ đánh); còn ≤ 3 người thì tình bạn nhường chỗ cho ngôi vô địch. **protect**: ai đánh người này (≤ 4s) bị ưu tiên trừng phạt (+2.2 điểm). **hate**: cộng điểm ưu tiên tiêu diệt. **line**: câu thoại khi lần đầu chạm mặt.');
+p('- **eternal — liên minh vĩnh cửu** (GĐ11): không bao giờ đánh nhau, không săn nhau, không làm kền kền nhau, chung phe "đồng minh" cho mọi chiêu hỗ trợ; tới bọc lót khi người kia giao tranh trong 35 đv; **chỉ khi còn đúng 2 người** mới phân thắng bại.');
+p('| Tướng | Bạn | Bảo vệ | Vĩnh cửu | Thù (hệ số) |');
+p('|---|---|---|---|---|');
+for (const [id, r] of Object.entries(G.RELATIONS)) { const nm = (x) => (G.HEROES[x] ? G.HEROES[x].name : x); p(`| ${nm(id)} | ${(r.friend || []).map(nm).join(', ') || '—'} | ${(r.protect || []).map(nm).join(', ') || '—'} | ${(r.eternal || []).map(nm).join(', ') || '—'} | ${Object.entries(r.hate || {}).map(([k, v]) => `${nm(k)} ${v}`).join(', ') || '—'} |`); }
+p('');
 p('## 14. Trang bị');
 p(`- ${G.ITEM_LIST.length} món hoàn chỉnh, tối đa ${G.ITEM_SLOTS} ô. Mỗi món có phôi (40% giá, 40% chỉ số). **Chỉ mua được ở Thương Nhân** (AI tự đi shop khi đủ tiền). Bán lại 50%.`);
 p('| Món | Loại | Giá | Chỉ số / hiệu ứng |');
@@ -265,7 +360,7 @@ for (const h of Object.values(G.HEROES).sort((a, b) => a.id.localeCompare(b.id))
   const b = h.base, P = G.personalityOf(h.id);
   p('');
   p(`### ${h.name} (${h.id}) — ${P.icon} ${P.name}`);
-  p(`- ${h.ranged ? 'Tầm xa' : 'Cận chiến'} • tài nguyên: ${h.resource === 'mana' ? 'mana' : 'không dùng mana'} • sát thương chính: ${h.dmgType === 'magic' ? 'phép' : 'vật lý'}`);
+  p(`- ${h.ranged ? 'Tầm xa' : 'Cận chiến'} • vũ khí: ${h.gfx} • tài nguyên: ${h.resource === 'mana' ? 'mana' : 'không dùng mana'} • sát thương chính: ${h.dmgType === 'magic' ? 'phép' : 'vật lý'}`);
   p(`- Chỉ số cấp 1: máu ${b.hp} (+${b.hpG}), mana ${b.mp || 0} (+${b.mpG || 0}), công ${b.ad} (+${b.adG}), giáp ${b.armor} (+${b.armorG}), KP ${b.mr} (+${b.mrG}), tốc đánh ${b.as} (+${f1((b.asG || 0) * 100)}%), tốc chạy ${b.ms}, tầm ${b.range}`);
   p(`- **Nội tại — ${h.passive.name}:** ${h.passive.desc}`);
   for (const k of ['s1', 's2', 's3', 's4', 'sub']) {
@@ -321,6 +416,20 @@ p('- GĐ7: rương gỗ viền vàng (đang mở: vòng tiến độ vàng 🎁)
 p('- Thông báo: 🦅 KỀN KỀN! • HẠ GỤC KÉP/BA… • CHIẾN CÔNG ĐẦU • CHẤM DỨT CHUỖI (kèm vàng truy nã) • "X BỊ LOẠI — hạng n"; bo bắt đầu co, thính sắp rơi / bị lấy, boss xuất hiện / cường hóa / bị hạ. Bảng xếp hạng (📋/Tab) và màn kết quả sau trận.');
 p('- GĐ8: bản đồ 8 vùng (Vùng Tử Khí: đất tro tím, cây chết, bia mộ, bụi gai; Trạm Khí Độc: vũng độc, sắt vụn, bồn khí có vạch cảnh báo, đường ống, nắp xả phun khói), 4 ổ boss mỗi ổ một kiểu sàn, đếm ngược + tên boss sắp ra; mỗi boss một dáng riêng (cánh lửa, rồng, hồn ma, giáp sắt, thú vàng, kiếm sư) + vòng tụ chiêu; vùng cảnh báo tròn / vành khăn / chữ nhật / hình nón (tô đậm dần tới lúc nổ); thanh Hộ Giáp bạc trên thanh máu; biểu tượng bùa lợi boss trên đầu; thẻ tướng có Hộ Giáp, chí mạng, may mắn, hồi chiêu, hút máu, kháng, xuyên thủng, bùa lợi boss, đồ Hoàng Kim, mảnh hồn đang gắn ✅ / cất túi 💤; dòng sự kiện boss xuất hiện / bị đánh (cả bản đồ biết) / bị hạ / thoát chết nhờ bùa / nhận đồ Hoàng Kim.');
 p('- GĐ9: thẻ tướng có 🔫 đạn / đang nạp / Tốc Nạp, 🧭 lối build đang theo (món đã có ✔), ❤ mảnh hồn yêu thích (✅ đang gắn / 💤 cất / · chưa có), 🌳 **cây kỹ năng đã nâng** (chạm để mở: từng mốc cấp 1/3/6/9/12, nhánh đã mở ✅, nhánh đã chọn nhưng chưa đủ cấp 🔒, mốc thêm cấp 15/18 ✨); dòng sự kiện 🔄 trao đổi / 💰 mua bán / 🃏 bịp / 🤨 nhìn thấu / 😤 vỡ lẽ, 💠 mảnh hồn văng ra; tiếng gọi trên đầu ("🔄 Đổi mảnh hồn không?", "📣 Bên kia có rương…", "👣 Truy vết").');
+p('- **GĐ11 — vũ khí & hiệu ứng riêng từng tướng**: mỗi tướng cầm vũ khí riêng (bảng dưới; tướng tay không: Borg đấm, Koda vuốt, Aria giọng hát, Alice găng tay), đạn đánh thường riêng (nước của Lyra, ánh thánh của Olivia/Justus, khối dữ liệu của Caelus, mảnh gương của Mirage, cánh hồng đen của Dahlia, đạn thời gian cam/lam của Chrono & Neo, plasma của Zero, lưỡi gió của Thanh Phong, lá bài của Luca/Joker…), đòn cận chiến đặc trưng theo vũ khí (đại kiếm chém rộng + tia ở mũi kiếm, katana hai vệt mảnh, song kiếm vệt chéo, lưỡi hái cung tím, dao găm đâm + giọt độc, phi đao hư không vết nứt tím, côn xoáy, song rìu + vụn băng, đại bản đao vàng, móc xích, kiếm khiên chớp khiên, cờ chiến đâm giáo) và **dấu ấn tung chiêu** (hạt + vầng sáng màu riêng mỗi tướng).');
+{ const by = {}; for (const h of Object.values(G.HEROES)) (by[h.gfx] = by[h.gfx] || []).push(h.name); p('| Vũ khí (gfx) | Tướng |'); p('|---|---|'); for (const [g, n] of Object.entries(by).sort()) p(`| ${g} | ${n.join(', ')} |`); }
+p('- **GĐ11 — Sandbox**: lớp vẽ hitbox (vòng xanh/đỏ), nón nhìn 180°, vòng tầm đánh & từng chiêu (có nhãn), vòng lồng Solo vàng nét đứt.');
+p('');
+p('## 20. Phòng thử nghiệm Sandbox (GĐ11 — src/sim/sandbox.js, src/ui/sandbox_ui.js)');
+p('- Màn hình chính → 🧪 **Phòng thử nghiệm**: chọn tướng, cấp (1/3/6/9/12/18), các bù nhìn cần thả → vào bản đồ thật (vách đá, bụi, công trình) nhưng **không quái, không rương, không bo, không ai chết** (về 0 máu thì hồi đầy, ghi "☠ hạ gục" vào nhật ký). Tướng thử do AI thật điều khiển, tự dùng chiêu lên bù nhìn.');
+p('- **Bù nhìn** (đội đối thủ, không liên minh / mua bán):');
+for (const [k, D] of Object.entries(G.Sandbox.DUMMY)) p(`  - ${D.icon} **${D.name}** — ${D.desc}`);
+p('  - ⚔ **Đối thủ tướng thật** — bất kỳ tướng nào, AI đầy đủ (test giữ cự ly, Solo).');
+p('- **Lệnh cho tướng thử** 🎮: 🤖 AI tự đánh (mặc định) • ⏸ **Đứng yên, không làm gì** (làm bia để test chiêu/bù nhìn bắn vào) • 🗡 **Chỉ đánh thường** • **S1 / S2 / S3 / S4 / chiêu phụ: CHỈ dùng đúng chiêu đó** — tự tiến vào tầm chiêu rồi tung lên mục tiêu gần nhất, không đánh thường, không dùng chiêu khác (chiêu chưa học thì mở tạm cấp 1; chiêu dùng lại như snapback cũng được bấm). Kết hợp ⏱ Không Hồi Chiêu để spam một chiêu.');
+p('- **Bảng điều khiển** (phím tắt): 🛡 Bất Tử • ⏱ Không Hồi Chiêu (F1) • ♾ Vô Hạn Tài Nguyên (F2: mana, đạn, thanh riêng) • nhảy cấp 1→3→6→9→12→18 (F3) • đổi tướng tại chỗ (F4) • lớp vẽ gỡ lỗi (F5): hitbox, nón nhìn 180°, vòng tầm đánh & tầm từng chiêu • tốc độ 0.1x / 0.25x / 0.5x / 1x / 2x (F6) • 🔒 Lồng Solo đường kính 14 đv • ☣ Bo giả lập (18 → 6 đv trong 25s, sát thương bo vòng 3 + Ăn Mòn) • chế độ Máy Xả Đạn • đổi Siêu Giáp (Hộ Giáp ↔ giáp thường) • 🧹 dọn bù nhìn.');
+p('- **Bảng đo**: DPS 1s gần nhất • DPS trung bình cả chuỗi (chuỗi kết thúc sau 3s không đánh) • đòn cao nhất • tổng, số đòn, số chí mạng • phân rã Vật Lý / Phép / Chuẩn / Hộ Giáp vỡ / Khiên (con số + %) • đồng hồ khống chế (Choáng, Trói, Chậm, Câm lặng, Hất tung…) • nhật ký từng đòn dạng `[mm:ss.cs] S1 Tên Chiêu → 240 Vật Lý (CHÍ MẠNG!) → 40 Hộ Giáp vỡ → 0.60s Choáng`.');
+p(`- **${G.Sandbox.SUITE.length} kịch bản kiểm thử mẫu** (chạy trong giao diện hoặc \`node tools/sandbox_test.js\`, mỗi dòng ✔/✘):`);
+for (const T of G.Sandbox.SUITE) p(`  - **${T.name}** — tướng ${G.HEROES[T.hero].name}, bù nhìn: ${T.dummies.map((d) => G.Sandbox.DUMMY[d].name).join(', ')}${T.noCd ? ', bật Không Hồi Chiêu' : ''}${T.spit ? ', Máy Xả Đạn chế độ ' + T.spit : ''}.`);
 const txt = L.join('\n') + '\n';
 
 if (process.argv.includes('--kiemtra')) {

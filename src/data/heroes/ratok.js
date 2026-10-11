@@ -7,7 +7,7 @@
   H.def({
     id: 'ratok', name: 'Ratok', color: '#a0582a', gfx: 'hookchain', kit: 'tank', pos: ['sup', 'top'], dmgType: 'phys',
     ranged: false, r: 0.66, resource: 'mana',
-    stats: { range: 1.8, hp: 660, hpG: 100, ms: 3.4 },
+    stats: { range: 1.8, hp: 720, hpG: 108, ad: 66, adG: 4.0, ms: 3.5 },
     passive: {
       name: 'Ràng Buộc Thép • Thiết Phá',
       desc: '+12 Giáp và +12 Kháng Phép với mỗi tướng địch trong 4 đv; từ 3 tướng địch trở lên: +25% kháng hiệu ứng. Mỗi 12s đòn đánh kế tiếp được cường hóa: thêm 6% máu tối đa sát thương vật lý và choáng 0.75s; mỗi đòn đánh trúng giảm 1s hồi chiêu nội tại này.',

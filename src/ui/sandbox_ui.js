@@ -79,6 +79,7 @@
         <div class="sbx-head"><b>🧪 SANDBOX</b><button data-a="min">${this.min ? '▣' : '▭'}</button><button data-a="quit">✕</button></div>
         <div class="sbx-body${this.min ? ' hidden' : ''}">
           <div class="sbx-row">Tướng <select data-a="hero">${opts(h && h.heroId)}</select> Cấp <button data-a="lv-">−</button><b>${h ? h.level : '-'}</b><button data-a="lv+">+</button> <button data-a="cd">↺ Hồi chiêu</button></div>
+          <div class="sbx-row">🎮 Lệnh ${[['auto', '🤖 AI tự đánh'], ['idle', '⏸ Đứng yên'], ['atk', '🗡 Chỉ đánh thường']].concat(['s1', 's2', 's3', 's4', 'sub'].filter((k) => h && h.hero.skills[k]).map((k) => [k, k.toUpperCase()])).map(([c, t]) => `<button class="tg${S.cmd === c ? ' on' : ''}" data-cmd="${c}" title="${c.startsWith('s') && h ? esc('Chỉ dùng: ' + h.hero.skills[c].name) : ''}">${t}</button>`).join('')}</div>
           <div class="sbx-row">${tg('god', '🛡 Bất Tử')}${tg('noCd', '⏱ Không hồi chiêu', 'F1')}${tg('infRes', '♾ Vô hạn tài nguyên', 'F2')}</div>
           <div class="sbx-row">${tg('hitbox', '◯ Hitbox', 'F5')}${tg('fov', '◔ Nón nhìn 180°', 'F5')}${tg('rings', '◎ Vòng tầm', 'F5')}${tg('cage', '🔒 Lồng Solo')}${tg('zone', '☣ Bo giả lập')}</div>
           <div class="sbx-row">${Object.keys(D).map((k) => `<button data-sp="${k}" title="${esc(D[k].desc)}">${D[k].icon}</button>`).join('')}<button data-sp="rival" title="Đối thủ tướng thật">⚔</button><select data-a="rival">${opts(this.pick.rival)}</select><button data-a="clear">🧹</button></div>
@@ -96,6 +97,7 @@
       const b = e.target.closest('button'); if (!b) return;
       const m = this.app.m; if (!m || !m.sbx) return;
       if (b.dataset.tg) { m.sbToggle(b.dataset.tg); this.render(); return; }
+      if (b.dataset.cmd) { m.sbCmd(b.dataset.cmd); this.render(); return; }
       if (b.dataset.sp) { m.sbSpawn(b.dataset.sp === 'rival' ? this.pick.rival : b.dataset.sp); return; }
       if (b.dataset.speed) { this.app.speed = +b.dataset.speed; this.app.hud.refreshCtrl && this.app.hud.refreshCtrl(); this.render(); return; }
       const a = b.dataset.a;

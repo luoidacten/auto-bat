@@ -56,7 +56,7 @@
   H.def({
     id: 'luca', name: 'Luca', color: '#ff4a7a', gfx: 'cane', kit: 'mage', pos: ['mid'], dmgType: 'magic',
     ranged: true, projSpeed: 20, projKind: 'card', r: 0.58, resource: 'mana',
-    stats: { range: 5.0, hp: 680, hpG: 100, ms: 3.45, armor: 24, mr: 30 },
+    stats: { range: 5.0, hp: 700, hpG: 104, ms: 3.5, armor: 26, mr: 32 },
     gauge: (u) => ({ v: u.ws.hype || 0, max: 100, label: 'Náo Nhiệt', color: '#ff6a9a' }),
     passive: {
       name: 'Sân Khấu Náo Nhiệt',

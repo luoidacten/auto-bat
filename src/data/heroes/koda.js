@@ -38,7 +38,7 @@
   H.def({
     id: 'koda', name: 'Koda', color: '#c0563a', gfx: 'claw', kit: 'fighter', pos: ['jungle'], dmgType: 'phys',
     ranged: false, r: 0.6, resource: 'none',
-    stats: { hp: 570, hpG: 88, ad: 61, adG: 3.7, as: 0.7, ms: 3.6, range: 1.4 },
+    stats: { hp: 620, hpG: 96, ad: 65, adG: 4.0, armor: 33, as: 0.72, ms: 3.65, range: 1.45 },
     passive: {
       name: 'Vết Thương Sâu',
       desc: 'Đòn đánh và chiêu gây 1 tầng Chảy Máu (tối đa 5): mỗi tầng 6 (+1.8/cấp) sát thương vật lý mỗi giây trong 4s.',
