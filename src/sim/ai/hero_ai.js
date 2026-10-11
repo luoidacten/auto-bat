@@ -159,6 +159,7 @@
       if (m.time >= (this.decT || 0) || urgent) { G.UtilityAI.decide(this, urgent); this.decT = m.time + this.decPeriod; }
       this.dir = this.actDir || { type: 'roam', point: this.roamPoint() };
       // GĐ7: vi mô theo tính cách (Đổi Mạng liều mạng, Quấy Nhiễu chuồn, Gieo Hỗn Loạn bắn thùng nổ, Ngụy Quân Tử đình chiến…)
+      if (G.Brain && this.turnT <= m.time && G.Brain.bond(this, enemies)) return;   // GĐ11: liên minh vĩnh cửu — bọc lót / đi cùng
       if (G.Persona && this.turnT <= m.time && G.Persona.micro(this, enemies, fight)) return;
       // AI riêng của tướng (vd Raven: tìm chỗ an toàn, thả quạ, đứng bắn súng ngắm qua tầm nhìn của quạ)
       if (u.hero.ai.micro && this.turnT <= m.time && this.hook2(u.hero.ai.micro, enemies, fight)) return;
@@ -264,6 +265,7 @@
       }
       const home = B.home || d.point;
       if (dist(u, home) > C.LEASH + 1) { this.goTo(home); return; }
+      if (G.Brain && G.Brain.bossTiming(this, B, home)) return;   // GĐ11: canh boss theo tính cách + cửa sổ kết liễu
       if (dist(u, B) > u.st.range + u.r + B.r + 0.5) { this.goTo(B); return; }
       this.hitMonster(B);
     }
@@ -492,7 +494,8 @@
         if (e === this.target) add('đang đánh', 0.6);
         if (e.disabled) add('bị khống chế', 0.3 + 0.2 * this.mastK);
         if (e.attackTarget === u || (u.dmgBy.has(e.id) && m.time - u.dmgBy.get(e.id) < 2)) add('đang đánh mình', 0.5);
-        if (u.lastAtt === e && m.time - (u.lastAttT || -99) < 3) add('vừa đánh lén mình', 1.0);   // GĐ11: ưu tiên trả đũa (+50 thù hận)
+        if (u.lastAtt === e && m.time - (u.lastAttT || -99) < 3) add('vừa đánh lén mình', 1.0);
+        if (u.bind && u.bind.exec && e.hpPct < 0.35) add('nhánh kết liễu', 0.8);   // GĐ11: gắn hành vi theo nhánh tiến hóa   // GĐ11: ưu tiên trả đũa (+50 thù hận)
         const an = this.annoyOf(e);
         if (an > 0) add('khó chịu', Math.min(1.6, an / 25));
         if (this.grudge(e)) add('thù dai', 0.35);
@@ -692,7 +695,11 @@
         const def = u.hero.skills[k];
         const w = def.ai && def.ai.recastWhen;
         const t = this.target || this.visibleEnemyHeroes(8)[0] || null;
-        if (!w || w(m, u, t) || rc.until - m.time < 0.15) m.castSkill(u, k, t, t ? { x: t.x, y: t.y } : null);
+        // GĐ11: chiêu có điểm neo (snapback) theo luật chung; chiêu cấm tự dùng lúc hết hạn (noExpire) thì chỉ theo recastWhen
+        const sn = G.Brain ? G.Brain.snapWhen(this, k, rc) : null;
+        if (sn === true) { m.castSkill(u, k, t, t ? { x: t.x, y: t.y } : null); continue; }
+        if (sn === false && !(w && w(m, u, t))) continue;
+        if (!w || w(m, u, t) || (rc.until - m.time < 0.15 && !def.ai.noExpire)) m.castSkill(u, k, t, t ? { x: t.x, y: t.y } : null);
       }
     }
 
@@ -707,7 +714,7 @@
         if (ch && m.rngAI.next() < 0.2 + 0.6 * this.sk('fight') && this.useSkills(ch, ['cc', 'engage', 'poke'], false)) { this.callout('✂️ Phá tụ lực!', '#ffe9a0'); return; }
       }
       // 2) đọc đòn: kẻ địch trước mặt đang vung đòn nặng / niệm chiêu vào mình → chiêu phòng thủ hoặc bước tránh
-      if (!allIn && this.readThreat(enemies)) return;
+      if ((!allIn || (u.bind && u.bind.parry)) && this.readThreat(enemies)) return;   // GĐ11: nhánh đỡ/phản đòn luôn đọc đòn
       // 3) đối phương đang thủ thế (Thế Thủ, Nghịch Trảm, Khiên Chắn, Gồng Mình, Hộp Ảo Thuật): đừng đánh vào, lùi khỏi tầm
       const gd = t.kind === 'hero' && t.ws && t.hero.ai.guard ? t.hero.ai.guard(m, t) : null;
       if (gd && gd.t > 0.1 && !allIn && m.rngAI.next() < 0.35 + 0.6 * this.sk('fight')) {
@@ -794,7 +801,7 @@
     prefDist(t) {
       const m = this.m, u = this.u, reach = u.st.range + u.r + t.r;
       let p = u.ranged ? reach - 0.5 : reach - 0.35;
-      if (u.hero.ai.tip) p = reach - 0.12;                                   // Gideon: giữ đối thủ ở mũi kiếm
+      if (u.hero.ai.tip || (u.bind && u.bind.tip && !u.ranged)) p = reach - 0.12;                                   // Gideon: giữ đối thủ ở mũi kiếm
       if (this.bait && this.bait.until > m.time) p = this.bait.dist;
       if (this.punishT > m.time) p = Math.min(p, reach - 0.6);
       p *= 1 + 0.2 * Math.max(0, 0.5 - u.hpPct) - 0.12 * Math.max(0, 0.5 - t.hpPct);
@@ -819,7 +826,7 @@
         if (mate) a = blend(a, M.atan2(t.y - mate.y, t.x - mate.x), 0.5);
       }
       const fl = u.hero.ai.flank;
-      if (fl === 'behind' && t.kind === 'hero') a = blend(a, M.atan2(-t.fy, -t.fx), 0.65);
+      if ((fl === 'behind' || (u.bind && u.bind.flank && !u.ranged && !fl)) && t.kind === 'hero') a = blend(a, M.atan2(-t.fy, -t.fx), 0.65);
       else if (typeof fl === 'function') { const fa = fl(m, u, t); if (fa != null) a = blend(a, fa, 0.75); }
       let gx = t.x + M.cos(a) * pref, gy = t.y + M.sin(a) * pref;
       for (const al of allies) {
@@ -1049,9 +1056,12 @@
       u.attackTarget = mon; u.goal = null;
       if (m.time < this.readyT || u.cast || u.dash) return;
       if (u.resource === 'mana' && u.mp < u.st.maxMp * 0.25) return;
+      const quiet = !mon.boss && G.Brain && G.Brain.quiet(this);   // GĐ11: có tướng địch gần → giữ mana ≥ 40% và không đốt chiêu cơ động
+      if (quiet && u.resource === 'mana' && u.mp < u.st.maxMp * 0.4) return;
       for (const k of ['s1', 's2', 's3']) {
         const def = u.hero.skills[k]; if (!def || !def.ai || def.ai.heroOnly) continue;
         if (def.ai.use === 'escape' || def.ai.use === 'support' || def.ai.use === 'defend' || def.ai.noMonster) continue;
+        if (quiet && (def.ai.use === 'engage' || def.ai.alsoEscape || (G.Brain.tax(def, k).cat & G.Brain.CAT.Mobility))) continue;
         if (!m.canCast(u, k)) continue;
         if (dist(u, mon) > (def.ai.range || 3) + mon.r) continue;
         if (m.castSkill(u, k, mon, { x: mon.x, y: mon.y })) return;

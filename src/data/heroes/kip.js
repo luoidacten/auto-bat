@@ -68,7 +68,7 @@
             mm.blink(uu, rift.x, rift.y); afterBlink(mm, uu);
             uu.ga = Math.min(uu.st.maxGa, (uu.ga || 0) + uu.st.maxGa * 0.15);
             mm.hitCircle(uu, rift.x, rift.y, 2.2, (e) => mm.addStatus(e, 'stun', 0.3, 1, { src: uu }), { color: '#a59aff' });
-          });
+          }, rift);   // GĐ11: điểm neo cho luật snapback chung
           if (H.T(u, '6c')) m.later(3, (mm) => mm.hitCircle(u, rift.x, rift.y, 2.5, (e) => mm.damage(u, e, 200, 'magic', { tag: 's1', aoe: true }), { color: '#7a6aff' }));
         },
         ai: { use: 'engage', range: 6, aim: 'point', speed: 0, alsoEscape: true, skillshot: true, cond: (m, u, t) => u.ws.ch >= 2 || u.hpPct < 0.4 || !!(t && t.hpPct < 0.35),   // GĐ10: giữ 1 Điểm Hư Không cho Vòm Xoáy / thoát thân
@@ -93,7 +93,7 @@
             onEnd: (mm, p) => {
               if (p.hitAny) return;
               const anchor = { x: p.x, y: p.y };
-              mm.allowRecast(u, 's2', 5, (m3, u3) => { m3.blink(u3, anchor.x, anchor.y); afterBlink(m3, u3); });
+              mm.allowRecast(u, 's2', 5, (m3, u3) => { m3.blink(u3, anchor.x, anchor.y); afterBlink(m3, u3); }, anchor);
             } });
           if (pr) { const oh = pr.onHit; pr.onHit = (mm, p, e) => { p.hitAny = true; return oh(mm, p, e); }; }
         },

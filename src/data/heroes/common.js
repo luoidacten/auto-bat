@@ -80,6 +80,7 @@
       if (!h || h === u || h.kind !== 'hero') return false;
       if (u.permWith && u.permWith.get(h.id) && !u.permWith.get(h.id).broken) return true;
       if (m.truces && m.truces.some((t) => !t.broken && t.until > m.time && ((t.a === u && t.b === h) || (t.b === u && t.a === h)))) return true;
+      if (G.eternal && G.eternal(u.heroId, h.heroId) && m.aliveCount() > 2) return true;   // GĐ11: liên minh vĩnh cửu Luca ↔ Alice
       return !!(G.isFriend && G.isFriend(u.heroId, h.heroId) && G.isFriend(h.heroId, u.heroId) && m.aliveCount() > 3);
     },
     friendsNear(m, u, R, self) {

@@ -25,6 +25,7 @@
     'sim/items.js',
     'sim/talents.js',
     'sim/decoy.js',
+    'sim/sandbox.js',
     'data/items.js',
     'data/builds.js',
     'data/personality.js',

@@ -12,8 +12,23 @@
     if (d.runTo) { d.attackTarget = null; d.goal = d.runTo; return; }
     let best = null, bd = 10;
     for (const h of m.heroes) if (h.alive && h.team !== d.team && h.vis[d.team]) { const x = M.dist(h, d); if (x < bd) { bd = x; best = h; } }
-    if (best) { d.attackTarget = best; d.goal = null; }
-    else { d.attackTarget = null; d.goal = d.home || null; }
+    // GĐ11: PHÂN THÂN LỪA ĐẢO — ảo ảnh không đứng ì như bia:
+    //  • chủ đang bỏ chạy (máu < 35%) → ảo ảnh chạy theo hướng NGƯỢC chủ, lạng lách, kéo kẻ đuổi đi sai đường
+    //  • ảo ảnh tụt dưới 40% máu → giả vờ tháo chạy (như tướng thật sắp chết) để dụ kẻ địch đuổi theo
+    //  • còn lại: đánh kẻ gần nhất nhưng lạng trái/phải giữa hai đòn như tướng thật
+    const o = d.owner, zig = (Math.floor(m.time / 0.5) + d.id) % 2 ? 1 : -1;
+    const flee = (from) => {
+      const v = M.dir(from, d), g = { x: d.x + v.x * 4 - v.y * 1.6 * zig, y: d.y + v.y * 4 + v.x * 1.6 * zig };
+      G.MAP.pushOut(g, d.r); d.attackTarget = null; d.goal = g;
+    };
+    if (o && o.alive && o.hpPct < 0.35 && best && M.dist(o, d) < 14) { flee(o); d.fake = 'flee'; return; }
+    if (best && d.hp < d.st.maxHp * 0.4) { flee(best); d.fake = 'flee'; return; }
+    d.fake = null;
+    if (best) {
+      const reach = d.st.range + d.r + best.r;
+      if (d.atkT > 0.2 && bd < reach + 0.3) { const v = M.dir(best, d), g = { x: best.x + v.x * (reach - 0.3) - v.y * 1.2 * zig, y: best.y + v.y * (reach - 0.3) + v.x * 1.2 * zig }; G.MAP.pushOut(g, d.r); d.attackTarget = null; d.goal = g; return; }
+      d.attackTarget = best; d.goal = null;
+    } else { d.attackTarget = null; d.goal = d.home || null; }
   }
   const DecoyMix = {
     // o: { life, hp (tỉ lệ máu tối đa của tướng gốc), runTo {x,y}, onDeath(m,d,k), onExpire(m,d), dmg (tỉ lệ sát thương) }

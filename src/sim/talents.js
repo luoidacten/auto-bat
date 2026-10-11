@@ -44,6 +44,7 @@
         if (b.init) this.hook(b.init, this, u);
         changed = true;
       }
+      if (changed && G.Brain) G.Brain.bind(u);   // GĐ11: gắn hành vi theo nhánh vừa chọn
       // GĐ8: Ý Niệm Rực Rỡ (Hoàng Kim) mở thêm 2 mốc cấp 15 và 18, mỗi mốc 3 lựa chọn:
       //   cấp 15 — học thêm nhánh còn lại của mốc 3 / mốc 6 / mốc 9 • cấp 18 — thêm nhánh của mốc 12 / Tối Thượng Nộ / Thần Lực
       if ((u.yNiem || 0) >= 6) {

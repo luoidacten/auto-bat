@@ -624,7 +624,7 @@
   function mod(X, k, r) {
     const { ai, m, u } = X, id = u.persId;
     if (k === 'boss' && r && r.dir && r.dir.target && r.dir.target.bossId === 'quai_thu' && (GOLD_HUNTER[id] || u.heroId === 'percy' || u.heroId === 'borg')) return { max: 2.0 * floor(r.f[0][1], 0.5), f: [['săn Quái Thú Hoàng Kim', 1]], dir: r.dir };
-    if (r && k === 'hunt' && r.dir && r.dir.target && (partnerOf(m, u) === r.dir.target || mate(m, u, r.dir.target))) return null;   // đang đình chiến / cùng phe nhà cái: không săn
+    if (r && k === 'hunt' && r.dir && r.dir.target && (partnerOf(m, u) === r.dir.target || mate(m, u, r.dir.target) || (G.eternal && r.dir.target.heroId && G.eternal(u.heroId, r.dir.target.heroId)))) return null;   // đang đình chiến / cùng phe nhà cái: không săn
     switch (id) {
       case 'hoabinh':
         if (k === 'hide' && !r) return anyBush(X);
@@ -685,6 +685,7 @@
     const p = partnerOf(m, u);
     if (p === e) { if (backstabReady(m, u, e)) { add('đâm sau lưng', 3); return true; } return false; }
     if (mate(m, u, e)) return false;   // GĐ9b: người của nhà cái không đánh nhau
+    if (G.eternal && G.eternal(u.heroId, e.heroId) && m.aliveCount() > 2) return false;   // GĐ11: liên minh vĩnh cửu (Luca ↔ Alice)
     if (p && p.lastAtt && G.ownerOf(p.lastAtt) === e && m.time - (p.lastAttT || -99) < 3) add('đánh đồng minh', 1.5);
     // GĐ10: quan hệ cốt truyện — bạn bè không ra tay trước; kẻ đánh người mình bảo vệ bị trừng phạt; kẻ thù được ưu tiên
     if (G.isFriend && G.isFriend(u.heroId, e.heroId) && !me && m.aliveCount() > 3) return false;   // còn 3 người trở xuống: tình bạn cũng phải nhường chỗ cho ngôi vô địch

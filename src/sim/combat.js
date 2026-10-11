@@ -107,9 +107,10 @@
         // GĐ5e: AI tuyển thủ ghi nhớ sát thương thật của từng chiêu lên lính/quái (để biết chiêu nào kết liễu được lính)
         if (owner && owner.ai && owner.ai.noteSkill && tgt.kind === 'monster' && SKEY[info.tag]) owner.ai.noteSkill(info.tag, a);
         // khiên hấp thụ
+        let shAbs = 0;
         if (a > 0) for (const s of tgt.statuses) {
           if (s.type !== 'shield' || s.v <= 0) continue;
-          const take = Math.min(s.v, a); s.v -= take; a -= take;
+          const take = Math.min(s.v, a); s.v -= take; a -= take; shAbs += take;
           if (s.v <= 0) s.t = 0;
           if (a <= 0) break;
         }
@@ -144,6 +145,7 @@
         if (tgt.hp < 1 && tgt.has('undying')) tgt.hp = 1;
         const dealt = before - Math.max(0, tgt.hp), tot = dealt + gaDealt;
         info.hpDealt = dealt; info.gaDealt = gaDealt;
+        if (this.sbx) this.sbOnDmg(owner, tgt, info, shAbs);   // GĐ11: bảng đo Sandbox
         // sổ sách
         tgt.lastDmgT = this.time;
         if (tgt.ai && tgt.ai.cog && tot > 0) G.Cog.onHit(this, tgt, owner, tot);   // GĐ10: bất ngờ / mù tiêu điểm
@@ -221,12 +223,14 @@
       if (type === 'blind' && tgt.shOn && tgt.shOn.has('G_VIS_03')) return null;   // GĐ9: Phá Ảo Chân Thị miễn nhiễm mù
       if (def.cc && owner && owner.team !== tgt.team) {
         if (tgt.has('unstop') || tgt.has('invuln')) return null;
+        if (tgt.ws && tgt.ws.ccNegate && tgt.ws.ccNegate(this, tgt, owner, type)) return null;   // GĐ11: Luca S2 triệt tiêu khống chế
         if (tgt.bonus['imm_' + type]) return null;               // miễn nhiễm riêng (nhánh tiến hóa)
         // GĐ8: mảnh hồn tự giải khống chế cứng (Hồn Ngưng Đọng Thời Không)
         if (def.hard && tgt.fxl && tgt.fxl.onHardCC) { let blk = false; for (const fn of tgt.fxl.onHardCC) if (this.hook(fn, this, tgt, owner)) { blk = true; break; } if (blk) return null; }
         if ((def.hard || type === 'root' || type === 'silence') && tgt.bonus.spellShield && owner.kind === 'hero' && this.spellBlock(tgt)) return null;
         if (!def.noTenacity) dur *= 1 - Math.min(0.6, tgt.st.tenacity || 0);
         if (owner.kind === 'hero' && tgt.kind === 'hero') { tgt.dmgBy.set(owner.id, this.time); owner.stats.ccTime += dur; }
+        if (this.sbx) this.sbOnCC(owner, tgt, type, dur);   // GĐ11: đồng hồ khống chế Sandbox
         if (def.hard) {
           tgt.windup = null;
           if (tgt.cast && !tgt.cast.unstop) this.interrupt(tgt);

@@ -12,6 +12,14 @@
 // 6. Duel     — Solo 1v1: máy trạng thái NEUTRAL → ENGAGE → RESET → EXECUTE, lực hút tâm sàn, lực tách thân, quay mặt về đối thủ.
 // 7. Zone     — ép bo: gác cổng (không bước ra ngoài bo đánh), khóa chân kẻ ngoài bão bằng khống chế, đứng phía trong để đẩy văng
 //               kẻ sát mép ra ngoài (ring-out); ngoài bo máu thấp thì dùng chiêu cơ động chạy vào.
+// 8. Bond     — liên minh vĩnh cửu (Luca ↔ Alice): bạn đánh nhau trong 35 đv → tới bọc lót, mở chiêu chia lửa; rảnh thì đi cùng.
+// 9. Snap     — luật Snapback chung cho chiêu "dùng lại để về điểm neo": nguy → giật về; bị đuổi sát lúc sắp hết hạn → giật về;
+//               đang ngoài bo mà điểm neo trong bo → giật về; còn lại không phí (hết hạn thì thôi).
+// 10. Boss    — canh boss theo tính cách: Kền Kền đứng 15–20 đv chờ boss dưới 20% mới lao vào cướp; Ám Sát rình kẻ đang đánh boss;
+//               Võ Sĩ / Bắt Nạt quay sang đánh người tranh boss; ai cũng biết "cửa sổ kết liễu" (đủ sát thương thì xả hết chiêu + Trừng Phạt).
+// 11. Quiet   — kỷ luật âm thanh khi farm: nghe có tướng địch gần (≤ 35 đv) → không đốt chiêu cơ động / không xả mana dưới 40%.
+// 12. Bind    — gắn hành vi theo nhánh tiến hóa đã chọn: nhánh "sau lưng" → đi vòng ra sau; "đỡ/phản đòn" → luôn đọc đòn để phản;
+//               "mũi kiếm / cự ly" → giữ đúng cự ly ngọt; "kết liễu" → ưu tiên mục tiêu máu thấp; "không bị ngắt" → không tự hủy chiêu.
 (function () {
   const G = globalThis.G;
   const M = G.M, MAP = G.MAP;
@@ -258,6 +266,98 @@
     if (m.castSkill(u, o.k, null, land)) { ai.callout('🏃 Lướt vào bo', '#b0ff70'); return true; }
     return false;
   }
+
+  // ===================== 8. LIÊN MINH VĨNH CỬU =====================
+  function bond(ai, enemies) {
+    const m = ai.m, u = ai.u;
+    if (!G.eternal || m.aliveCount() <= 2 || u.hpPct < 0.3 || ai.act === 'retreat' || ai.act === 'zone' || u.cast || u.dash) return false;
+    const p = m.heroes.find((h) => h.alive && h !== u && G.eternal(u.heroId, h.heroId)); if (!p) return false;
+    const dp = dist(u, p); if (dp > 35) return false;
+    let foe = p.ai && p.ai.mode === 'fight' && p.ai.target && p.ai.target.kind === 'hero' && p.ai.target.alive ? p.ai.target : null;
+    if (!foe && p.lastAtt && m.time - (p.lastAttT || -99) < 3) { const a = G.ownerOf(p.lastAtt); if (a && a.kind === 'hero' && a.alive && a !== u) foe = a; }
+    if (foe && (foe === u || G.eternal(u.heroId, foe.heroId))) foe = null;
+    if (foe) {
+      if (ai.target && ai.target.kind === 'hero' && ai.target !== foe && ai.target.alive && dist(u, ai.target) < 6) return false;   // đang dính đối thủ khác sát người
+      if (!(m.time < (ai.bondT || 0))) { ai.bondT = m.time + 8; ai.callout('🤝 Bọc lót ' + p.hero.name, '#ff9ac0'); u.stats.bond = (u.stats.bond || 0) + 1; }
+      const df = dist(u, foe);
+      if (df > 9 || !foe.vis[u.team]) { u.attackTarget = null; ai.goTo({ x: (p.x + foe.x) / 2, y: (p.y + foe.y) / 2 }); return true; }
+      const bo = u.hero.ai.bondOpen; if (bo && bo(m, u, foe, p)) return true;   // Luca: mở Sân Khấu chia lửa
+      ai.mode = 'fight'; ai.target = foe; ai.fightMicro(foe, enemies.includes(foe) ? enemies : enemies.concat([foe]), [p]); return true;
+    }
+    // rảnh: đi cùng nhau, giữ cách 3–6 đv
+    if (!enemies.length && dp > 7 && dp < 25 && (ai.act === 'roam' || ai.act === 'hide') && !(p.ai && p.ai.act === 'retreat')) {
+      u.attackTarget = null; ai.goTo({ x: p.x + (u.x - p.x) / dp * 4, y: p.y + (u.y - p.y) / dp * 4 }); return true;
+    }
+    return false;
+  }
+
+  // ===================== 9. SNAPBACK =====================
+  // trả true = giật về ngay • false = giữ (kể cả lúc sắp hết hạn) • null = không phải chiêu có điểm neo, để luật cũ quyết
+  function snapWhen(ai, k, rc) {
+    const m = ai.m, u = ai.u, A = rc.anchor; if (!A) return null;
+    const foes = ai.visibleEnemyHeroes(9), near = foes.length ? foes.reduce((a, b) => (dist(a, u) < dist(b, u) ? a : b)) : null;
+    const safer = !near || dist(A, near) > dist(u, near) + 1.5;
+    const z = m.zoneSt;
+    let why = null;
+    if (z && z.dps > 0 && !m.inZone(u) && m.inZone(A)) why = 'zone';
+    else if (near && u.hpPct < 0.4 && m.time - (u.lastDmgT || -99) < 1.5 && safer) why = 'danger';
+    else if (near && rc.until - m.time < 0.3 && dist(near, u) < 6 && safer) why = 'expire';
+    if (!why) return false;
+    u.stats.snap = (u.stats.snap || 0) + 1;
+    ai.callout(why === 'zone' ? '↩ Giật về trong bo' : '↩ Giật về điểm neo', '#e0c0ff');
+    return true;
+  }
+
+  // ===================== 10. CANH BOSS THEO TÍNH CÁCH =====================
+  function bossTiming(ai, B, home) {
+    const m = ai.m, u = ai.u, C = G.C;
+    const rivals = m.heroes.filter((h) => h.alive && h !== u && !G.H.isAlly(m, u, h) && dist(h, B) < C.LEASH + B.r + 4);
+    // cửa sổ kết liễu: tổng sát thương sẵn sàng ≥ máu boss → xả hết (kể cả chiêu cuối) + Trừng Phạt
+    const lethal = G.SkillAI.burstOf(ai, B) * 0.8 + (m.bagCount && m.bagCount(u, 'smite') > 0 ? 500 + 60 * u.level : 0);
+    if (B.hp <= lethal && dist(u, B) < u.st.range + u.r + B.r + 4) {
+      if (!(m.time < (ai.lethalT || 0))) { ai.lethalT = m.time + 3; ai.callout('⚡ Cửa sổ kết liễu boss!', '#ffd24a'); u.stats.bossLethal = (u.stats.bossLethal || 0) + 1; }
+      for (const k of ['s4', 's1', 's2', 's3']) { const d = u.hero.skills[k]; if (!d || !d.ai || ['escape', 'support', 'defend'].includes(d.ai.use)) continue; if (m.canCast(u, k) && m.castSkill(u, k, B, { x: B.x, y: B.y })) return true; }
+      return false;
+    }
+    if (!rivals.length) return false;
+    const id = u.persId;
+    // Kền Kền: đứng 15–20 đv chờ boss < 20% (người khác gánh đòn)
+    if ((id === 'kenken' || id === 'nguyquan' || id === 'honloan') && B.hpPct > 0.2) {
+      const v = M.dir(home, u), p = { x: home.x + v.x * (C.LEASH + B.r + 6), y: home.y + v.y * (C.LEASH + B.r + 6) }; MAP.pushOut(p, u.r);
+      if (!(m.time < (ai.vultT || 0))) { ai.vultT = m.time + 6; ai.callout('🦅 Chờ boss yếu rồi cướp', '#ffb0a0'); u.stats.bossWait = (u.stats.bossWait || 0) + 1; }
+      u.attackTarget = null; ai.goTo(p); return true;
+    }
+    // Ám Sát / Bắt Nạt / Võ Sĩ: kẻ đang đánh boss bị thương → đánh người, không đánh boss
+    const weak = rivals.find((r) => r.hpPct < 0.55 && r.vis[u.team]);
+    if (weak && (id === 'amsat' || id === 'batnat' || id === 'vosi' || id === 'tramtuong' || u.hero.ai.role === 'assassin')) {
+      if (!(m.time < (ai.vultT || 0))) { ai.vultT = m.time + 6; ai.callout('🗡 Đánh kẻ tranh boss', '#ffb0a0'); }
+      ai.mode = 'fight'; ai.target = weak; ai.fightMicro(weak, [weak], ai.alliesNear || []); return true;
+    }
+    return false;
+  }
+
+  // ===================== 11. KỶ LUẬT ÂM THANH KHI FARM =====================
+  function quiet(ai) {
+    const m = ai.m, u = ai.u;
+    if (m.time < (ai.quietChk || 0)) return ai.quietOn;
+    ai.quietChk = m.time + 1;
+    ai.quietOn = m.heroes.some((h) => h.alive && h !== u && !G.H.isAlly(m, u, h) && dist(h, u) < 35 && (h.vis[u.team] || m.time - (h.lastAtkT || h.lastDmgT || -99) < 3));
+    return ai.quietOn;
+  }
+
+  // ===================== 12. GẮN HÀNH VI THEO NHÁNH TIẾN HÓA =====================
+  function bind(u) {
+    const B = u.bind || (u.bind = {});
+    for (const b of u.tfx || []) {
+      const t = low(b.name + ' ' + (b.desc || ''));
+      if (/sau lưng|từ phía sau|đánh lén/.test(t)) B.flank = 1;
+      if (/đỡ được|phản đòn|phản kích|thế thủ|chặn đòn|đỡ đòn/.test(t)) B.parry = 1;
+      if (/mũi kiếm|điểm ngọt|cự ly|ở mép tầm/.test(t)) B.tip = 1;
+      if (/kết liễu|hành quyết|dưới \d+% máu|máu thấp/.test(t)) B.exec = 1;
+      if (/không bị ngắt|không thể bị ngắt|không bị gián đoạn|gồng/.test(t)) B.noCancel = 1;
+    }
+    return B;
+  }
   // gác cổng / khóa bão — không thả diều ra ngoài bo
-  G.Brain = { CAT, tax, has, ready, healOk, lastStand, onHit, react, antiKite, arrival, duel, zoneFight, zoneEscape, ccLeft };
+  G.Brain = { CAT, tax, has, ready, healOk, lastStand, onHit, react, antiKite, arrival, duel, zoneFight, zoneEscape, ccLeft, bond, snapWhen, bossTiming, quiet, bind };
 })();

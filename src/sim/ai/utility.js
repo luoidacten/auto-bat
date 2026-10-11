@@ -355,6 +355,7 @@
         const a = h.att, b = h.vic;
         if (a === u || b === u || !a.alive || !b.alive || a.kind !== 'hero' || b.kind !== 'hero') continue;
         if (u.permWith && G.Persona && (G.Persona.mate(m, u, a) || G.Persona.mate(m, u, b))) continue;   // GĐ9b: không làm kền kền người cùng phe nhà cái
+        if (G.eternal && (G.eternal(u.heroId, a.heroId) || G.eternal(u.heroId, b.heroId))) continue;   // GĐ11: người vĩnh cửu đánh nhau thì đi bọc lót (Luca/Alice micro), không làm kền kền
         const key = Math.min(a.id, b.id) + ':' + Math.max(a.id, b.id); if (seenPair.has(key)) continue; seenPair.add(key);
         const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, d = dist(u, mid);
         // thấy tận mắt, hoặc NGHE tiếng giao tranh trong bán kính 35–55 đv (Đọc Bản Đồ cao nghe xa hơn)

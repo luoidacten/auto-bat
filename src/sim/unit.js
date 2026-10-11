@@ -121,6 +121,7 @@
       // GĐ8: HỘ GIÁP — thanh giáp phụ gánh sát thương trước máu: nền theo cấp + mảnh hồn (+ Giáp Hoàng Kim ×2); không tự hồi
       if (this.kind === 'hero') { const GA = C.GA; s.maxGa = ((GA.base + GA.perLvl * ((this.level || 1) - 1)) + (k.gaMax || 0)) * (1 + (k.gaPct || 0)); }
       else s.maxGa = 0;
+      if (this.fixSt) { const F = this.fixSt; if (F.hp) s.maxHp = F.hp; if (F.ga != null) s.maxGa = F.ga; if (F.armor != null) s.armor = F.armor; if (F.mr != null) s.mr = F.mr; }   // GĐ11: bù nhìn Sandbox — chỉ số cố định
       if (k.reduceAll) dmgRed = 1 - (1 - dmgRed) * (1 - k.reduceAll);
       if (k.apPct) s.ap *= 1 + k.apPct;
       if (armorPct) s.armor *= Math.max(0.2, 1 + armorPct);

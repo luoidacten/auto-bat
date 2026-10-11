@@ -3,12 +3,13 @@
 // friend: không ra tay trước với người này (chỉ đánh trả khi bị chính họ đánh)
 // protect: ai đánh người này thì ưu tiên trừng phạt kẻ đó (và đi theo họ khi rảnh)
 // hate: hệ số ưu tiên tiêu diệt (cộng thêm điểm chọn mục tiêu)
+// eternal: GĐ11 liên minh VĨNH CỬU (Luca ↔ Alice) — không bao giờ đánh nhau, không tranh thính/boss, đi cùng & bọc lót nhau; chỉ khi còn đúng 2 người mới phân thắng bại
 // line: câu thoại khi lần đầu chạm mặt
 (function () {
   const G = globalThis.G || (globalThis.G = {});
   G.RELATIONS = {
-    luca:    { friend: ['alice'], protect: ['alice'], hate: { caelus: 0.6, vector: 0.6 } },
-    alice:   { friend: ['luca', 'mirage'] },
+    luca:    { friend: ['alice'], protect: ['alice'], eternal: ['alice'], hate: { caelus: 0.6, vector: 0.6 } },
+    alice:   { friend: ['luca', 'mirage'], protect: ['luca'], eternal: ['luca'] },
     mirage:  { friend: ['alice', 'luca'], protect: ['alice', 'vesper'], hate: { caelus: 0.8, vector: 0.6 },
                line: { vesper: 'Ta biết sự thật sau nhát đạn đó, đứa trẻ tội nghiệp…', caelus: 'Ngươi nhìn thấu tương lai, nhưng có thấy bản thân đang đứng ở đâu không?' } },
     kip:     { friend: ['aria'], protect: ['aria'], hate: { caelus: 0.7 }, line: { caelus: 'Tính toán tiếp đi ông tiến sĩ!' } },
@@ -27,6 +28,7 @@
   };
   const R = (id) => G.RELATIONS[id] || null;
   G.isFriend = (a, b) => { const r = R(a); return !!(r && r.friend && r.friend.includes(b)); };
+  G.eternal = (a, b) => { const r = R(a), q = R(b); return !!((r && r.eternal && r.eternal.includes(b)) || (q && q.eternal && q.eternal.includes(a))); };
   G.protects = (a) => { const r = R(a); return (r && r.protect) || []; };
   G.hateOf = (a, b) => { const r = R(a); return (r && r.hate && r.hate[b]) || 0; };
   G.relLine = (a, b) => { const r = R(a); return (r && r.line && r.line[b]) || null; };

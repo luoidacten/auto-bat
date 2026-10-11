@@ -39,21 +39,37 @@
       return own(m, u, ctx);
     };
   }
+  // Trò Lừa Bịp thành công: hóa búp hoa ra sau lưng kẻ tấn công, câm lặng 1.25s, đánh dấu +20% sát thương phép
+  function counter(m, u, a) {
+    u.ws.spotUntil = 0;
+    const R = a.r + u.r + 0.6;
+    m.later(0, (mm) => {
+      if (!u.alive || !a.alive) return;
+      mm.blink(u, a.x - a.fx * Math.min(3.5, R + 1), a.y - a.fy * Math.min(3.5, R + 1)); u.face(a.x, a.y);
+      mm.addStatus(a, 'silence', 1.25, 1, { src: u });
+      mm.addStatus(a, 'mark', 3, 1, { key: 'luca_spot', src: u });
+      if (H.T(u, '3a')) mm.addStatus(a, 'blind', 1.5, 1, { src: u });
+      hype(mm, u, 20);
+      if (mm.fxOn) mm.fx({ type: 'callout', id: u.id, text: '🌹 Ánh đèn rọi vào tôi nè!', color: '#ff6a9a' });
+    });
+  }
   H.def({
     id: 'luca', name: 'Luca', color: '#ff4a7a', gfx: 'cane', kit: 'mage', pos: ['mid'], dmgType: 'magic',
     ranged: true, projSpeed: 20, projKind: 'card', r: 0.58, resource: 'mana',
-    stats: { range: 5.0, hp: 600, hpG: 90, ms: 3.45 },
+    stats: { range: 5.0, hp: 680, hpG: 100, ms: 3.45, armor: 24, mr: 30 },
     gauge: (u) => ({ v: u.ws.hype || 0, max: 100, label: 'Náo Nhiệt', color: '#ff6a9a' }),
     passive: {
       name: 'Sân Khấu Náo Nhiệt',
       desc: 'Náo Nhiệt 0–100: đánh trúng tướng +5, chiêu trúng tướng +10, lừa đòn +20, thoát hiểm +15. Mỗi 10 điểm +2% tốc chạy, +3% SMPT; đủ 100 mở khóa Cải Trang Tuyệt Đỉnh. Áo Choàng Thoát Hiểm (120s): lần đầu tụt dưới 10% máu → tàng hình 1.5s, dịch chuyển 4 đv ra xa kẻ địch, +15 Náo Nhiệt; mỗi lần đầy 100 Náo Nhiệt giảm 30s hồi.',
-      init(m, u) { u.ws.hype = 0; u.ws.hypeT = 0; u.ws.cloakT = 0; u.ws.ccd = {}; u.ws.kit = 'own'; u.ws.stage = null; u.ws.waltz = 0; },
+      init(m, u) { u.ws.hype = 0; u.ws.hypeT = 0; u.ws.cloakT = 0; u.ws.ccd = {}; u.ws.kit = 'own'; u.ws.stage = null; u.ws.waltz = 0;
+        u.ws.ccNegate = (mm, uu, a) => { if (!(uu.ws.spotUntil > mm.time) || !a || (a.kind !== 'hero' && a.kind !== 'pet')) return false; counter(mm, uu, a); return true; };   // GĐ11: Trò Lừa Bịp triệt tiêu cả khống chế
+      },
       update(m, u) {
         if (m.tick % 10 !== 0) return;
-        if (!H.T(u, '9c') && m.time - u.ws.hypeT > 8 && u.ws.hype > 0) u.ws.hype = Math.max(0, u.ws.hype - 1);   // ngoài giao tranh tụt dần
+        if (!H.T(u, '9c') && m.time - u.ws.hypeT > 6 && u.ws.hype > 0) u.ws.hype = Math.max(0, u.ws.hype - 5 * 10 * G.C.TICK);   // GĐ11: ngoài giao tranh > 6s tụt 5 điểm/giây
         const k = Math.floor(u.ws.hype / 10);
         const s = u.hasKey(KEY);
-        if (!s || s.n !== k) { m.removeStatus(u, 'buff', KEY); if (k > 0) { const st = m.addStatus(u, 'buff', 9999, 1, { key: KEY, mods: { msPct: 0.02 * k, apPct: 0 } }); if (st) { st.n = k; st.mods.ap = u.st.ap * 0.03 * k * 0.5; } } }
+        if (!s || s.n !== k) { m.removeStatus(u, 'buff', KEY); if (k > 0) { const st = m.addStatus(u, 'buff', 9999, 1, { key: KEY, mods: { msPct: 0.02 * k, apPct: 0 } }); if (st) { st.n = k; st.mods.ap = u.st.ap * 0.03 * k; } } }
         if (u.ws.copy && u.ws.copyUntil <= m.time) endDisguise(m, u);
         // Áo Choàng Thoát Hiểm
         if (u.alive && u.hpPct < 0.1 && (u.ws.cloakT || 0) <= m.time && m.time - (u.lastDmgT || -99) < 2) {
@@ -78,17 +94,7 @@
       onTake(m, u, att, info) {
         if (!(u.ws.spotUntil > m.time) || !att || att.team === u.team) return;
         const a = G.ownerOf ? G.ownerOf(att) : att; if (!a || (a.kind !== 'hero' && a.kind !== 'pet')) return;
-        info.amt = 0; u.ws.spotUntil = 0;
-        const R = a.r + u.r + 0.6;
-        m.later(0, (mm) => {
-          if (!u.alive || !a.alive) return;
-          mm.blink(u, a.x - a.fx * Math.min(3.5, R + 1), a.y - a.fy * Math.min(3.5, R + 1)); u.face(a.x, a.y);
-          mm.addStatus(a, 'silence', 1.25, 1, { src: u });
-          mm.addStatus(a, 'mark', 3, 1, { key: 'luca_spot', src: u });
-          if (H.T(u, '3a')) mm.addStatus(a, 'blind', 1.5, 1, { src: u });
-          hype(mm, u, 20);
-          if (mm.fxOn) mm.fx({ type: 'callout', id: u.id, text: '🌹 Ánh đèn rọi vào tôi nè!', color: '#ff6a9a' });
-        });
+        info.amt = 0; counter(m, u, a);
       },
     },
     skills: {
@@ -96,7 +102,7 @@
         name: 'Sân Khấu Mở Ra / Bước Nhảy Ngàn Hoa', desc: 'Mở Vùng Sân Khấu bán kính 6 đv trong 6s: trong vùng +20% tốc chạy, +15% hút máu phép. Trong sân khấu, S1 thành Bước Nhảy Ngàn Hoa: hồi 1.2s, tốn 25 mana, lướt 2.5 đv phóng cánh hoa hồng thép gây sát thương phép kẻ địch lướt qua.',
         cd: [10, 9, 8, 7, 7], cost: [55, 55, 55, 55, 55], manualCd: true,
         use: wrap('s1', (m, u, ctx) => {
-          const dmg = H.amt(u, ctx.v([60, 90, 120, 150, 180]), 0, 0.55);
+          const dmg = H.amt(u, ctx.v([75, 110, 145, 180, 215]), 0, 0.6);
           if (inStage(m, u)) {
             u.mp += m.costOf(u, 's1') - (H.T(u, '12b') ? 0 : 25 * G.C.MANA_COST);
             u.cd.s1 = 1.2;
@@ -128,7 +134,7 @@
         name: 'Hoán Vị Ảnh Hồng', desc: 'Để lại Đóa Hồng Chiếu Ảnh (6s) rồi lao 4.5 đv: kẻ đầu tiên va phải nhận sát thương phép và choáng 0.75s. Trong 6s dùng lại để dịch chuyển về đóa hồng.',
         cd: [11, 10, 9, 8, 8], cost: [65, 65, 65, 65, 65],
         use: wrap('s3', (m, u, ctx) => {
-          const dmg = H.amt(u, ctx.v([85, 125, 165, 205, 245]), 0, 0.7), life = H.T(u, '3b') ? 8 : 6;
+          const dmg = H.amt(u, ctx.v([100, 145, 190, 235, 280]), 0, 0.75), life = H.T(u, '3b') ? 8 : 6;
           const rose = { x: u.x, y: u.y };
           if (m.fxOn) m.fx({ type: 'ring', x: rose.x, y: rose.y, r: 0.8, color: '#ff4a7a', life });
           let hit = false;
@@ -138,7 +144,7 @@
             const from = { x: uu.x, y: uu.y };
             mm.blink(uu, rose.x, rose.y);
             if (H.T(uu, '9b')) mm.hitCircle(uu, from.x, from.y, 2.5, (e) => mm.damage(uu, e, dmg * 0.7, 'magic', { tag: 's3', aoe: true }), { color: '#ff4a7a' });
-          });
+          }, rose);
         }),
         ai: { use: 'engage', range: 5, aim: 'point', speed: 20, skillshot: true, alsoEscape: true,
           recastWhen: (m, u, t) => u.hpPct < 0.45 || !!(t && t.kind === 'hero' && t.hpPct > u.hpPct + 0.25) },
@@ -168,9 +174,9 @@
           H.shoot(m, u, ctx.pt, { speed: 26, range: 8, r: 0.5, kind: 'card', hitMinions: false, onHit: (mm, p, e) => {
             mm.damage(u, e, dmg, 'magic', { tag: 's4' });
             if (e.kind !== 'hero') return;
-            u.ws.copyUlt = false; u.ws.copy = e.heroId; u.ws.copyUntil = mm.time + 15; u.ws.copyFrom = from; u.ws.kit = 'copy'; u.ws.ccd = {};
+            u.ws.copyUlt = false; u.ws.copy = e.heroId; u.ws.copyUntil = mm.time + 15; u.ws.copyFrom = from; u.ws.copyVic = e; u.ws.kit = 'copy'; u.ws.ccd = {};
             const P = e.hero.passive; if (P && P.init && !u.ws['init_' + e.heroId]) { u.ws['init_' + e.heroId] = 1; try { P.init(mm, u); } catch (err) { /* nội tại không hợp: bỏ qua */ } }
-            if (e.hero.dmgType === 'phys') mm.addStatus(u, 'buff', 15, 1, { key: 'luca_copy', mods: { ad: u.st.ap * 0.8 } });
+            if (e.hero.dmgType === 'phys') mm.addStatus(u, 'buff', 15, 1, { key: 'luca_copy', mods: { ad: u.st.ap * 0.65 } });   // GĐ11: 1 SMPT → 0.65 SMVL
             if (mm.fxOn) mm.fx({ type: 'callout', id: u.id, text: '🎭 Cải trang: ' + e.hero.name, color: '#ffd24a' });
             mm.allowRecast(u, 's4', 2, (m3, u3) => {
               if (!e.alive) return;
@@ -179,10 +185,17 @@
             });
           } });
         },
-        ai: { use: 'ult', aim: 'point', speed: 26, range: 7.5, heroOnly: true },
+        // GĐ11: đổi chỗ có chủ đích — Luca ngoài bo còn nạn nhân trong bo (ring-out: ném nạn nhân ra bão), có Lật Tẩy (choáng),
+        // hoặc nạn nhân đứng xa (đổi chỗ để áp sát); không thì KHÔNG tự đổi lúc hết hạn
+        ai: { use: 'ult', aim: 'point', speed: 26, range: 7.5, heroOnly: true, noExpire: true,
+          recastWhen: (m, u) => { const v = u.ws.copyVic; if (!v || !v.alive) return false; const z = m.zoneSt;
+            if (z && z.dps > 0 && !m.inZone(u) && m.inZone(v)) { u.stats.ringOut = (u.stats.ringOut || 0) + 1; return true; }
+            return H.T(u, '6b') || M.dist(u, v) > 4; } },
       },
     },
     ai: { order: ['s3', 's1', 's2'], engageRange: 6, role: 'assassin',
+      // GĐ11: Alice đang đánh nhau → tới nơi mở Sân Khấu chia lửa
+      bondOpen: (m, u, foe) => { if (inStage(m, u) || M.dist(u, foe) > 7 || !m.canCast(u, 's1')) return false; return !!m.castSkill(u, 's1', foe, { x: u.x, y: u.y }); },
       guard: (m, u) => (u.ws.spotUntil > m.time ? { t: 1, punish: true } : null) },
     tags: ['dive'],
   });

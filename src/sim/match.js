@@ -52,7 +52,8 @@
       }
       this.setupHeroes();
       this.setupZone();
-      if (!this.soloArena) {
+      if (cfg.sandbox) this.setupSandbox();   // GĐ11: phòng thử nghiệm — không quái, không rương, không bo
+      else if (!this.soloArena) {
         this.setupNeutral();
         this.setupDuel();
         this.setupChests(); this.traps = []; this.setupProps();   // GĐ7: rương đồ, bẫy, thùng thuốc nổ
@@ -73,86 +74,90 @@
     // ---------- dựng trận ----------
     setupHeroes() {
       const picks = this.cfg.picks || [];
-      picks.forEach((pk, i) => {
-        const def = G.HEROES[pk.hero];
-        if (!def) throw new Error('Không có tướng ' + pk.hero);
-        let sp = MAP.spawns[i % MAP.spawns.length];
-        if (this.soloArena) {
-          const cx = this.soloArena.cx, cy = this.soloArena.cy;
-          sp = { x: cx + (i === 0 ? -12.5 : 12.5), y: cy };
-        } else if (this.cfg.mode === 'solo' && this.cfg.soloCenter) {
-          const cx = MAP.center.x, cy = MAP.center.y;
-          sp = { x: cx + (i === 0 ? -9 : 9), y: cy };
-          MAP.pushOut(sp, 1);
-        }
-        const u = new Unit(this, { kind: 'hero', team: i, x: sp.x, y: sp.y, r: def.r || 0.65, ranged: def.ranged, projSpeed: def.projSpeed || C.HERO_PROJ, base: {} });
-        u.hero = def; u.heroId = def.id; u.pick = pk; u.slot = i;
-        u.home = { x: sp.x, y: sp.y };                     // "lãnh địa" đầu trận: AI ưu tiên farm quanh đây
-        // GĐ7: nhân vật có chỉ số bản lĩnh cố định theo tướng (pk.player chỉ để công cụ thử nghiệm ghi đè)
-        const ch = pk.player || (G.heroChar ? G.heroChar(def.id) : null);
-        u.player = Object.assign({}, DEFAULT_PLAYER, ch || {});
-        u.player.stats = Object.assign({}, DEFAULT_PLAYER.stats, (ch && ch.stats) || {});
-        if (pk.playerStats) Object.assign(u.player.stats, pk.playerStats);
-        u.pers = (pk.pers && G.PERSONALITY && G.PERSONALITY[pk.pers]) || G.personalityOf(def.id);
-        u.persId = pk.pers || G.HERO_PERSONALITY[def.id] || 'binhthuong';
-        u.fstyle = G.fightStyleOf(def.id);
-        // thành thạo tướng → hiệu quả sát thương lên tướng (combo, nội tại): 0 → 0.65, 70 → 1.0, 100 → 1.06
-        const masteryVal = pk.mastery != null ? pk.mastery : (u.player.mastery == null ? 70 : u.player.mastery);
-        u.player.mastery = masteryVal;
-        const mk = Math.max(0, Math.min(1, masteryVal / 100));
-        u.mastMul = mk >= 0.7 ? 1 + 0.2 * (mk - 0.7) : 1 - 0.5 * (0.7 - mk);
-        u.level = 1; u.xp = 0; u.gold = pk.gold != null ? pk.gold : C.GOLD_START; u.ranks = { s1: 0, s2: 0, s3: 0, s4: 0 }; u.points = 0;
-        u.respawnT = 0; u.recast = {}; u.ws = {}; u.tilt = 0; u.out = false; u.place = 0; u.revived = false;
-        u.stats = { k: 0, d: 0, a: 0, dmgHero: 0, dmgTaken: 0, heal: 0, ccTime: 0, goldEarned: 0, camps: 0, boss: 0, drops: 0, vulture: 0 };
-        u.resource = def.resource || 'mana';
-        this.applyLevel(u, true);
-        u.hp = u.st.maxHp; u.mp = u.st.maxMp; u.ga = u.st.maxGa;
-        u.points = 1; this.autoSkill(u);
-        if (pk.level && pk.level > 1) {
-          u.level = Math.max(1, Math.min(C.MAX_LVL || 18, pk.level | 0));
-          u.points = u.level;
-          this.applyLevel(u);
-          this.autoSkill(u);
-        }
-        if (G.pickBuild) u.buildPref = G.pickBuild(this, u);   // GĐ9: 1 trong 3 lối build sở trường
-        if (u.pers && u.pers.trader) u.stock = [1, 2].map((t, i) => Object.assign(this.makeShard(t), { key: 'stock_0' + i }));   // GĐ9: Thương Nhân / Kẻ Bịp Bợm mang sẵn 2 mảnh hàng
-        this.initItems(u);
-        if (pk.items && Array.isArray(pk.items) && pk.items.length) {
-          u.items = pk.items.filter((it) => it && G.ITEMS && G.ITEMS[it]).slice(0, 6);
-          this.recalcItems(u);
-          u.calc();
-        }
-        this.initPotions(u);
-        if (pk.yNiem != null) {
-          this.setYNiem(u, pk.yNiem, 'tùy chỉnh', true);
-        }
-        if (pk.souls && Array.isArray(pk.souls)) {
-          for (const sid of pk.souls) {
-            if (sid && G.SHARDS && G.SHARDS[sid]) {
-              this.giveSoul(u, G.SHARDS[sid].t, 'tùy chỉnh', sid);
-            }
+      picks.forEach((pk, i) => this.spawnHero(pk, i, null));
+    }
+    // dựng 1 tướng (GĐ11: tách riêng để Sandbox đổi tướng / thả bù nhìn giữa chừng; at = vị trí chỉ định)
+    spawnHero(pk, i, at) {
+      const def = pk.def || G.HEROES[pk.hero];   // GĐ11: Sandbox — bù nhìn có def riêng (không nằm trong danh sách tướng)
+      if (!def) throw new Error('Không có tướng ' + pk.hero);
+      let sp = at || MAP.spawns[i % MAP.spawns.length];
+      if (at) { /* GĐ11: vị trí chỉ định (Sandbox) */ } else if (this.soloArena) {
+        const cx = this.soloArena.cx, cy = this.soloArena.cy;
+        sp = { x: cx + (i === 0 ? -12.5 : 12.5), y: cy };
+      } else if (this.cfg.mode === 'solo' && this.cfg.soloCenter) {
+        const cx = MAP.center.x, cy = MAP.center.y;
+        sp = { x: cx + (i === 0 ? -9 : 9), y: cy };
+        MAP.pushOut(sp, 1);
+      }
+      const u = new Unit(this, { kind: 'hero', team: pk.team != null ? pk.team : i, x: sp.x, y: sp.y, r: def.r || 0.65, ranged: def.ranged, projSpeed: def.projSpeed || C.HERO_PROJ, base: {} });
+      u.hero = def; u.heroId = def.id; u.pick = pk; u.slot = i;
+      u.home = { x: sp.x, y: sp.y };                     // "lãnh địa" đầu trận: AI ưu tiên farm quanh đây
+      // GĐ7: nhân vật có chỉ số bản lĩnh cố định theo tướng (pk.player chỉ để công cụ thử nghiệm ghi đè)
+      const ch = pk.player || (G.heroChar ? G.heroChar(def.id) : null);
+      u.player = Object.assign({}, DEFAULT_PLAYER, ch || {});
+      u.player.stats = Object.assign({}, DEFAULT_PLAYER.stats, (ch && ch.stats) || {});
+      if (pk.playerStats) Object.assign(u.player.stats, pk.playerStats);
+      u.pers = (pk.pers && G.PERSONALITY && G.PERSONALITY[pk.pers]) || G.personalityOf(def.id);
+      u.persId = pk.pers || G.HERO_PERSONALITY[def.id] || 'binhthuong';
+      u.fstyle = G.fightStyleOf(def.id);
+      // thành thạo tướng → hiệu quả sát thương lên tướng (combo, nội tại): 0 → 0.65, 70 → 1.0, 100 → 1.06
+      const masteryVal = pk.mastery != null ? pk.mastery : (u.player.mastery == null ? 70 : u.player.mastery);
+      u.player.mastery = masteryVal;
+      const mk = Math.max(0, Math.min(1, masteryVal / 100));
+      u.mastMul = mk >= 0.7 ? 1 + 0.2 * (mk - 0.7) : 1 - 0.5 * (0.7 - mk);
+      u.level = 1; u.xp = 0; u.gold = pk.gold != null ? pk.gold : C.GOLD_START; u.ranks = { s1: 0, s2: 0, s3: 0, s4: 0 }; u.points = 0;
+      u.respawnT = 0; u.recast = {}; u.ws = {}; u.tilt = 0; u.out = false; u.place = 0; u.revived = false;
+      u.stats = { k: 0, d: 0, a: 0, dmgHero: 0, dmgTaken: 0, heal: 0, ccTime: 0, goldEarned: 0, camps: 0, boss: 0, drops: 0, vulture: 0 };
+      u.resource = def.resource || 'mana';
+      this.applyLevel(u, true);
+      u.hp = u.st.maxHp; u.mp = u.st.maxMp; u.ga = u.st.maxGa;
+      u.points = 1; this.autoSkill(u);
+      if (pk.level && pk.level > 1) {
+        u.level = Math.max(1, Math.min(C.MAX_LVL || 18, pk.level | 0));
+        u.points = u.level;
+        this.applyLevel(u);
+        this.autoSkill(u);
+      }
+      if (G.pickBuild) u.buildPref = G.pickBuild(this, u);   // GĐ9: 1 trong 3 lối build sở trường
+      if (u.pers && u.pers.trader) u.stock = [1, 2].map((t, i) => Object.assign(this.makeShard(t), { key: 'stock_0' + i }));   // GĐ9: Thương Nhân / Kẻ Bịp Bợm mang sẵn 2 mảnh hàng
+      this.initItems(u);
+      if (pk.items && Array.isArray(pk.items) && pk.items.length) {
+        u.items = pk.items.filter((it) => it && G.ITEMS && G.ITEMS[it]).slice(0, 6);
+        this.recalcItems(u);
+        u.calc();
+      }
+      this.initPotions(u);
+      if (pk.yNiem != null) {
+        this.setYNiem(u, pk.yNiem, 'tùy chỉnh', true);
+      }
+      if (pk.souls && Array.isArray(pk.souls)) {
+        for (const sid of pk.souls) {
+          if (sid && G.SHARDS && G.SHARDS[sid]) {
+            this.giveSoul(u, G.SHARDS[sid].t, 'tùy chỉnh', sid);
           }
         }
-        if (pk.pots && Array.isArray(pk.pots)) {
-          for (const pid of pk.pots) {
-            if (pid && this.bagAdd) this.bagAdd(u, pid, 1);
-          }
+      }
+      if (pk.pots && Array.isArray(pk.pots)) {
+        for (const pid of pk.pots) {
+          if (pid && this.bagAdd) this.bagAdd(u, pid, 1);
         }
-        this.initTree(u, pk.tree);
-        // Hồi phục đầy đủ toàn bộ sau khi nâng cấp
-        u.hp = u.st.maxHp; u.mp = u.st.maxMp; u.ga = u.st.maxGa;
-        this.addUnit(u); this.heroes.push(u);
-        if (this.soloArena) {
-          u.face(this.soloArena.cx + (i === 0 ? 10 : -10), this.soloArena.cy);
-        } else if (this.cfg.mode === 'solo' && this.cfg.soloCenter) {
-          u.face(MAP.center.x + (i === 0 ? 10 : -10), MAP.center.y);
-        } else {
-          u.face(MAP.center.x, MAP.center.y);
-        }
-        u.ai = new G.HeroAI(this, u);
-        this.hook(def.passive && def.passive.init, this, u);
-        if (!pk.items || !pk.items.length) this.shopAI(u);
-      });
+      }
+      this.initTree(u, pk.tree);
+      // Hồi phục đầy đủ toàn bộ sau khi nâng cấp
+      u.hp = u.st.maxHp; u.mp = u.st.maxMp; u.ga = u.st.maxGa;
+      this.addUnit(u); this.heroes.push(u);
+      if (at) u.face(at.x + 1, at.y);
+      else if (this.soloArena) {
+        u.face(this.soloArena.cx + (i === 0 ? 10 : -10), this.soloArena.cy);
+      } else if (this.cfg.mode === 'solo' && this.cfg.soloCenter) {
+        u.face(MAP.center.x + (i === 0 ? 10 : -10), MAP.center.y);
+      } else {
+        u.face(MAP.center.x, MAP.center.y);
+      }
+      u.ai = pk.ai ? pk.ai(this, u) : new G.HeroAI(this, u);   // GĐ11: bù nhìn Sandbox có AI riêng
+      this.hook(def.passive && def.passive.init, this, u);
+      if (!pk.items || !pk.items.length) this.shopAI(u);
+      return u;
     }
     addUnit(u) {
       const n = this.nTeams;
@@ -244,6 +249,7 @@
       this.separate();
       this.duelContain();
       if (this.soloArena) this.containSoloArena();
+      if (this.sbx) this.sbTick();   // GĐ11: Sandbox — bất tử / không hồi chiêu / vô hạn tài nguyên, bao cát hồi máu
       this.updateProjs(dt);
       this.updateZones(dt);
       this.updateHeroesMisc(dt);
@@ -685,6 +691,7 @@
     // ---------- chết ----------
     kill(u, killer, src) {
       if (!u.alive) return;
+      if (this.sbx && u.kind === 'hero') { this.sbFatal(u, killer); return; }   // GĐ11: phòng tập — không ai chết
       // GĐ8: bùa lợi boss cứu mạng (Hồn Thần Bất Diệt của Thiên Hồn Chủ, Ấn Niết Bàn của Phượng Hoàng)
       if (u.kind === 'hero' && this.bossBuffSave(u)) return;
       // nhánh tiến hóa "không chết" (Ý Chí Bất Diệt, Phượng Hoàng Tái Sinh…)
@@ -840,7 +847,7 @@
       } else u.cd[key] = 0;
     }
     // cho phép tái kích hoạt chiêu key trong dur giây
-    allowRecast(u, key, dur, fn) { u.recast[key] = { until: this.time + dur, fn }; }
+    allowRecast(u, key, dur, fn, anchor) { u.recast[key] = { until: this.time + dur, fn, anchor: anchor || null }; }   // GĐ11: anchor = điểm neo snapback
 
     // ---------- chạy cả trận (không cần hình) ----------
     runToEnd() { while (!this.over) this.step(); return this.result(); }
@@ -855,7 +862,7 @@
       };
     }
   }
-  Object.assign(Match.prototype, G.Combat, G.Neutral, G.BossMix, G.ArenaMix, G.ExtrasMix, G.BagMix, G.PropMix, G.ItemMix, G.TreeMix, G.DecoyMix, G.HouseMix, G.RoamMix);
+  Object.assign(Match.prototype, G.Combat, G.Neutral, G.BossMix, G.ArenaMix, G.ExtrasMix, G.BagMix, G.PropMix, G.ItemMix, G.TreeMix, G.DecoyMix, G.HouseMix, G.RoamMix, G.SandboxMix);
   G.Match = Match;
   G.DEFAULT_PLAYER = DEFAULT_PLAYER;
 })();
