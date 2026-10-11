@@ -12,16 +12,16 @@
     ranged: true, projSpeed: 140, projKind: 'laser', r: 0.58, resource: 'mana',
     gun: (m, u) => ({ n: u.ws.ammo, max: mag(u), rl: u.ws.reload, rlMax: u.ws.rlMax || 1.8 }),
     gunSet(m, u, n) { u.ws.ammo = n; if (n > 0 && u.ws.reload > 0) { u.ws.reload = 0; H.reloadDone(m, u); u.atkT = Math.min(u.atkT, 0.15); } },
-    stats: { range: 8.0, hp: 555, hpG: 86, mp: 330, mpG: 42, armor: 26, armorG: 3.8, mr: 30, mrG: 1.3, ms: 3.3, ad: 64, adG: 3.6, as: 0.66, asG: 0.025 },
+    stats: { range: 8.0, hp: 555, hpG: 86, mp: 330, mpG: 42, armor: 26, armorG: 3.8, mr: 30, mrG: 1.3, ms: 3.3, ad: 54, adG: 3.2, as: 0.62, asG: 0.025 },
     passive: {
       name: 'Laser Gun • Tính Toán Tuyệt Đối',
-      desc: 'Đánh thường là tia laser bắn tức thời, xuyên mọi mục tiêu thẳng hàng (mục tiêu sau nhận 65%). Ổ 8 viên, cạn đạn nạp 1.8s. Sẵn 50% chí mạng, 20% xuyên giáp và 25% Xuyên Thủng Hộ Giáp.',
+      desc: 'Đánh thường là tia laser bắn tức thời, xuyên mọi mục tiêu thẳng hàng (mục tiêu sau nhận 65%). Ổ 8 viên, cạn đạn nạp 1.8s. Sẵn 40% chí mạng, 20% xuyên giáp và 25% Xuyên Thủng Hộ Giáp.',
       init(m, u) { u.ws.ammo = MAG; u.ws.reload = 0; u.ws.oc = 0; },
       update(m, u, dt) {
         if (u.ws.reload > 0) { u.ws.reload -= dt; if (u.ws.reload <= 0) { u.ws.ammo = mag(u); H.reloadDone(m, u); } }
         if (u.ws.ammo <= 0) u.atkT = Math.max(u.atkT, u.ws.reload);
         if (u.ws.ammo < mag(u) && u.ws.reload <= 0 && m.time - (u.combatT || -99) > 4) startReload(m, u);
-        if (m.tick % 10 === 0 && !u.hasKey('vec_calc')) m.addStatus(u, 'buff', 9999, 1, { key: 'vec_calc', mods: { crit: H.T(u, '1b') ? 0.65 : 0.5, armorPen: 0.2, bypass: 0.25 } });
+        if (m.tick % 10 === 0 && !u.hasKey('vec_calc')) m.addStatus(u, 'buff', 9999, 1, { key: 'vec_calc', mods: { crit: H.T(u, '1b') ? 0.55 : 0.4, armorPen: 0.2, bypass: 0.25 } });
         if (u.ws.scanUntil > m.time && m.tick % 10 === 0) {
           for (const e of m.heroes) if (e.alive && e.team !== u.team && M.dist(e, u) <= 16) { if (e.has('stealth')) m.removeStatus(e, 'stealth'); e.revealedT = Math.max(e.revealedT || 0, m.time + 1); }
         }
@@ -122,7 +122,7 @@
   G.HEROES.vector.tree = [
     [
       { name: 'Tụ Quang Thần Tốc', desc: 'Nạp đạn 1.2s.' },
-      { name: 'Chí Mạng Tuyệt Đối', desc: 'Chí mạng gốc 65%.' },
+      { name: 'Chí Mạng Tuyệt Đối', desc: 'Chí mạng gốc 55%.' },
       { name: 'Gia Tốc Radar', desc: 'Radar cho +50% tốc chạy.' },
     ],
     [

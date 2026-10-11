@@ -181,6 +181,64 @@
         ctx.strokeStyle = tc('#a0a8b0'); ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(8, 14); ctx.lineTo(34, 14); ctx.stroke();
         ctx.beginPath(); ctx.arc(36, 14, 5, 0.6, TAU - 0.6); ctx.stroke(); ctx.fillStyle = '#3a3d44'; ctx.fillRect(12, -16, 18, 6);
         break;
+      // ---- GĐ10: vũ khí tướng mới ----
+      case 'cane':        // gậy ba toong ảo thuật (Luca, Mirage, Dahlia)
+        ctx.rotate(rot * 0.8); ctx.translate(ext, 0);
+        ctx.strokeStyle = tc('#1a1a22'); ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(4, 14); ctx.lineTo(44, 14); ctx.stroke();
+        ctx.strokeStyle = '#e8d070'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(46, 9, 5, Math.PI * 0.5, Math.PI * 1.9, true); ctx.stroke();
+        ctx.fillStyle = '#f4f4f8'; ctx.fillRect(4, 12, 4, 4);
+        break;
+      case 'tome':        // sách thánh + chùy (Justus)
+        ctx.rotate(rot * 0.7);
+        ctx.fillStyle = tc('#e8e0c0'); ctx.strokeStyle = '#7a5a20'; ctx.lineWidth = 1.5; ctx.fillRect(10, -20, 14, 18); ctx.strokeRect(10, -20, 14, 18);
+        ctx.fillStyle = '#d0a040'; ctx.fillRect(16, -18, 2, 14); ctx.fillRect(12, -13, 10, 2);
+        ctx.strokeStyle = '#6a5030'; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(6, 14); ctx.lineTo(34 + ext, 14); ctx.stroke();
+        ctx.fillStyle = tc('#c0c4cc'); ctx.beginPath(); ctx.arc(38 + ext, 14, 6, 0, TAU); ctx.fill();
+        break;
+      case 'hookchain': { // móc sắt xích (Ratok)
+        ctx.rotate(rot * 0.5);
+        const L = 30 + ext * 2;
+        ctx.strokeStyle = '#8a8a90'; ctx.lineWidth = 2; ctx.setLineDash([3, 2]); ctx.beginPath(); ctx.moveTo(6, 12); ctx.lineTo(L, 12); ctx.stroke(); ctx.setLineDash([]);
+        ctx.strokeStyle = tc('#c8ccd4'); ctx.lineWidth = 3.5; ctx.beginPath(); ctx.arc(L + 4, 6, 7, Math.PI * 0.5, Math.PI * 1.6, true); ctx.stroke();
+        break;
+      }
+      case 'orb':         // quả cầu xác suất lơ lửng (Dr. Caelus)
+        ctx.fillStyle = tc('rgba(120,200,255,0.85)'); ctx.strokeStyle = '#e0f4ff'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(24 + ext * 0.6, -6 + Math.sin(time * 3) * 3, 7, 0, TAU); ctx.fill(); ctx.stroke();
+        ctx.strokeStyle = 'rgba(200,240,255,0.6)'; ctx.beginPath(); ctx.arc(24 + ext * 0.6, -6 + Math.sin(time * 3) * 3, 11, time * 2, time * 2 + 2); ctx.stroke();
+        break;
+      case 'axes':        // song rìu (Boran)
+        ctx.rotate(rot);
+        for (const yy of [-12, 14]) {
+          ctx.strokeStyle = '#5a3a1a'; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(6, yy); ctx.lineTo(34, yy); ctx.stroke();
+          ctx.fillStyle = tc('#b8bcc4'); ctx.beginPath(); ctx.moveTo(28, yy); ctx.lineTo(40, yy - 9); ctx.lineTo(42, yy + 7); ctx.closePath(); ctx.fill();
+        }
+        break;
+      case 'cleaver':     // đại bản đao (Ariston)
+        ctx.rotate(rot);
+        ctx.strokeStyle = '#4a3a2a'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(4, 14); ctx.lineTo(22, 14); ctx.stroke();
+        ctx.fillStyle = tc('#d8dce4'); ctx.strokeStyle = '#333'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(20, 6); ctx.lineTo(62, 4); ctx.lineTo(66, 16); ctx.lineTo(20, 20); ctx.closePath(); ctx.fill(); ctx.stroke();
+        break;
+      case 'laser':       // súng laser lượng tử (Dr. Vector)
+        ctx.translate(-ext * 0.3, 0);
+        ctx.fillStyle = '#2a3040'; ctx.fillRect(6, 8, 16, 9);
+        ctx.fillStyle = tc('#e8f0ff'); ctx.fillRect(18, 9, 24, 6);
+        ctx.fillStyle = 'rgba(64,224,255,0.9)'; ctx.fillRect(40, 10, 5, 4); ctx.fillRect(24, 6, 10, 2);
+        break;
+      case 'flysword':    // phi kiếm lơ lửng (Bạch Diệp)
+        for (let i = 0; i < 3; i++) {
+          const a0 = time * 2.2 + i * 2.094, r0 = 22;
+          ctx.save(); ctx.translate(Math.cos(a0) * r0 * 0.6 + 6, Math.sin(a0) * r0); ctx.rotate(-0.2 + rot * 0.3);
+          blade(ctx, 0, 0, 18, 2.5, '#d8f0ff'); ctx.restore();
+        }
+        break;
+      case 'ninja':       // song nhẫn đao + phi tiêu (Tsukiyo)
+        ctx.rotate(rot);
+        blade(ctx, 6, -12, 24, 2.5, '#c8ccd8'); blade(ctx, 6, 14, 24, 2.5, '#c8ccd8');
+        ctx.fillStyle = tc('#6b6bd6'); ctx.save(); ctx.translate(36 + ext, 0); ctx.rotate(time * 8);
+        ctx.beginPath(); for (let i = 0; i < 4; i++) { const q = i * Math.PI / 2; ctx.lineTo(Math.cos(q) * 6, Math.sin(q) * 6); ctx.lineTo(Math.cos(q + 0.785) * 2, Math.sin(q + 0.785) * 2); } ctx.closePath(); ctx.fill(); ctx.restore();
+        break;
       default: break;
     }
   }

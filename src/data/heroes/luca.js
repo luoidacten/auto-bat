@@ -42,7 +42,7 @@
   H.def({
     id: 'luca', name: 'Luca', color: '#ff4a7a', gfx: 'cane', kit: 'mage', pos: ['mid'], dmgType: 'magic',
     ranged: true, projSpeed: 20, projKind: 'card', r: 0.58, resource: 'mana',
-    stats: { range: 5.0, hp: 560, ms: 3.45 },
+    stats: { range: 5.0, hp: 600, hpG: 90, ms: 3.45 },
     gauge: (u) => ({ v: u.ws.hype || 0, max: 100, label: 'Náo Nhiệt', color: '#ff6a9a' }),
     passive: {
       name: 'Sân Khấu Náo Nhiệt',
@@ -96,7 +96,7 @@
         name: 'Sân Khấu Mở Ra / Bước Nhảy Ngàn Hoa', desc: 'Mở Vùng Sân Khấu bán kính 6 đv trong 6s: trong vùng +20% tốc chạy, +15% hút máu phép. Trong sân khấu, S1 thành Bước Nhảy Ngàn Hoa: hồi 1.2s, tốn 25 mana, lướt 2.5 đv phóng cánh hoa hồng thép gây sát thương phép kẻ địch lướt qua.',
         cd: [10, 9, 8, 7, 7], cost: [55, 55, 55, 55, 55], manualCd: true,
         use: wrap('s1', (m, u, ctx) => {
-          const dmg = H.amt(u, ctx.v([50, 75, 100, 125, 150]), 0, 0.45);
+          const dmg = H.amt(u, ctx.v([60, 90, 120, 150, 180]), 0, 0.55);
           if (inStage(m, u)) {
             u.mp += m.costOf(u, 's1') - (H.T(u, '12b') ? 0 : 25 * G.C.MANA_COST);
             u.cd.s1 = 1.2;
@@ -128,7 +128,7 @@
         name: 'Hoán Vị Ảnh Hồng', desc: 'Để lại Đóa Hồng Chiếu Ảnh (6s) rồi lao 4.5 đv: kẻ đầu tiên va phải nhận sát thương phép và choáng 0.75s. Trong 6s dùng lại để dịch chuyển về đóa hồng.',
         cd: [11, 10, 9, 8, 8], cost: [65, 65, 65, 65, 65],
         use: wrap('s3', (m, u, ctx) => {
-          const dmg = H.amt(u, ctx.v([70, 105, 140, 175, 210]), 0, 0.6), life = H.T(u, '3b') ? 8 : 6;
+          const dmg = H.amt(u, ctx.v([85, 125, 165, 205, 245]), 0, 0.7), life = H.T(u, '3b') ? 8 : 6;
           const rose = { x: u.x, y: u.y };
           if (m.fxOn) m.fx({ type: 'ring', x: rose.x, y: rose.y, r: 0.8, color: '#ff4a7a', life });
           let hit = false;

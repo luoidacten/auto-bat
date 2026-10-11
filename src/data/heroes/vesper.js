@@ -49,7 +49,7 @@
         if (u.hasKey('ves_camo')) m.removeStatus(u, 'stealth', 'ves_camo');
         if (isUnseen) {
           info.amt *= 2;
-          info.extra.push(() => { if (!t.alive) return; m.dot(u, t, 10 + 3 * u.level, 4, 'phys', POISON); if (t.kind === 'hero' && H.ready(m, u, 'kh' + t.id, 8)) m.addStatus(t, 'stun', 1, 1, { src: u }); });
+          info.extra.push(() => { if (!t.alive) return; m.dot(u, t, 10 + 3 * u.level, 4, 'phys', POISON); if (t.kind === 'hero' && H.ready(m, u, 'kh' + t.id, 10)) m.addStatus(t, 'stun', 0.75, 1, { src: u }); });
           if (m.fxOn) m.fx({ type: 'callout', id: u.id, text: '🗡 ĐỘT KÍCH x2', color: '#b07aff' });
         }
         if (u.ws.ultHit > m.time) {
@@ -132,7 +132,7 @@
         cd: [100, 85, 70], cost: [100, 100, 100], castTime: 0.15,
         use(m, u, ctx) {
           u.ws.unseenUlt = !u.visAny || u.has('stealth') || u.bush >= 0;
-          const n = ctx.v([10, 20, 40]) + (H.T(u, '9a') ? 4 : 0), R = ctx.v([6, 8, 10]), dmg = H.amt(u, ctx.v([50, 80, 110]), 0.35) * (ctx.rank >= 3 ? 0.6 : ctx.rank === 2 ? 0.75 : 1);
+          const n = ctx.v([10, 20, 40]) + (H.T(u, '9a') ? 4 : 0), R = ctx.v([6, 8, 10]), dmg = H.amt(u, ctx.v([50, 80, 110]), 0.35) * (ctx.rank >= 3 ? 0.35 : ctx.rank === 2 ? 0.55 : 1);
           const hit = [], uu = u.ws.unseenUlt;
           stealth(m, u, 5);
           for (let i = 0; i < n; i++) {
@@ -150,7 +150,7 @@
           m.later(0.4, (mm) => {
             if (!u.alive) return;
             // cấp tối đa: Hư Ảnh Đoạt Mệnh đâm xuyên mọi mục tiêu bị đánh dấu
-            if (ctx.rank >= 3) for (const e of hit) if (e.alive) { mm.addStatus(e, 'mark', 2, 1, { key: 'ves_mark', src: u }); mm.later(0.3, (m2) => { if (e.alive) { m2.damage(u, e, dmg * 2, 'phys', { tag: 's4' }); if (m2.fxOn) m2.fx({ type: 'line', x: e.x - 2, y: e.y, x2: e.x + 2, y2: e.y, w: 0.3, color: '#b07aff', fx: 'thrust', team: u.team }); } }); }
+            if (ctx.rank >= 3) for (const e of hit) if (e.alive) { mm.addStatus(e, 'mark', 2, 1, { key: 'ves_mark', src: u }); mm.later(0.3, (m2) => { if (e.alive) { m2.damage(u, e, dmg * 1.2, 'phys', { tag: 's4' }); if (m2.fxOn) m2.fx({ type: 'line', x: e.x - 2, y: e.y, x2: e.x + 2, y2: e.y, w: 0.3, color: '#b07aff', fx: 'thrust', team: u.team }); } }); }
             if (!hit.some((e) => e.alive)) return;
             mm.allowRecast(u, 's4', 5, (m3, u3) => {
               const t = hit.filter((e) => e.alive).sort((a, b) => a.hpPct - b.hpPct || a.id - b.id)[0];

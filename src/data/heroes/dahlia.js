@@ -25,7 +25,7 @@
     id: 'dahlia', name: 'Dahlia', color: '#c040ff', gfx: 'cane', kit: 'mage', pos: ['mid', 'jungle'], dmgType: 'magic',
     ranged: true, projSpeed: 20, projKind: 'star', r: 0.56, resource: 'mana',
     stats: { range: 5.0, hp: 555, hpG: 88, mp: 400, mpG: 48, armor: 25, armorG: 3.7, ms: 3.45 },
-    gauge: (u) => ({ v: u.ws.frenzyUntil > (u.m ? u.m.time : 0) ? 100 : u.ws.fz || 0, max: 100, label: 'Cuồng Nhiệt', color: '#c040ff' }),
+    gauge: (u, m) => ({ v: u.ws.frenzyUntil > (m ? m.time : 0) ? 100 : u.ws.fz || 0, max: 100, label: 'Cuồng Nhiệt', color: '#c040ff' }),
     passive: {
       name: 'Náo Nhiệt & Cuồng Nhiệt • Chiếc Mũ Thoát Hiểm • Ảo Ảnh Chết Chóc • Gậy Đen',
       desc: 'Có ai lướt / dịch chuyển gần đó: +5 Náo Nhiệt; quái, vật triệu hồi, ảo ảnh bị hạ: +8; có đơn vị không phải tướng trong 6 đv: +3/giây. Đủ 100 → Cuồng Nhiệt 8s: +40% tốc đánh, +25% sát thương phép, +20% tốc chạy, cường hóa mọi chiêu. Tụt xuống 50% máu (90s): mũ cao chụp xuống, Dahlia dịch chuyển 5.5 đv, chiếc mũ phát nổ choáng 1s quanh chỗ cũ. Ảo ảnh của Dahlia tự đánh (35%) và khi tan để lại khói độc 3.5s (mù, độc, gọt Hộ Giáp). Đánh thường gây sát thương phép, đòn thứ 3 liên tiếp nổ lan 2 đv.',

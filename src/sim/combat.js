@@ -137,6 +137,7 @@
         info.hpDealt = dealt; info.gaDealt = gaDealt;
         // sổ sách
         tgt.lastDmgT = this.time;
+        if (tgt.ai && tgt.ai.cog && tot > 0) G.Cog.onHit(this, tgt, owner, tot);   // GĐ10: bất ngờ / mù tiêu điểm
         // kẻ vừa đánh (mọi loại: tướng, vật triệu hồi, quái) — hộ vệ của chủ dùng để nhắm kẻ đánh chủ
         if (owner && owner !== tgt && tot > 0) {
           tgt.lastAtt = owner; tgt.lastAttT = this.time;

@@ -15,6 +15,7 @@
     constructor(m, u) {
       this.m = m; this.u = u;
       this.mode = 'idle'; this.target = null; this.targetT = 0;
+      if (G.Cog) G.Cog.init(this);   // GĐ10: trễ nhận thức theo kiểu tướng, bất ngờ, hoảng loạn
       this.lastCharge = 1; this.fleeing = false;
       this.dodgeUntil = 0; this.dodgeGoal = null; this.seenProj = new Set();
       this.readyT = 0;           // thời điểm được phép ra chiêu tiếp (nhịp combo)
@@ -53,7 +54,7 @@
     }
     // thời gian phản ứng (giây): Kỹ Năng Cá Nhân cao → nghĩ dày hơn (né, lùi, ra chiêu kịp); 12/thành thạo 70 ≈ 0.1s như trước
     // GĐ5c: chủ yếu theo Phản Xạ (70%) + Kỹ Năng Cá Nhân (30%)
-    reactTime() { const v = 0.1 + 0.32 * (0.55 - (0.7 * this.sk('refl') + 0.3 * this.sk('meca'))); return v < 0.06 ? 0.06 : v > 0.25 ? 0.25 : v; }
+    reactTime() { const v = 0.1 + 0.32 * (0.55 - (0.7 * this.sk('refl') + 0.3 * this.sk('meca'))); return (v < 0.06 ? 0.06 : v > 0.25 ? 0.25 : v) + (this.cog ? G.Cog.extra(this) : 0); }
     scheduleNext(tick) {
       // hiệu suất ra đòn: tay kém thì giữa hai đòn đánh thường hụt nhịp (0–25% chu kỳ đánh)
       const lag = (0.62 - this.sk('meca')) * 0.5;
@@ -104,6 +105,7 @@
     think() {
       const m = this.m, u = this.u;
       if (!u.alive) return;
+      if (this.cog) { G.Cog.tick(this); if (G.Cog.frozen(this)) return; }   // GĐ10: đang "giật mình" — giữ nguyên hướng cũ, chưa phản ứng
       if (u.disabled) {
         this.tryItems(true);
         if (u.bag && m.bagCount(u, 'cleanse')) G.BagAI.tryBag(this, this.visibleEnemyHeroes(9));   // Thanh Tẩy dùng được khi bị khống chế
@@ -603,7 +605,7 @@
       return this.ehp(h, hpPct) * this.dps(h) / 100 * k;
     }
     // GĐ8: AI "tinh ý" (đọc trận tốt): câu giờ chờ bùa Rồng của đối thủ hết hạn
-    smart() { const id = this.u.heroId; return id === 'alice' || id === 'chrononeo' || id === 'raven' || id === 'lyra' || (this.u.player.stats.map || 10) >= 16; }
+    smart() { const id = this.u.heroId; return id === 'alice' || id === 'chrononeo' || id === 'raven' || id === 'lyra' || id === 'caelus' || id === 'vector' || id === 'mirage' || id === 'luca' || (this.u.player.stats.map || 10) >= 16; }
     curveEdge(e) { const m = this.m; return G.heroCurve ? (G.heroCurve(this.u, m) - G.heroCurve(e, m)) * 4 : 0; }
     soft(p, tol) {
       const m = this.m, u = this.u;

@@ -217,6 +217,7 @@
       this.evCount = 0;
       this.rebuildGrid();
       if (this.tick % 6 === 0) this.updateVision();
+      if (G.RelTalk) G.RelTalk.check(this);   // GĐ10: câu thoại quan hệ khi gặp nhau lần đầu
       this.runQueue();
       this.updateZone();
       this.updateNeutral(dt);
@@ -796,6 +797,8 @@
     cdOf(u, key) { const def = u.hero.skills[key]; const r = this.rankOf(u, key); const cd = typeof def.cd === 'function' ? def.cd(this, u) : Array.isArray(def.cd) ? def.cd[Math.min(def.cd.length, r) - 1] : def.cd; return cd * (1 - u.st.cdr); }
     castSkill(u, key, tgt, pt) {
       if (!this.canCast(u, key)) return false;
+      // GĐ10: hoảng loạn (máu tụt quá nhanh) → bấm nhầm chiêu / lệch góc
+      if (u.ai && u.ai.cog && u.ai.cog.panic > 0.7) { const p = G.Cog.perturb(this, u, key, tgt, pt); if (p && this.canCast(u, p.key)) { key = p.key; tgt = p.tgt; pt = p.pt; } }
       const def = u.hero.skills[key];
       const rank = this.rankOf(u, key);
       const ctx = { key, rank, tgt: tgt || null, pt: pt || (tgt ? { x: tgt.x, y: tgt.y } : { x: u.x + u.fx * 3, y: u.y + u.fy * 3 }), v: (arr) => (Array.isArray(arr) ? arr[Math.min(arr.length, rank) - 1] : arr) };

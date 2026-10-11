@@ -23,7 +23,7 @@
     id: 'tsukiyo', name: 'Tsukiyo', color: '#6b6bd6', gfx: 'ninja', kit: 'fighter', pos: ['jungle', 'mid'], dmgType: 'phys',
     ranged: true, projSpeed: 24, projKind: 'shuriken', r: 0.54, resource: 'mana',
     stats: { range: 5.5, hp: 565, hpG: 88, mp: 100, mpG: 10, mpr: 0, mprG: 0, armor: 27, armorG: 3.7, mr: 30, mrG: 1.4, ms: 3.55, ad: 62, adG: 3.8, ap: 0, as: 0.7, asG: 0.026 },
-    gauge: (u) => ({ v: u.mp, max: u.st.maxMp, label: 'Nội Năng', color: '#ffd84a' }),
+    manaLabel: 'Nội Năng', manaColor: '#ffd84a',
     passive: {
       name: 'Thích Ứng Cận – Viễn • Tam Đại Nhẫn Thuật • Nhẫn Đạo Toàn Giác',
       desc: 'Dùng Nội Năng (100 +10/cấp, tự hồi 10/giây) thay mana. Mục tiêu xa hơn 2 đv: ném phi tiêu; gần: song đao chém (+20%). Đòn đánh trúng tướng +8 Nội Năng; S1/S2 trúng tướng +15. Mỗi chiêu theo 1 trong 3 nhánh: Kỹ Thuật (phép, khống chế), Tất Sát (vật lý, dồn sát thương), Bí Thuật (tốc độ, phản đòn). Nhẫn Đạo: 120 Công Phép → phi tiêu thêm phép và hiệu ứng ngẫu nhiên, nhát chém gắn Dấu Ấn Hắc Ám; 90 Công Vật Lý thêm → ném 3 phi tiêu / chém 2 nhát (4s); 35% tốc đánh + tốc chạy thêm → né 1 đòn cận chiến và chém phản 1 đòn tầm xa (12s mỗi loại).',

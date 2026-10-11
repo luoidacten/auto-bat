@@ -7,7 +7,7 @@
   H.def({
     id: 'boran', name: 'Boran', color: '#8ad8ff', gfx: 'axes', kit: 'fighter', pos: ['top', 'jungle'], dmgType: 'phys',
     ranged: false, r: 0.64, resource: 'none', zoneRed: 0.3,
-    stats: { hp: 640, hpG: 98, ad: 66, adG: 4.0, armor: 31, armorG: 3.8, as: 0.7, asG: 0.025, ms: 3.55, range: 1.6 },
+    stats: { hp: 600, hpG: 94, ad: 62, adG: 3.8, armor: 31, armorG: 3.8, as: 0.7, asG: 0.025, ms: 3.55, range: 1.6 },
     gauge: (u) => ({ v: u.ws.fury || 0, max: 100, label: 'Nộ Khí', color: '#8ad8ff' }),
     passive: {
       name: 'Huyết Mạch Băng Cổ • Thể Trọng Băng Hóa',

@@ -17,7 +17,7 @@
   H.def({
     id: 'kip', name: 'Kip', color: '#7a6aff', gfx: 'dagger', kit: 'fighter', pos: ['jungle'], dmgType: 'phys',
     ranged: false, r: 0.55, resource: 'none',
-    stats: { hp: 570, hpG: 88, ad: 63, adG: 3.9, armor: 27, armorG: 3.6, as: 0.75, ms: 3.7, range: 1.4 },
+    stats: { hp: 600, hpG: 90, ad: 68, adG: 4.1, armor: 27, armorG: 3.6, as: 0.75, ms: 3.7, range: 1.4 },
     gauge: (u) => ({ v: u.ws.ch || 0, max: maxCh(u), label: 'Điểm Hư Không', color: '#a59aff', pips: true }),
     passive: {
       name: 'Gia Tốc Trượt Không Gian',
@@ -71,7 +71,7 @@
           });
           if (H.T(u, '6c')) m.later(3, (mm) => mm.hitCircle(u, rift.x, rift.y, 2.5, (e) => mm.damage(u, e, 200, 'magic', { tag: 's1', aoe: true }), { color: '#7a6aff' }));
         },
-        ai: { use: 'engage', range: 6, aim: 'point', speed: 0, alsoEscape: true, skillshot: true,
+        ai: { use: 'engage', range: 6, aim: 'point', speed: 0, alsoEscape: true, skillshot: true, cond: (m, u, t) => u.ws.ch >= 2 || u.hpPct < 0.4 || !!(t && t.hpPct < 0.35),   // GĐ10: giữ 1 Điểm Hư Không cho Vòm Xoáy / thoát thân
           recastWhen: (m, u, t) => u.hpPct < 0.4 || !!(t && t.kind === 'hero' && !t.ranged && M.dist(u, t) < 2.5 && u.hpPct < 0.6) },
       },
       s2: {

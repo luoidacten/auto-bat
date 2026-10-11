@@ -1319,7 +1319,7 @@
       ctx.fillStyle = 'rgba(0,0,0,0.35)';
       for (let v = 200; v < tot; v += 200) ctx.fillRect(p.x - w / 2 + w * v / tot, y, 1, 5);
       if (u.kind === 'hero') {
-        if (u.st.maxMp > 0) { ctx.fillStyle = '#5a8cff'; ctx.fillRect(p.x - w / 2, y + 6, w * u.mp / u.st.maxMp, 2); }
+        if (u.st.maxMp > 0) { ctx.fillStyle = u.hero.manaColor || '#5a8cff'; ctx.fillRect(p.x - w / 2, y + 6, w * u.mp / u.st.maxMp, 2); }
         // GĐ9: băng đạn (tướng súng) — mỗi viên một vạch; đang nạp: thanh vàng chạy
         const GN = u.hero.gun && u.ws && u.hero.gun(this.m, u);
         if (GN && GN.max) {
@@ -1330,6 +1330,14 @@
             if (MX <= 12) { const pw = (w - (MX - 1)) / MX; for (let i = 0; i < MX; i++) { ctx.fillStyle = i < n ? '#f4e6b0' : 'rgba(255,255,255,0.12)'; ctx.fillRect(p.x - w / 2 + i * (pw + 1), yy, pw, 2); } }
             else { ctx.fillStyle = '#f4e6b0'; ctx.fillRect(p.x - w / 2, yy, w * n / MX, 2); }
           }
+        }
+        // GĐ10: thanh tài nguyên riêng của tướng (Náo Nhiệt, Đức Tin, Kiếm Khí…) — vạch mảnh dưới thanh mana / băng đạn
+        const GG = u.hero.gauge && u.ws && u.hero.gauge(u, this.m);
+        if (GG && GG.max > 0) {
+          const yy = y + (u.st.maxMp > 0 ? 9 : 7) + (GN && GN.max ? 4 : 0), k = Math.max(0, Math.min(1, GG.v / GG.max));
+          ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(p.x - w / 2 - 1, yy - 1, w + 2, 3.5);
+          if (GG.pips && GG.max <= 8) { const pw = (w - (GG.max - 1)) / GG.max; for (let i = 0; i < GG.max; i++) { ctx.fillStyle = i < GG.v ? GG.color : 'rgba(255,255,255,0.12)'; ctx.fillRect(p.x - w / 2 + i * (pw + 1), yy, pw, 1.8); } }
+          else { ctx.fillStyle = GG.color || '#ffd24a'; ctx.fillRect(p.x - w / 2, yy, w * k, 1.8); }
         }
         ctx.fillStyle = '#1b2230'; ctx.fillRect(p.x - w / 2 - 13, y - 2, 12, 11);
         ctx.fillStyle = '#ffe9a0'; ctx.font = 'bold 9px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.fillText(String(u.level), p.x - w / 2 - 7, y + 7);

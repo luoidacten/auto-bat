@@ -18,10 +18,12 @@
       u.tset = {}; u.tfx = [];
       if (!tree) { u.tree = null; return; }
       const rng = this.treeRng || (this.treeRng = new G.Rng(this.seed + ':tree'));
+      // GĐ10: nhánh chưa được HLV / người chơi chọn sẵn thì để trống — AI chấm điểm tiện ích lúc mở mốc (G.TreeAI)
       u.tree = TIERS.map((_, i) => {
-        const c = choice && choice[i];
-        return c === 0 || c === 1 || c === 2 ? c : rng.int(0, 2);
+        const c = choice && choice[i], n = (tree[i] || []).length;
+        return (c === 0 || c === 1 || c === 2) && c < Math.max(1, n) ? c : null;
       });
+      void rng;
       u.treeOn = 0;
       this.unlockTree(u);
     },
@@ -31,10 +33,13 @@
       if (!tree || !u.tree) return;
       let changed = false;
       while (u.treeOn < TIERS.length && u.level >= TIERS[u.treeOn]) {
-        const i = u.treeOn, b = tree[i] && tree[i][u.tree[i]];
+        const i = u.treeOn;
+        if (u.tree[i] == null) u.tree[i] = G.TreeAI ? G.TreeAI.pick(this, u, i) : (this.treeRng || (this.treeRng = new G.Rng(this.seed + ':tree'))).int(0, Math.max(0, (tree[i] || []).length - 1));
+        const b = tree[i] && tree[i][u.tree[i]];
         u.treeOn++;
         if (!b) continue;
         u.tset[code(i, u.tree[i])] = true;
+        if (i >= 2 && u.treeWhy && u.treeWhy[i] && this.addFeed) this.addFeed({ type: 'tree_pick', hero: u, lv: TIERS[i], name: b.name, why: u.treeWhy[i] });
         u.tfx.push(b);
         if (b.init) this.hook(b.init, this, u);
         changed = true;
@@ -50,7 +55,7 @@
           const o = opts[rng.int(0, opts.length - 1)];
           let name = '', cd = null;
           if (o.ti != null) {
-            const left = [0, 1, 2].filter((j) => j !== u.tree[o.ti] && !u.tset[code(o.ti, j)]);
+            const left = [0, 1, 2].filter((j) => j !== u.tree[o.ti] && !u.tset[code(o.ti, j)] && tree[o.ti] && tree[o.ti][j]);
             if (!left.length) continue;
             const j = left[rng.int(0, left.length - 1)], b = tree[o.ti] && tree[o.ti][j];
             if (!b) continue;
@@ -64,7 +69,7 @@
       if (changed) this.recalcItems(u);
     },
     // danh sách mã nhánh đang có (báo cáo)
-    treeCodes(u) { return u.tree ? u.tree.map((c, i) => code(i, c)).concat((u.treeX || []).map((x) => x.code)) : []; },
+    treeCodes(u) { return u.tree ? u.tree.map((c, i) => (c == null ? null : code(i, c))).filter(Boolean).concat((u.treeX || []).map((x) => x.code)) : []; },
   };
   G.TreeMix = TreeMix;
   G.TREE_TIERS = TIERS; G.TREE_EXTRA = EXTRA; G.TREE_GEN = GEN;

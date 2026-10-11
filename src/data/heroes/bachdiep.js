@@ -2,7 +2,8 @@
 // ===== Bạch Diệp — Kiếm Vương Rotava • pháp sư / đấu sĩ ngự kiếm, tích kiếm vô hạn • mana + Kiếm Khí • phép =====
 (function () {
   const G = globalThis.G, H = G.H, M = G.M;
-  const per = (u) => (H.T(u, '6a') ? 0.016 : 0.012);
+  const per = (u) => (H.T(u, '6a') ? 0.013 : 0.01);
+  const AMP_CAP = 0.6;   // trần cộng sát thương từ kiếm (vẫn tích kiếm vô hạn cho Giáp Ảo / Vạn Kiếm Quy Tông)
   function addSw(m, u, n) {
     const before = u.ws.sw; u.ws.sw += n; u.ws.swT = m.time;
     if (H.T(u, '12b') && u.ws.sw > 25) { const k = u.ws.sw - Math.max(25, before); if (k > 0) { u.ws.swArm += 2 * k; u.dirty = true; } }
@@ -25,7 +26,7 @@
     gauge: (u) => ({ v: u.ws.sw || 0, max: Math.max(10, Math.ceil((u.ws.sw || 0) / 10) * 10), label: 'Kiếm Khí', color: '#bfe8ff' }),
     passive: {
       name: 'Vạn Kiếm Triệu • Mưa Kiếm Thức Thời',
-      desc: 'Đánh thường gây sát thương phép. Mỗi phi kiếm Loạn Trảm trúng: +1 Kiếm; mỗi 5 đòn đánh trúng: +1 Kiếm. KHÔNG GIỚI HẠN số kiếm; mỗi kiếm +1.2% sát thương phép mọi đòn. Rời giao tranh 4s: mất 2 kiếm mỗi giây. Mỗi 10s, đòn đánh kế tiếp thành Mưa Kiếm: 6 phi kiếm rơi xuống bán kính 2 đv, làm chậm 30% 1.5s.',
+      desc: 'Đánh thường gây sát thương phép. Mỗi phi kiếm Loạn Trảm trúng: +1 Kiếm; mỗi 5 đòn đánh trúng: +1 Kiếm. KHÔNG GIỚI HẠN số kiếm; mỗi kiếm +1% sát thương phép mọi đòn (tối đa +60%). Rời giao tranh 4s: mất 2 kiếm mỗi giây. Mỗi 10s, đòn đánh kế tiếp thành Mưa Kiếm: 6 phi kiếm rơi xuống bán kính 2 đv, làm chậm 30% 1.5s.',
       init(m, u) { u.ws.sw = 0; u.ws.swT = -99; u.ws.swArm = 0; u.ws.hitN = 0; u.ws.rainT = 0; u.ws.chain = 0; u.ws.chainT = -99; u.ws.dom = null; },
       update(m, u, dt) {
         if (u.ws.dom) {
@@ -36,7 +37,7 @@
         if (m.tick % 10 !== 0) return;
         const hold = H.T(u, '9a') ? 8 : 4, rate = H.T(u, '9a') ? 1 : 2;
         if (u.ws.sw > 0 && m.time - Math.max(u.ws.swT, u.combatT || -99) > hold) { u.ws.sw = Math.max(0, u.ws.sw - rate); if (u.ws.sw <= 25 && u.ws.swArm) { u.ws.swArm = 0; u.dirty = true; } }
-        const amp = u.ws.sw * per(u), a = u.statuses.find((s) => s.key === 'bd_sw');
+        const amp = Math.min(AMP_CAP * (H.T(u, '6a') ? 1.3 : 1), u.ws.sw * per(u)), a = u.statuses.find((s) => s.key === 'bd_sw');
         if (!a || Math.abs(a.mods.dmgAmp - amp) > 0.005 || a.mods.armor !== u.ws.swArm) { if (a) m.removeStatus(u, 'buff', 'bd_sw'); if (amp > 0 || u.ws.swArm) m.addStatus(u, 'buff', 9999, 1, { key: 'bd_sw', mods: { dmgAmp: amp, armor: u.ws.swArm, mr: u.ws.swArm } }); }
       },
       onAuto(m, u, t, info) {
@@ -61,7 +62,7 @@
           if (u.ws.freeS1 > m.time) u.mp += m.costOf(u, 's1'); else u.mp = Math.max(0, u.mp - extra * (u.ws.sixUntil > m.time ? 0.7 : 1));
           if (u.ws.sixUntil > m.time && !(u.ws.freeS1 > m.time)) u.mp += m.costOf(u, 's1') * 0.3;
           u.ws.chain = Math.min(n + 1, 8); u.ws.chainT = m.time;
-          const cnt = Math.min(11, 1 + n * 2), v = H.dirTo(u, ctx.pt), dmg = H.amt(u, 12 + 2.5 * u.level, 0, 0.12), hit = new Map();
+          const cnt = Math.min(11, 1 + n * 2), v = H.dirTo(u, ctx.pt), dmg = H.amt(u, 10 + 2 * u.level, 0, 0.1), hit = new Map();
           for (let i = 0; i < cnt; i++) {
             const a = Math.atan2(v.y, v.x) + (i - (cnt - 1) / 2) * 0.03;
             m.later(i * 0.03, (mm) => H.shoot(mm, u, { x: u.x + Math.cos(a) * 7.5, y: u.y + Math.sin(a) * 7.5 }, { speed: 26, range: 7.5, r: 0.35, kind: 'arrow', hitMinions: true,
@@ -153,7 +154,7 @@
       { name: 'Hộ Pháp Bộc Phá', desc: 'Kiếm Hộ Pháp khi có ≥10 Kiếm: tiêu 5 Kiếm nổ kiếm khí đẩy lùi kẻ địch 3 đv.' },
     ],
     [
-      { name: 'Kiếm Khí Bất Tận', desc: 'Mỗi Kiếm +1.6% sát thương.' },
+      { name: 'Kiếm Khí Bất Tận', desc: 'Mỗi Kiếm +1.3% sát thương (tối đa +78%).' },
       { name: 'Loạn Trảm Xuyên Giáp', desc: 'Loạn Trảm xuyên 35% Hộ Giáp.' },
       { name: 'Hấp Năng Kiếm Trận', desc: 'Mỗi nhịp Kiếm Trận trúng tướng: hồi 8 mana.' },
     ],
