@@ -116,6 +116,7 @@
     if (reason !== 'backstab' && !(t.trade && (reason === 'time' || reason === 'trade'))) m.addFeed({ type: 'truce_end', hero: t.a, other: t.b, reason, by: by || null, trade: !!t.trade });
   }
   function formAlliance(m, a, b, dur, opt) {
+    if (m.sbx) return null;   // GĐ11: phòng thử nghiệm — không liên minh / mua bán
     const t = { a, b, t0: m.time, until: m.time + dur, broken: false, dmg: 0, betray: null, trade: !!(opt && opt.trade) };
     (m.truces || (m.truces = [])).push(t); a.allyRec = t; b.allyRec = t;
     for (const [x, y] of [[a, b], [b, a]]) if (x.ai && x.ai.target === y) { x.ai.target = null; x.ai.mode = 'idle'; x.attackTarget = null; }
@@ -290,7 +291,7 @@
   // gạ đình chiến mua bán (Thương Nhân / Kẻ Bịp Bợm) với một người gặp trên đường
   function tryTrade(ai, enemies) {
     const m = ai.m, u = ai.u, TR = traderOf(u);
-    if (!TR || truceOf(m, u) || m.time - (ai.tradeAskT || -99) < 20 || ai.mode === 'fight' || u.hpPct < 0.35 || m.aliveCount() <= C.ALLY.dissolve) return false;
+    if (!TR || m.sbx || truceOf(m, u) || m.time - (ai.tradeAskT || -99) < 20 || ai.mode === 'fight' || u.hpPct < 0.35 || m.aliveCount() <= C.ALLY.dissolve) return false;
     const e = enemies.find((x) => x.kind === 'hero' && dist(x, u) < 18 && !truceOf(m, x) && x.hpPct > 0.3 && !(x.ai && x.ai.mode === 'fight') && x.attackTarget !== u && !onMe(ai, x) && !(x.ai && x.ai.cheatedBy && x.ai.cheatedBy.has(u.id)));
     if (!e || !e.ai) return false;
     ai.tradeAskT = m.time;
@@ -437,7 +438,7 @@
   // đề nghị liên minh khi gặp nhau (đầu–giữa trận, cả hai còn khỏe, không đang đánh nhau, chưa có liên minh)
   function tryAlly(ai, enemies) {
     const m = ai.m, u = ai.u, A = C.ALLY;
-    if (m.time > A.until || m.time < A.from || truceOf(m, u) || m.aliveCount() <= A.dissolve + 1 || m.time - (ai.truceAskT || -99) < A.askGap || u.hpPct < 0.45 || ai.mode === 'fight') return false;
+    if (m.sbx || m.time > A.until || m.time < A.from || truceOf(m, u) || m.aliveCount() <= A.dissolve + 1 || m.time - (ai.truceAskT || -99) < A.askGap || u.hpPct < 0.45 || ai.mode === 'fight') return false;
     if ((ai.truceN || 0) >= A.perHero || u.house) return false;   // GĐ9b: người của nhà cái không kết liên minh tạm với ai
     const e = enemies.find((x) => x.kind === 'hero' && !x.house && dist(x, u) < 13 && x.hpPct > 0.45 && !onMe(ai, x) && x.attackTarget !== u && !truceOf(m, x) && !(x.ai && x.ai.mode === 'fight'));
     if (!e) return false;

@@ -32,7 +32,7 @@
   }
   H.def({
     id: 'caelus', name: 'Dr. Caelus', color: '#4ad0ff', gfx: 'orb', kit: 'mage', pos: ['mid'], dmgType: 'magic',
-    ranged: true, projSpeed: 20, projKind: 'star', r: 0.56, resource: 'mana',
+    ranged: true, projSpeed: 20, projKind: 'data', r: 0.56, resource: 'mana',
     stats: { range: 5.8, hp: 545, ms: 3.35 },
     gauge: (u) => ({ v: u.ws.prob || 0, max: 100, label: 'Xác Suất', color: '#6ad8ff' }),
     passive: {

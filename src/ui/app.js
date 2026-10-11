@@ -190,7 +190,7 @@
       else if (e.type === 'swing') {
         const h = this.m.heroes.find((x) => x.id === e.id); if (!h) return;
         const g = h.hero.gfx;
-        S.play(g === 'bow' ? 'bow_shoot' : g === 'pistol' ? 'gun_shot' : g === 'shotgun' ? 'shotgun' : g === 'staff' ? 'boom_small' : g === 'voice' ? 'note_2' : g === 'greatsword' ? 'slash_heavy' : 'slash_light', { vol: 0.5 });
+        S.play(g === 'bow' || g === 'crossbow' ? 'bow_shoot' : g === 'pistol' || g === 'revolver' || g === 'rifle' || g === 'dual' ? 'gun_shot' : g === 'shotgun' ? 'shotgun' : g === 'staff' ? 'boom_small' : g === 'voice' ? 'note_2' : g === 'greatsword' || g === 'axes' || g === 'cleaver' || g === 'hookchain' ? 'slash_heavy' : 'slash_light', { vol: 0.5 });   // GĐ11: âm theo vũ khí
       } else if (e.type === 'death') S.play('explosion', { vol: 0.6 });
       else if (e.type === 'boom') S.play(e.big ? 'boom_big' : 'boom_small');
       else if (e.type === 'sfx') S.play(e.name);

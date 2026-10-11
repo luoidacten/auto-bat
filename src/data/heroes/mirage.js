@@ -32,8 +32,8 @@
     return d;
   }
   H.def({
-    id: 'mirage', name: 'Mirage', color: '#c9a0ff', gfx: 'cane', kit: 'mage', pos: ['mid'], dmgType: 'magic',
-    ranged: true, projSpeed: 20, projKind: 'star', r: 0.56, resource: 'none',
+    id: 'mirage', name: 'Mirage', color: '#c9a0ff', gfx: 'wand', kit: 'mage', pos: ['mid'], dmgType: 'magic',
+    ranged: true, projSpeed: 20, projKind: 'mirror', r: 0.56, resource: 'none',
     stats: { range: 5.2, hp: 550, hpG: 86, armor: 24, armorG: 3.6, mr: 30, mrG: 1.4, ms: 3.45 },
     gauge: (u) => ({ v: u.ws.nn || 0, max: 100, label: 'Náo Nhiệt', color: '#e0b0ff' }),
     passive: {

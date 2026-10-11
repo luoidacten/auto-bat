@@ -25,8 +25,8 @@
     } });
   }
   H.def({
-    id: 'lyra', name: 'Lyra', color: '#4ab8e8', gfx: 'staff', kit: 'mage', pos: ['mid', 'sup'], dmgType: 'magic',
-    ranged: true, projSpeed: 15, projKind: 'star', r: 0.6, resource: 'mana',
+    id: 'lyra', name: 'Lyra', color: '#4ab8e8', gfx: 'tidestaff', kit: 'mage', pos: ['mid', 'sup'], dmgType: 'magic',
+    ranged: true, projSpeed: 15, projKind: 'water', r: 0.6, resource: 'mana',
     stats: { range: 5.5, hp: 550, hpG: 84, mp: 420, mpG: 50, ad: 52, adG: 3, armor: 22, armorG: 3.6, mr: 30, mrG: 1.4, as: 0.63, asG: 0.015, ms: 3.35 },
     unreleased: true, release: 2, tagline: 'chuột lũi đại dương — khống chế chuỗi, giữ mạng, thả cột nước từ xa',
     passive: {

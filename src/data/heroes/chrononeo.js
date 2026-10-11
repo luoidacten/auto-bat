@@ -25,7 +25,7 @@
   }
   H.def({
     id: 'chrononeo', name: 'Chrono & Neo', color: '#6ac0ff', gfx: 'dual', kit: 'marksman', pos: ['adc', 'mid'], dmgType: 'phys',
-    ranged: true, projSpeed: 26, projKind: 'bullet', r: 0.6, resource: 'mana',
+    ranged: true, projSpeed: 26, projKind: 'chrono', r: 0.6, resource: 'mana',
     gunSet(m, u, n) { u.ws.ammo[u.ws.stance] = n; if (n > 0 && u.ws.rl > 0) { u.ws.rl = 0; H.reloadDone(m, u); u.atkT = Math.min(u.atkT, 0.15); } },
     gun: (m, u) => ({ n: u.ws.ammo[u.ws.stance], max: magOf(u, u.ws.stance), rl: u.ws.rl, rlMax: u.ws.rlMax || 1.5, alt: { n: u.ws.ammo[isC(u) ? 'neo' : 'chrono'], max: magOf(u, isC(u) ? 'neo' : 'chrono') } }),
     stats: { range: 6.0, ad: 60, adG: 3.7, as: 0.68, asG: 0.03 },

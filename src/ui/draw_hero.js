@@ -182,7 +182,7 @@
         ctx.beginPath(); ctx.arc(36, 14, 5, 0.6, TAU - 0.6); ctx.stroke(); ctx.fillStyle = '#3a3d44'; ctx.fillRect(12, -16, 18, 6);
         break;
       // ---- GĐ10: vũ khí tướng mới ----
-      case 'cane':        // gậy ba toong ảo thuật (Luca, Mirage, Dahlia)
+      case 'cane':        // gậy ba toong ảo thuật (Luca)
         ctx.rotate(rot * 0.8); ctx.translate(ext, 0);
         ctx.strokeStyle = tc('#1a1a22'); ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(4, 14); ctx.lineTo(44, 14); ctx.stroke();
         ctx.strokeStyle = '#e8d070'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(46, 9, 5, Math.PI * 0.5, Math.PI * 1.9, true); ctx.stroke();
@@ -239,6 +239,57 @@
         ctx.fillStyle = tc('#6b6bd6'); ctx.save(); ctx.translate(36 + ext, 0); ctx.rotate(time * 8);
         ctx.beginPath(); for (let i = 0; i < 4; i++) { const q = i * Math.PI / 2; ctx.lineTo(Math.cos(q) * 6, Math.sin(q) * 6); ctx.lineTo(Math.cos(q + 0.785) * 2, Math.sin(q + 0.785) * 2); } ctx.closePath(); ctx.fill(); ctx.restore();
         break;
+      // ===== GĐ11: vũ khí còn thiếu / tách riêng từng tướng =====
+      case 'flag': {      // cờ chiến Quân Lệnh (Victoria): cán dài, lá cờ đỏ phấp phới, mũi giáo
+        ctx.rotate(rot * 0.6);
+        ctx.strokeStyle = '#5a4020'; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(-2, 14); ctx.lineTo(46 + ext, 14); ctx.stroke();
+        ctx.fillStyle = '#d8d8e0'; ctx.beginPath(); ctx.moveTo(46 + ext, 10); ctx.lineTo(56 + ext, 14); ctx.lineTo(46 + ext, 18); ctx.closePath(); ctx.fill();
+        const wv = Math.sin(time * 9) * 3;
+        ctx.fillStyle = tc('#c83a3a'); ctx.beginPath(); ctx.moveTo(40 + ext, 14); ctx.quadraticCurveTo(32 + ext, -2 + wv, 22 + ext, -14 + wv); ctx.lineTo(22 + ext, 4); ctx.quadraticCurveTo(30 + ext, 10 - wv, 40 + ext, 14); ctx.fill();
+        ctx.fillStyle = '#ffd24a'; ctx.beginPath(); ctx.arc(28 + ext, -2 + wv * 0.5, 2.5, 0, TAU); ctx.fill();
+        break;
+      }
+      case 'wand': {      // đũa phép ảo thuật + mũ chóp (Mirage)
+        ctx.rotate(rot * 0.9); ctx.translate(ext, 0);
+        ctx.strokeStyle = '#111'; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(8, 14); ctx.lineTo(36, 14); ctx.stroke();
+        ctx.strokeStyle = '#f8f8ff'; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(33, 14); ctx.lineTo(40, 14); ctx.stroke();
+        ctx.fillStyle = tc('#cfa8ff'); ctx.shadowColor = '#cfa8ff'; ctx.shadowBlur = 8; ctx.beginPath(); ctx.arc(42, 14, 2.5 + Math.sin(time * 6), 0, TAU); ctx.fill(); ctx.shadowBlur = 0;
+        ctx.fillStyle = '#1a1a26'; ctx.fillRect(-6, -24, 12, 10); ctx.fillRect(-10, -15, 20, 3);
+        ctx.fillStyle = '#a07ad0'; ctx.fillRect(-6, -17, 12, 2);
+        break;
+      }
+      case 'blackcane': { // Gậy Đen đầu hoa hồng đen (Dahlia)
+        ctx.rotate(rot * 0.8); ctx.translate(ext, 0);
+        ctx.strokeStyle = '#0a0a0e'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(2, 14); ctx.lineTo(44, 14); ctx.stroke();
+        ctx.strokeStyle = '#6a0a1a'; ctx.lineWidth = 1.5; ctx.beginPath(); for (let i = 0; i < 5; i++) { ctx.moveTo(8 + i * 8, 11); ctx.lineTo(12 + i * 8, 17); } ctx.stroke();
+        ctx.fillStyle = tc('#7a0a2a'); for (let i = 0; i < 5; i++) { const q = i * TAU / 5 + time; ctx.beginPath(); ctx.arc(47 + Math.cos(q) * 3, 14 + Math.sin(q) * 3, 3, 0, TAU); ctx.fill(); }
+        ctx.fillStyle = '#1a0008'; ctx.beginPath(); ctx.arc(47, 14, 2.5, 0, TAU); ctx.fill();
+        break;
+      }
+      case 'lightstaff': { // Trượng Quang (Olivia): cán trắng, vầng hào quang vàng + chữ thập
+        ctx.rotate(rot * 0.5);
+        ctx.strokeStyle = '#f0ece0'; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(0, 14); ctx.lineTo(34 + ext, 14); ctx.stroke();
+        const ch = a && a.charge ? a.charge : 0;
+        ctx.strokeStyle = tc('#ffd24a'); ctx.shadowColor = '#ffe07a'; ctx.shadowBlur = 12; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(37 + ext, 14, 6 + ch * 6, 0, TAU); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(37 + ext, 6); ctx.lineTo(37 + ext, 22); ctx.moveTo(31 + ext, 12); ctx.lineTo(43 + ext, 12); ctx.stroke(); ctx.shadowBlur = 0;
+        break;
+      }
+      case 'tidestaff': { // trượng thủy triều (Lyra): cán bạc, vòng nước xoay quanh ngọc xanh
+        ctx.rotate(rot * 0.5);
+        ctx.strokeStyle = '#a8b8c8'; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(0, 14); ctx.lineTo(34 + ext, 14); ctx.stroke();
+        const ch = a && a.charge ? a.charge : 0;
+        ctx.fillStyle = tc('#4ab0ff'); ctx.shadowColor = tc('#4ab0ff'); ctx.shadowBlur = 12; ctx.beginPath(); ctx.arc(37 + ext, 14, 5 + ch * 7, 0, TAU); ctx.fill(); ctx.shadowBlur = 0;
+        ctx.strokeStyle = 'rgba(180,230,255,0.85)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.ellipse(37 + ext, 14, 10, 4, time * 3, 0, TAU); ctx.stroke();
+        break;
+      }
+      case 'voidknife': { // phi đao hư không (Kip): dao đen viền tím, vệt nứt không gian
+        ctx.rotate(rot); ctx.translate(ext, 0);
+        blade(ctx, 12, 14, 22, 3, '#2a2040'); blade(ctx, 12, -14, 20, 3, '#2a2040');
+        ctx.strokeStyle = tc('#a59aff'); ctx.lineWidth = 1.2; ctx.shadowColor = '#a59aff'; ctx.shadowBlur = 6;
+        ctx.beginPath(); ctx.moveTo(14, 14); ctx.lineTo(34, 14); ctx.moveTo(14, -14); ctx.lineTo(32, -14); ctx.stroke(); ctx.shadowBlur = 0;
+        break;
+      }
       default: break;
     }
   }

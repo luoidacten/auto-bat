@@ -10,7 +10,7 @@
   const hitsNeed = (u) => (H.T(u, '3a') ? 4 : 5);
   H.def({
     id: 'zero', name: 'Zero', color: '#9aa0a8', gfx: 'pistol', kit: 'marksman', pos: ['adc'], dmgType: 'phys',
-    ranged: true, projSpeed: 30, projKind: 'bullet', r: 0.6, resource: 'mana',
+    ranged: true, projSpeed: 30, projKind: 'plasma', r: 0.6, resource: 'mana',
     gun: (m, u) => ({ n: u.ws.ammo, max: mag(u), rl: u.ws.reload, rlMax: u.ws.rlMax || RELOAD }),
     gunSet(m, u, n) { u.ws.ammo = n; if (n > 0 && u.ws.reload > 0) { u.ws.reload = 0; H.reloadDone(m, u); u.atkT = Math.min(u.atkT, 0.15); } },
     stats: { range: 6.2, ad: 71, adG: 4.2, as: 0.68, asG: 0.028 },

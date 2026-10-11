@@ -10,7 +10,7 @@
   function refund(m, u) { if (H.ready(m, u, 'jfb', 1.5)) faith(u, 10); }
   H.def({
     id: 'justus', name: 'Justus', color: '#f0d27a', gfx: 'tome', kit: 'mage', pos: ['sup', 'mid'], dmgType: 'magic',
-    ranged: true, projSpeed: 22, projKind: 'star', r: 0.58, resource: 'none',
+    ranged: true, projSpeed: 22, projKind: 'holy', r: 0.58, resource: 'none',
     stats: { range: 5.0, hp: 570, hpG: 88, armor: 28, armorG: 3.8, mr: 32, mrG: 2.0, ms: 3.35 },
     gauge: (u) => ({ v: u.ws.faith || 0, max: 100, label: 'Đức Tin', color: '#ffe08a' }),
     passive: {

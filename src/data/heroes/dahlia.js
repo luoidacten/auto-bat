@@ -22,8 +22,8 @@
       onExpire: (mm, d) => { cloud(mm, u, d.x, d.y); gain(mm, u, H.T(u, '1a') ? 14 : 8); } });
   }
   H.def({
-    id: 'dahlia', name: 'Dahlia', color: '#c040ff', gfx: 'cane', kit: 'mage', pos: ['mid', 'jungle'], dmgType: 'magic',
-    ranged: true, projSpeed: 20, projKind: 'star', r: 0.56, resource: 'mana',
+    id: 'dahlia', name: 'Dahlia', color: '#c040ff', gfx: 'blackcane', kit: 'mage', pos: ['mid', 'jungle'], dmgType: 'magic',
+    ranged: true, projSpeed: 20, projKind: 'rose', r: 0.56, resource: 'mana',
     stats: { range: 5.0, hp: 555, hpG: 88, mp: 400, mpG: 48, armor: 25, armorG: 3.7, ms: 3.45 },
     gauge: (u, m) => ({ v: u.ws.frenzyUntil > (m ? m.time : 0) ? 100 : u.ws.fz || 0, max: 100, label: 'Cuồng Nhiệt', color: '#c040ff' }),
     passive: {

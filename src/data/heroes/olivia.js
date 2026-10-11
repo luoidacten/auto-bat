@@ -9,8 +9,8 @@
   const allies = (m, u, R) => H.friendsNear(m, u, R, true);
   function cleanseAll(m, a) { m.cleanse(a); m.removeStatus(a, 'wound'); }
   H.def({
-    id: 'olivia', name: 'Olivia', color: '#ffe9a0', gfx: 'staff', kit: 'support', pos: ['sup'], dmgType: 'magic',
-    ranged: true, projSpeed: 18, projKind: 'star', r: 0.56, resource: 'mana',
+    id: 'olivia', name: 'Olivia', color: '#ffe9a0', gfx: 'lightstaff', kit: 'support', pos: ['sup'], dmgType: 'magic',
+    ranged: true, projSpeed: 18, projKind: 'holy', r: 0.56, resource: 'mana',
     stats: { range: 5.5, hp: 575 },
     gauge: (u) => ({ v: u.ws.faith || 0, max: 100, label: 'Đức Tin', color: '#ffe08a' }),
     passive: {

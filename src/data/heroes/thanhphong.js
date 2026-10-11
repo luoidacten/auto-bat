@@ -14,7 +14,7 @@
   const behind = (t, d) => ({ x: t.x - t.fx * (t.r + d), y: t.y - t.fy * (t.r + d) });
   H.def({
     id: 'thanhphong', name: 'Diệp Thanh Phong', color: '#7ad0b0', gfx: 'fan', kit: 'mage', pos: ['mid', 'sup'], dmgType: 'magic',
-    ranged: true, projSpeed: 18, projKind: 'note', r: 0.58, resource: 'none',
+    ranged: true, projSpeed: 18, projKind: 'wind', r: 0.58, resource: 'none',
     stats: { range: 4.8, hp: 560, hpG: 88, armor: 24, ms: 3.45 },
     passive: {
       name: 'Khí Áp Phong Vũ',

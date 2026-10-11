@@ -15,7 +15,7 @@
   }
   function bypassNow(m, u) { let b = 0; if (u.ws.riftHit > m.time) b += H.T(u, '9b') ? 0.65 : 0.3; if (inField(m, u)) b += 0.5; return b; }
   H.def({
-    id: 'kip', name: 'Kip', color: '#7a6aff', gfx: 'dagger', kit: 'fighter', pos: ['jungle'], dmgType: 'phys',
+    id: 'kip', name: 'Kip', color: '#7a6aff', gfx: 'voidknife', kit: 'fighter', pos: ['jungle'], dmgType: 'phys',
     ranged: false, r: 0.55, resource: 'none',
     stats: { hp: 600, hpG: 90, ad: 68, adG: 4.1, armor: 27, armorG: 3.6, as: 0.75, ms: 3.7, range: 1.4 },
     gauge: (u) => ({ v: u.ws.ch || 0, max: maxCh(u), label: 'Điểm Hư Không', color: '#a59aff', pips: true }),

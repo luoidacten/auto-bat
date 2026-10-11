@@ -1399,6 +1399,47 @@
           ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, R * 1.6, 0, TAU); ctx.fill();
           break;
         }
+        // ===== GĐ11: đạn đánh thường riêng từng tướng =====
+        case 'water': {   // Lyra: giọt nước + vệt bọt
+          trail(1.1, Math.max(2, r * 0.9), 'rgba(120,200,255,0.75)');
+          ctx.fillStyle = '#bfe8ff'; ctx.shadowColor = '#4ab0ff'; ctx.shadowBlur = 10;
+          ctx.beginPath(); ctx.ellipse(p.x, p.y, r * 0.9, r * 0.6, ang, 0, TAU); ctx.fill(); break;
+        }
+        case 'holy': {    // Olivia / Justus: cầu sáng vàng + tia chữ thập
+          const R = Math.max(3, r * 0.75); trail(0.8, R, 'rgba(255,230,140,0.6)');
+          ctx.shadowColor = '#ffe07a'; ctx.shadowBlur = 14; ctx.fillStyle = '#fff6d0'; ctx.beginPath(); ctx.arc(p.x, p.y, R * 0.7, 0, TAU); ctx.fill();
+          ctx.strokeStyle = '#ffd24a'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(p.x - R * 1.4, p.y); ctx.lineTo(p.x + R * 1.4, p.y); ctx.moveTo(p.x, p.y - R * 1.4); ctx.lineTo(p.x, p.y + R * 1.4); ctx.stroke(); break;
+        }
+        case 'data': {    // Dr. Caelus: khối dữ liệu xanh xoay + vệt nhị phân
+          trail(1.0, 1.5, 'rgba(90,255,230,0.7)');
+          ctx.translate(p.x, p.y); ctx.rotate(now * 9); ctx.strokeStyle = '#5affe6'; ctx.lineWidth = 1.5; ctx.shadowColor = '#5affe6'; ctx.shadowBlur = 8;
+          const R = Math.max(3, r * 0.7); ctx.strokeRect(-R, -R, R * 2, R * 2); ctx.fillStyle = 'rgba(90,255,230,0.35)'; ctx.fillRect(-R * 0.5, -R * 0.5, R, R); break;
+        }
+        case 'mirror': {  // Mirage: mảnh gương ảo ảnh tím trắng
+          trail(0.9, 2, 'rgba(210,170,255,0.6)');
+          ctx.translate(p.x, p.y); ctx.rotate(ang); ctx.fillStyle = '#f4ecff'; ctx.strokeStyle = '#a07ad0'; ctx.lineWidth = 1.2; ctx.shadowColor = '#cfa8ff'; ctx.shadowBlur = 10;
+          const R = Math.max(3, r * 0.8); ctx.beginPath(); ctx.moveTo(R * 1.4, 0); ctx.lineTo(0, R * 0.6); ctx.lineTo(-R, 0); ctx.lineTo(0, -R * 0.6); ctx.closePath(); ctx.fill(); ctx.stroke(); break;
+        }
+        case 'rose': {    // Dahlia: cánh hoa hồng đen viền đỏ xoay
+          if (V && (now * 60 | 0) % 3 === 0) V.burstParts(now, pj.x, pj.y, 1, { color: '#7a0a2a', speed: 0.8, life: 0.4, size: 0.12, a: ang + Math.PI, spread: 1.4 });
+          ctx.translate(p.x, p.y); ctx.rotate(now * 7); const R = Math.max(3, r * 0.8);
+          for (let i = 0; i < 4; i++) { ctx.rotate(Math.PI / 2); ctx.fillStyle = i % 2 ? '#2a0010' : '#8a1030'; ctx.beginPath(); ctx.ellipse(R * 0.5, 0, R * 0.6, R * 0.32, 0, 0, TAU); ctx.fill(); } break;
+        }
+        case 'chrono': {  // Chrono & Neo: đạn thời gian — cam (quá khứ) / lam (tương lai) xen kẽ, vòng đồng hồ
+          const blue = (pj.id & 1) === 1, c1 = blue ? '#7ac8ff' : '#ffb04a';
+          trail(1.0, Math.max(2, r * 0.6), blue ? 'rgba(120,200,255,0.8)' : 'rgba(255,176,74,0.8)');
+          ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(1.8, r * 0.4), 0, TAU); ctx.fill();
+          ctx.strokeStyle = c1; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(3.5, r * 0.9), now * 6, now * 6 + 4.2); ctx.stroke(); break;
+        }
+        case 'plasma': {  // Zero: tia plasma xanh dài
+          trail(1.6, Math.max(2.5, r * 0.7), 'rgba(90,200,255,0.9)');
+          ctx.shadowColor = '#5ac8ff'; ctx.shadowBlur = 10; ctx.fillStyle = '#e8f8ff'; ctx.beginPath(); ctx.ellipse(p.x, p.y, Math.max(3, r), Math.max(1.5, r * 0.35), ang, 0, TAU); ctx.fill(); break;
+        }
+        case 'wind': {    // Thanh Phong: lưỡi gió lưỡi liềm xanh nhạt
+          ctx.translate(p.x, p.y); ctx.rotate(ang); const R = Math.max(5, r * 1.3);
+          ctx.strokeStyle = 'rgba(200,255,230,0.9)'; ctx.lineWidth = 2.5; ctx.shadowColor = '#9fffd0'; ctx.shadowBlur = 8;
+          ctx.beginPath(); ctx.arc(-R * 0.4, 0, R, -1.0, 1.0); ctx.stroke(); ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(-R * 0.9, 0, R * 0.9, -0.8, 0.8); ctx.stroke(); break;
+        }
         case 'tower': {
           const col = pj.team === 0 ? 'rgba(140,200,255,0.9)' : 'rgba(255,140,140,0.9)';
           trail(1.2, 6, col);
@@ -1669,7 +1710,7 @@
       if (use === 'defend') return 'guard';
       if (use === 'support') return 'raise';
       if (gfx === 'bow') return 'draw';
-      if (GUN[gfx] || gfx === 'staff' || gfx === 'cards' || gfx === 'flask' || gfx === 'voice') return use === 'cc' ? 'raise' : 'thrust';
+      if (GUN[gfx] || gfx === 'staff' || gfx === 'tidestaff' || gfx === 'lightstaff' || gfx === 'wand' || gfx === 'cards' || gfx === 'flask' || gfx === 'voice') return use === 'cc' ? 'raise' : 'thrust';
       if (use === 'cc') return 'slam';
       return alt ? 'swing2' : 'swing';
     }

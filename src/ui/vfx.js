@@ -5,6 +5,45 @@
 // khói/bụi (Free Smoke Fx), đạn dạng ảnh (500 Bullet), hạt (tia lửa, tàn lửa, bụi), rung màn hình, chớp sáng, chữ nổi.
 // Mọi hiệu ứng neo theo tọa độ bản đồ (đv) và thời gian trận (nhanh/chậm theo tốc độ xem, dừng khi tạm dừng).
 (function () {
+  // dấu ấn tung chiêu: c màu hạt • key vầng sáng dưới chân (halo / rune / spark / burst / sun) • n số hạt
+  const CAST_SIG = {
+    luca: { c: '#ff6a9a', key: 'halo', n: 8 }, alice: { c: '#ffd24a', key: 'spark', n: 7 }, mirage: { c: '#cfa8ff', key: 'halo', n: 6 }, dahlia: { c: '#8a1030', key: 'rune', n: 8, sz: 0.16 },
+    lyra: { c: '#7ac8ff', key: 'halo', n: 8 }, olivia: { c: '#ffe07a', key: 'sun', n: 6 }, justus: { c: '#ffd24a', key: 'sun', n: 6 }, ariston: { c: '#ffd24a', key: 'burst', n: 6 },
+    caelus: { c: '#5affe6', key: 'rune', n: 6, sz: 0.1 }, vector: { c: '#ff5a5a', key: 'spark', n: 5, sz: 0.1 }, kip: { c: '#a59aff', key: 'rune', n: 7 }, tsukiyo: { c: '#8a8aff', n: 6, sz: 0.1 },
+    bachdiep: { c: '#e0f4ff', key: 'halo', n: 8, sz: 0.1 }, boran: { c: '#bfeaff', key: 'burst', n: 8 }, ratok: { c: '#c0c0d0', n: 5 }, ignatius: { c: '#ff8a2a', key: 'sun', n: 9 },
+    death: { c: '#9070d0', key: 'rune', n: 7 }, vesper: { c: '#7ad06a', n: 6 }, thanhphong: { c: '#bfffe0', key: 'halo', n: 8, sp: 3.5 }, chrononeo: { c: '#7ac8ff', key: 'rune', n: 6 },
+    aria: { c: '#ffb0e0', key: 'halo', n: 6 }, galo: { c: '#8aff6a', n: 7 }, roxie: { c: '#ffc04a', key: 'spark', n: 6 }, joker: { c: '#ff4a4a', n: 7 }, gideon: { c: '#e8d8a0', key: 'burst', n: 5 },
+  };
+  // ===== GĐ11: đòn đánh thường cận chiến đặc trưng theo vũ khí (mỗi tướng một kiểu) =====
+  const FLIP = (now) => (now * 7 | 0) & 1;
+  const MELEE = {
+    // đại kiếm (Gideon): vệt chém rộng, nặng + bụi ở mũi kiếm (điểm ngọt)
+    greatsword: (V, now, e, a, R, c) => { V.add(now, { k: 'slash', x: e.x, y: e.y, a, r: R * 0.9, arc: 2.3, w: 0.62, c, heavy: true, life: 0.32, flip: FLIP(now) }); V.add(now, { k: 'spr', key: 'spark', x: e.x + Math.cos(a) * R, y: e.y + Math.sin(a) * R, s: 1.1, c: '#fff0c0', life: 0.2 }); },
+    // katana (Ryoma): hai vệt mảnh cực nhanh
+    katana: (V, now, e, a, R, c) => { V.add(now, { k: 'slash', x: e.x, y: e.y, a: a - 0.15, r: R * 0.85, arc: 1.5, w: 0.22, c: '#f0f4ff', life: 0.16, flip: 0 }); V.add(now, { k: 'slash', x: e.x, y: e.y, a: a + 0.15, r: R * 0.8, arc: 1.5, w: 0.2, c, life: 0.2, flip: 1 }); },
+    // song kiếm (Kazuki): hai vệt chéo nhau
+    twinblades: (V, now, e, a, R, c) => { V.add(now, { k: 'slash', x: e.x, y: e.y, a, r: R * 0.78, arc: 1.7, w: 0.3, c, life: 0.22, flip: 0 }); V.add(now, { k: 'slash', x: e.x, y: e.y, a, r: R * 0.72, arc: 1.7, w: 0.3, c: '#e0e8ff', life: 0.22, flip: 1 }); },
+    // lưỡi hái (Death): cung tím rộng, có bóng mờ
+    scythe: (V, now, e, a, R, c) => { V.add(now, { k: 'slash', x: e.x, y: e.y, a, r: R * 0.95, arc: 2.7, w: 0.5, c: '#b090ff', life: 0.34, flip: FLIP(now) }); V.burstParts(now, e.tx, e.ty, 4, { color: '#8060c0', speed: 1.5, life: 0.4, size: 0.12 }); },
+    // dao găm (Vesper): đâm ngắn + giọt độc
+    dagger: (V, now, e, a, R, c) => { V.add(now, { k: 'thrust', x: e.x, y: e.y, a, len: R + 0.2, w: 0.35, c: '#c8a0ff', life: 0.16 }); V.burstParts(now, e.tx, e.ty, 3, { color: '#7ad06a', speed: 1.2, life: 0.35, size: 0.1 }); },
+    // phi đao hư không (Kip): đâm + vết nứt tím
+    voidknife: (V, now, e, a, R, c) => { V.add(now, { k: 'thrust', x: e.x, y: e.y, a, len: R + 0.3, w: 0.32, c: '#a59aff', life: 0.18 }); V.add(now, { k: 'spr', key: 'spark', x: e.tx, y: e.ty, s: 1.0, c: '#7a6aff', life: 0.22 }); },
+    // côn (Wukong): xoáy côn nhỏ
+    pole: (V, now, e, a, R, c) => { V.add(now, { k: 'whirl', x: e.x, y: e.y, a, r: R * 0.7, w: 0.35, c: '#ffd24a', life: 0.24 }); },
+    // song rìu (Boran): hai nhát bổ nặng + vụn băng
+    axes: (V, now, e, a, R, c) => { V.add(now, { k: 'slash', x: e.x, y: e.y, a, r: R * 0.8, arc: 1.4, w: 0.55, c: '#9fe0ff', heavy: true, life: 0.26, flip: FLIP(now) }); V.burstParts(now, e.tx, e.ty, 5, { color: '#d8f4ff', speed: 2, life: 0.35, size: 0.12 }); },
+    // đại bản đao (Ariston): vệt vàng thánh nặng
+    cleaver: (V, now, e, a, R, c) => { V.add(now, { k: 'slash', x: e.x, y: e.y, a, r: R * 0.85, arc: 2.0, w: 0.6, c: '#ffd24a', heavy: true, life: 0.3, flip: FLIP(now) }); },
+    // móc xích (Ratok): móc quăng + tia lửa xám
+    hookchain: (V, now, e, a, R, c) => { V.add(now, { k: 'thrust', x: e.x, y: e.y, a, len: R + 0.3, w: 0.4, c: '#b0b0c0', life: 0.2 }); V.add(now, { k: 'spr', key: 'spark', x: e.tx, y: e.ty, s: 1.1, c: '#e0e0f0', life: 0.2 }); },
+    // kiếm khiên (Valerius): chém ngắn + chớp khiên
+    swordshield: (V, now, e, a, R, c) => { V.add(now, { k: 'slash', x: e.x, y: e.y, a, r: R * 0.7, arc: 1.6, w: 0.4, c, life: 0.24, flip: FLIP(now) }); V.add(now, { k: 'spr', key: 'burst', x: e.x + Math.cos(a) * 0.5, y: e.y + Math.sin(a) * 0.5, s: 0.9, c: '#c8d8ff', life: 0.18 }); },
+    // cờ chiến (Victoria): đâm mũi giáo + vệt cờ đỏ
+    flag: (V, now, e, a, R, c) => { V.add(now, { k: 'thrust', x: e.x, y: e.y, a, len: R + 0.4, w: 0.45, c: '#ff6a6a', life: 0.22 }); },
+    // nhẫn đao (Tsukiyo) khi cận chiến: chém mảnh tím
+    ninja: (V, now, e, a, R, c) => { V.add(now, { k: 'slash', x: e.x, y: e.y, a, r: R * 0.75, arc: 1.6, w: 0.25, c: '#8a8aff', life: 0.18, flip: FLIP(now) }); },
+  };
   const G = globalThis.G || (globalThis.G = {});
   const TAU = Math.PI * 2;
   const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -193,6 +232,7 @@
           if (gfx === 'spear' || gfx === 'rapier') this.add(now, { k: 'thrust', x: e.x, y: e.y, a, len: reach + 0.4, w: 0.55, c, life: 0.22 });
           else if (gfx === 'fist' || gfx === 'claw') this.add(now, { k: 'spr', key: 'spark', x: e.tx, y: e.ty, s: 1.3, c, life: 0.22 });
           else if (gfx === 'guardian') { this.add(now, { k: 'spr', key: 'burst', x: e.tx, y: e.ty, s: 1.8, c: '#9fe0b0', life: 0.3 }); this.add(now, { k: 'slash', x: e.x, y: e.y, a, r: reach * 0.85, arc: 1.4, w: 0.55, c: '#7ae0a0', life: 0.24, flip: (now * 7 | 0) & 1 }); }   // GĐ9: Oktava vồ / dậm
+          else if (MELEE[gfx]) MELEE[gfx](this, now, e, a, reach, c);   // GĐ11: đòn đánh thường đặc trưng từng vũ khí
           else this.add(now, { k: 'slash', x: e.x, y: e.y, a, r: reach * 0.78, arc: 1.9, w: 0.42, c, life: 0.26, flip: (now * 7 | 0) & 1 });
           return;
         }
@@ -299,6 +339,8 @@
           // như bản Legacy: tên chiêu bật lên trên đầu tướng (chiêu cuối: chữ to, màu tướng)
           const sk = u.hero && u.hero.skills && u.hero.skills[e.key];
           if (sk && sk.name && u.kind === 'hero') this.add(now, { k: 'text', id: e.id, text: (e.key === 's4' ? '✦ ' : '') + sk.name + (e.key === 's4' ? '!' : ''), c: e.key === 's4' ? (u.hero.color || '#ffd24a') : '#f4ecd0', life: e.key === 's4' ? 1.4 : 0.9, big: e.key === 's4', dy: e.key === 's4' ? -0.6 : 0 });
+          // GĐ11: dấu ấn tung chiêu riêng từng tướng (màu hạt, kiểu vầng sáng)
+          if (u.kind === 'hero' && u.hero) { const sg = CAST_SIG[u.heroId] || { c: u.hero.color }; this.burstParts(now, e.x, e.y, sg.n || 6, { color: sg.c || u.hero.color, speed: sg.sp || 2.4, life: 0.45, size: sg.sz || 0.13 }); if (sg.key) this.add(now, { k: 'spr', key: sg.key, x: e.x, y: e.y, s: sg.s || 1.6, c: sg.c, life: 0.4, under: true }); }
           if (e.key !== 's4') return;
           this.add(now, { k: 'spr', key: 'rune', x: e.x, y: e.y, s: 3.6, c: (u.hero && u.hero.color) || '#ffffff', life: 0.8, under: true });
           this.flash(0.08, (u.hero && u.hero.color) || '#ffffff');
