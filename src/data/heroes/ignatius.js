@@ -132,7 +132,7 @@
         name: 'Thiên Thạch', desc: 'Gọi thiên thạch giáng xuống điểm trong 20 đv sau 1s cảnh báo: bán kính 8/10/16 đv (trùm cả ổ boss), sát thương phép 125/150/200% SMPT, hất tung 0.75/1/1.5s và găm ngay 6 tầng Hỏa Ấn (kích nổ nội tại). Để lại biển dung nham 6/8/12s.',
         cd: [110, 90, 70], cost: [100, 100, 100], castTime: 0.25, castMove: 1,
         use(m, u, ctx) {
-          const pick = H.bestAoe ? H.bestAoe(m, u, 20, ctx.v([8, 10, 16]), 1.1) : null;
+          const pick = H.bestAoe && !u.ctl ? H.bestAoe(m, u, 20, ctx.v([8, 10, 16]), 1.1) : null;   // GĐ13: người chơi — rơi đúng chỗ ngắm
           const p = pick || H.toward(u, ctx.pt, 20, true), big = H.T(u, '9b'), R = ctx.v([8, 10, 16]) * (big ? 1.2 : 1);
           m.telegraph({ team: u.team, x: p.x, y: p.y, r: R, life: 1, color: '#ff4a1a' });
           m.dangers.push({ x: p.x, y: p.y, r: R, until: m.time + 1.1, team: u.team });
