@@ -1759,6 +1759,7 @@
       for (const d of m.drops || []) if (d.warned && !d.taken) { g.fillStyle = '#ffd24a'; g.strokeStyle = '#000'; g.lineWidth = 1; g.fillRect(d.x * k - 3, d.y * k - 3, 6, 6); g.strokeRect(d.x * k - 3, d.y * k - 3, 6, 6); }
       for (const h of m.heroes) {
         if (!h.alive || (h.duel && h.x > 800)) continue;
+        if (this.pov != null && h.team !== this.pov && h.vis && h.vis[this.pov] === false) continue;   // PvE: chỉ thấy tướng trong tầm nhìn
         g.fillStyle = h.hero.color; g.strokeStyle = TEAM[h.team]; g.lineWidth = 2;
         g.beginPath(); g.arc(h.x * k, h.y * k, Math.max(3.2, S / 44), 0, TAU); g.fill(); g.stroke();
       }

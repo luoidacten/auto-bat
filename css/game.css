@@ -714,3 +714,12 @@ body.pve-on .pve-cancel.on ~ .pve-info { display: none; }
 .ps-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #2a2840; font-size: 13px; } .ps-row > div { flex: 1; } .ps-row small { opacity: .75; }
 .ps-row button { white-space: nowrap; font-size: 12px; padding: 5px 8px; } .ps-row button:disabled { opacity: .4; } .ps-row.own b { color: #7aff9a; }
 .ps-hint { font-size: 12px; opacity: .8; }
+
+/* GĐ13: PvE — đang sống: khóa tốc độ (chỉ còn ⏸), ẩn tua nhanh / AI debug / camera điểm nóng */
+body.pve-on:not(.pve-dead) #ctrl .spd, body.pve-on:not(.pve-dead) #ctrl .spc, body.pve-on:not(.pve-dead) #bFast, body.pve-on:not(.pve-dead) #bDbg, body.pve-on:not(.pve-dead) #bCam, body.pve-on:not(.pve-dead) #bSlow { display: none; }
+.pve-chest { position: absolute; left: 50%; bottom: 120px; transform: translateX(-50%); pointer-events: auto; padding: 8px 16px; border-radius: 20px; font-size: 15px; font-weight: 700; background: linear-gradient(#b8862a, #7a5410); color: #fff6dc; border: 2px solid #ffd24a; box-shadow: 0 0 12px rgba(255,210,74,.6); animation: pvblink 1.2s infinite; }
+.pve-chest:disabled { animation: none; opacity: .85; }
+.ps-pts { margin: 4px 10px 0; padding: 4px 8px; border-radius: 8px; background: rgba(60,120,40,.9); font-size: 12px; animation: pvblink 1s infinite; }
+.ps-search { display: flex; gap: 6px; margin: 6px 10px 0; }
+.ps-search input { flex: 1; padding: 6px 10px; border-radius: 8px; border: 1px solid #6a5aa8; background: #0e0c18; color: #fff; font-size: 14px; }
+.ps-search button { padding: 4px 10px; }

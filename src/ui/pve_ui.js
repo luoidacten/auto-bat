@@ -22,6 +22,7 @@
   const G = globalThis.G || (globalThis.G = {});
   const esc = (s) => G.esc(s);
   const $ = (s) => document.querySelector(s);
+  const norm = (t) => String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
   const KEYS = { q: 's1', e: 's2', r: 's3', f: 's4', ' ': 'sub' };
   const TAU = Math.PI * 2;
   const MAXDRAG = 85;
@@ -68,7 +69,7 @@
       this.mount();
     },
     mount() {
-      this.unmount();
+      this.unmount(true);
       const el = document.createElement('div'); el.id = 'pvePad'; el.className = 'pve-pad';
       el.innerHTML = `
         <div class="pve-left" id="pvLeft"><div class="pve-stick" id="pvStick"><i id="pvKnob"></i></div></div>
@@ -82,6 +83,7 @@
           <button class="pve-sm" data-a="mp" title="Bình mana / giáp (G)">💧<em></em></button>
           <button class="pve-sm" data-a="shop" id="pvShopBtn" title="Cửa hàng (P)">🛒</button>
         </div>
+        <button class="pve-chest hidden" id="pvChest" title="Mở rương (V)">🎁 Mở rương</button>
         <div class="pve-wheel hidden" id="pvWheel"></div>
         <button class="pve-cam on" id="pvCam" title="Khóa / thả camera (Y)">🔒 Camera</button>
         <div class="pve-pts hidden" id="pvPts"></div>
@@ -99,17 +101,24 @@
       this.bindStick(); this.bindSkills(); this.bindAtk(); this.bindBag();
       for (const b of el.querySelectorAll('.pve-sm')) if (b.dataset.a !== 'bag') b.onclick = (e) => { e.stopPropagation(); const a = b.dataset.a; if (a === 'lock') this.cycle(); else if (a === 'shop') this.toggleShop(); else this.drink(a); };
       $('#pvCam').onclick = (e) => { e.stopPropagation(); this.toggleCam(); };
+      $('#pvChest').onclick = (e) => { e.stopPropagation(); this.openChest(); };
+      // nút không giữ focus — tránh phím cách / Enter "bấm lại" nút vừa chạm (vd. nút tốc độ)
+      this.blur = (e) => { if (e.target.closest && e.target.closest('button')) setTimeout(() => { const a = document.activeElement; if (a && a.tagName === 'BUTTON') a.blur(); }, 0); };
+      document.addEventListener('click', this.blur, true);
+      if (document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
       $('#pvShop').addEventListener('click', (e) => this.shopClick(e));
       this.raf = requestAnimationFrame(() => this.tick());
     },
-    unmount() {
-      document.body.classList.remove('pve-on');
+    // keep = dọn giao diện cũ để dựng lại (giữ cờ pveMode + góc nhìn người chơi r.pov — trước đây bị xóa nhầm khiến phím cách = tạm dừng, minimap thấy hết tướng)
+    unmount(keep) {
+      document.body.classList.remove('pve-on', 'pve-dead');
+      if (this.blur) document.removeEventListener('click', this.blur, true); this.blur = null;
       if (this.el) this.el.remove(); this.el = null;
       if (this.kd) { window.removeEventListener('keydown', this.kd); window.removeEventListener('keyup', this.ku); }
       if (this.mm && this.app) { const cv = this.app.cv; cv.removeEventListener('pointermove', this.mm); cv.removeEventListener('pointerdown', this.md); cv.removeEventListener('contextmenu', this.cm); }
       this.kd = this.ku = this.mm = this.md = null;
       if (this.raf) cancelAnimationFrame(this.raf); this.raf = 0;
-      if (this.app) { this.app.pveMode = false; if (this.app.r) { this.app.r.pov = null; this.app.r.cam.push = null; } }
+      if (this.app && !keep) { this.app.pveMode = false; if (this.app.r) { this.app.r.pov = null; this.app.r.cam.push = null; } }
     },
     unit() { const m = this.app.m; return m && m.pve ? m.pveUnit() : null; },
     w2s(x, y) { return this.app.r.w2s(x, y); },
@@ -256,6 +265,7 @@
     },
     onKey(e, down) {
       if (!this.app.m || !this.app.m.pve) return;
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;   // đang gõ ô tìm kiếm
       const k = e.key.toLowerCase();
       if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k)) { this.keys[k] = down; e.preventDefault(); return; }
       if (KEYS[k] && (e.ctrlKey || e.altKey) && down && KEYS[k] !== 'sub') { e.preventDefault(); this.learn(KEYS[k]); return; }   // Ctrl/Alt + Q/E/R/F = nâng chiêu
@@ -269,6 +279,7 @@
       if (!down) return;
       if (k === 'y') this.toggleCam();
       else if (k === 'p') this.toggleShop();
+      else if (k === 'v') this.openChest();
       else if (k === 't') this.cycle();
       else if (k === 'h') this.drink('hp');
       else if (k === 'g') this.drink('mp');
@@ -282,6 +293,7 @@
       else { r.cam.follow = true; r.cam.focusId = u.id; r.cam.x = u.x; r.cam.y = u.y; }   // khóa: bám theo tướng của bạn
       if (this.app.hud.refreshCtrl) this.app.hud.refreshCtrl();
     },
+    openChest() { const m = this.app.m, u = this.unit(); if (m && u && m.pveChest(u, 2.5)) m.pve.queue.push({ chest: 1 }); },
     // ---------- điểm chiêu thủ công ----------
     learn(k) { const m = this.app.m, u = this.unit(); if (!m || !u || !m.canLearn(u, k)) return; m.pve.queue.push({ learn: k }); },
     // ---------- cửa hàng thủ công ----------
@@ -290,7 +302,8 @@
       e.stopPropagation();
       const b = e.target.closest('button'); if (!b) return;
       const m = this.app.m, u = this.unit(); if (!m || !u) return;
-      if (b.dataset.tab) { this.shopTab = b.dataset.tab; this.renderShop(); return; }
+      if (b.dataset.tab) { this.shopTab = b.dataset.tab; this.shopQ = ''; const q = $('#psQ'); if (q) q.value = ''; this.renderShop(); return; }
+      if (b.dataset.clear) { this.shopQ = ''; const q = $('#psQ'); if (q) { q.value = ''; q.focus(); } this.renderShop(); return; }
       if (b.dataset.close) { this.toggleShop(); return; }
       const o = b.dataset.buy ? { buy: b.dataset.buy } : b.dataset.sell != null ? { sell: +b.dataset.sell } : b.dataset.bag ? { bagBuy: b.dataset.bag } : b.dataset.bagup ? { bagUp: 1 } : b.dataset.forge ? { forge: 1 } : null;
       if (o) { m.pve.queue.push({ shop: o }); setTimeout(() => this.renderShop(), 120); }
@@ -320,10 +333,31 @@
         const C = G.CONSUMABLES;
         body += Object.keys(C).filter((id) => !C[id].noBuy).sort((a, b) => (C[a].group || '').localeCompare(C[b].group || '') || C[a].cost - C[b].cost).map((id) => { const d = C[id], ok = can && gold >= d.cost && m.bagRoom(u, id) > 0; return `<div class="ps-row"><div>${d.icon || '🎁'} <b>${esc(d.name)}</b> <small>(có ${d.pot ? m.potCount(u, d.pot) : m.bagCount(u, id)})</small><br><small>${esc(d.desc || '')}</small></div><button data-bag="${id}"${ok ? '' : ' disabled'}>💰 ${d.cost}</button></div>`; }).join('');
       }
-      el.innerHTML = `<div class="ps-head"><b>🛒 Cửa hàng</b><span>💰 ${gold}</span><button data-close="1">✕</button></div>
-        <div class="ps-st ${can ? 'ok' : 'no'}">${can ? '✅ Đang đứng cạnh Thương Nhân — mua bán được' : '⛔ Phải đứng cạnh Thương Nhân (trong 3.5 đv) mới mua được. ' + near}</div>
-        <div class="ps-tabs">${[['goi_y', '⭐ Gợi ý'], ['all', '📦 Tất cả'], ['mine', '🎒 Đồ của tôi'], ['bag', '🧪 Balo & bình']].map(([k, t]) => `<button data-tab="${k}" class="${tab === k ? 'on' : ''}">${t}</button>`).join('')}</div>
-        <div class="ps-body">${body}</div>`;
+      // khung cố định dựng 1 lần (ô tìm kiếm giữ focus khi bảng tự làm mới); phần động cập nhật riêng
+      if (!el.querySelector('.ps-search')) {
+        el.innerHTML = `<div class="ps-head"><b>🛒 Cửa hàng</b><span class="ps-gold"></span><button data-close="1">✕</button></div>
+          <div class="ps-st"></div><div class="ps-pts hidden"></div>
+          <div class="ps-search"><input type="search" id="psQ" placeholder="🔍 Tìm trang bị / vật phẩm (tên, chỉ số: chí mạng, hút máu, giáp…)" autocomplete="off"><button data-clear="1">✕</button></div>
+          <div class="ps-tabs"></div><div class="ps-body"></div>`;
+        const q = el.querySelector('#psQ');
+        q.addEventListener('input', () => { this.shopQ = q.value; this.renderShop(); });
+        q.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Escape') { if (q.value) { q.value = ''; this.shopQ = ''; this.renderShop(); } else { q.blur(); this.toggleShop(); } } });
+        q.addEventListener('keyup', (e) => e.stopPropagation());
+      }
+      const Q = norm(this.shopQ || '');
+      if (Q) {
+        const hit = (t) => norm(t).includes(Q);
+        const its = Object.keys(I).filter((id) => !I[id].hidden && m.allowed(u, id) && (hit(I[id].name) || hit(I[id].statText || '') || hit(I[id].desc || '') || hit(I[id].uniq || ''))).sort((a, b) => I[a].cost - I[b].cost);
+        const C = G.CONSUMABLES, cs = Object.keys(C).filter((id) => !C[id].noBuy && (hit(C[id].name) || hit(C[id].desc || '')));
+        body = (its.length ? `<h4>📦 Trang bị (${its.length})</h4>` + its.map(itemRow).join('') : '') +
+          (cs.length ? `<h4>🧪 Vật phẩm balo (${cs.length})</h4>` + cs.map((id) => { const d = C[id], ok = can && gold >= d.cost && m.bagRoom(u, id) > 0; return `<div class="ps-row"><div>${d.icon || '🎁'} <b>${esc(d.name)}</b><br><small>${esc(d.desc || '')}</small></div><button data-bag="${id}"${ok ? '' : ' disabled'}>💰 ${d.cost}</button></div>`; }).join('') : '') ||
+          `<p class="ps-hint">Không tìm thấy “${esc(this.shopQ)}”.</p>`;
+      }
+      el.querySelector('.ps-gold').textContent = `💰 ${gold}`;
+      const st = el.querySelector('.ps-st'); st.className = 'ps-st ' + (can ? 'ok' : 'no'); st.textContent = can ? '✅ Đang đứng cạnh Thương Nhân — mua bán được' : '⛔ Phải đứng cạnh Thương Nhân (trong 3.5 đv) mới mua được. ' + near;
+      const pp = el.querySelector('.ps-pts'); pp.classList.toggle('hidden', !(u.points > 0)); if (u.points > 0) pp.textContent = `⬆ Còn ${u.points} điểm chiêu — chạm + trên nút chiêu (Ctrl+Q/E/R/F)`;
+      el.querySelector('.ps-tabs').innerHTML = [['goi_y', '⭐ Gợi ý'], ['all', '📦 Tất cả'], ['mine', '🎒 Đồ của tôi'], ['bag', '🧪 Balo & bình']].map(([k, t]) => `<button data-tab="${k}" class="${tab === k && !Q ? 'on' : ''}">${t}</button>`).join('');
+      el.querySelector('.ps-body').innerHTML = body;
     },
     // ---------- mỗi khung hình ----------
     tick() {
@@ -335,7 +369,7 @@
       if (this.bagMove) this.bagMove();
       if (!u) return;
       if (m.pve.out || (u.out && !u.alive)) {
-        if (!this.outShown) { this.outShown = true; this.app.hud.banner(`💀 Bạn bị loại — hạng ${u.place || '?'} • chuyển sang góc nhìn trọng tài`, 'red'); r.cam.focusId = null; r.pov = null; r.cam.push = null; this.app.setSpeed(this.app.pref.speed || 2); this.el.classList.add('pve-dead'); }
+        if (!this.outShown) { this.outShown = true; this.app.hud.banner(`💀 Bạn bị loại — hạng ${u.place || '?'} • chuyển sang góc nhìn trọng tài`, 'red'); r.cam.focusId = null; r.pov = null; r.cam.push = null; this.app.setSpeed(this.app.pref.speed || 2); this.el.classList.add('pve-dead'); document.body.classList.add('pve-dead'); this.app.hud.refreshCtrl(); }
         return;
       }
       // camera: chiêu tầm xa đang ngắm → trôi theo hướng ngắm; PC: con trỏ sát mép → trôi tối đa 8 đv
@@ -347,7 +381,9 @@
       } else if (!A) r.cam.push = null;
       const cb = $('#pvCam'), lk = this.camLocked(); cb.classList.toggle('on', lk); cb.textContent = lk ? '🔒 Camera' : '🔓 Camera';
       // điểm chiêu chưa cộng: nút + nhấp nháy trên chiêu nâng được
-      const pts = $('#pvPts'); pts.classList.toggle('hidden', !(u.points > 0)); if (u.points > 0) pts.textContent = `⬆ ${u.points} điểm chiêu — chạm + trên chiêu (Ctrl+Q/E/R/F)`;
+      const chN = m.pveChest(u, 2.5), cb2 = $('#pvChest'), opening = u.cast && u.cast.key === 'chest';
+      cb2.classList.toggle('hidden', !chN && !opening); cb2.textContent = opening ? `🎁 Đang mở… ${Math.max(0, u.cast.t).toFixed(1)}s` : '🎁 Mở rương (V)'; cb2.disabled = opening;
+      const pts = $('#pvPts'); pts.classList.toggle('hidden', !(u.points > 0) || !!this.shopOpen);   // bảng cửa hàng mở → báo điểm ngay trong bảng if (u.points > 0) pts.textContent = `⬆ ${u.points} điểm chiêu — chạm + trên chiêu (Ctrl+Q/E/R/F)`;
       for (const b of this.el.querySelectorAll('.pve-up')) b.classList.toggle('hidden', !m.canLearn(u, b.dataset.up));
       for (const b of this.el.querySelectorAll('.pve-rk')) { const k = b.parentNode.dataset.k; b.textContent = k ? '•'.repeat(u.ranks[k] || 0) : ''; }
       const sb = $('#pvShopBtn'); sb.classList.toggle('hot', m.pveCanShop(u));

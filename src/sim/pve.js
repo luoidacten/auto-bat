@@ -65,8 +65,9 @@
         const c = P.queue.shift();
         if (c.learn) { if (this.canLearn(u, c.learn)) { u.ranks[c.learn]++; u.points--; if (this.fxOn) this.fx({ type: 'lvl', x: u.x, y: u.y, team: u.team }); } continue; }
         if (c.shop) { this.pveShop(u, c.shop); continue; }
+        if (c.chest) { const ch = this.pveChest(u, 2.5); if (ch) { u.attackTarget = null; P.atkId = null; P.chestId = ch.id; } continue; }
         if (c.bag) { const pt = c.pt || (t ? { x: t.x, y: t.y } : { x: u.x + u.fx * 3, y: u.y + u.fy * 3 }); this.useBag(u, c.bag, t, pt); continue; }
-        if (c.atk !== undefined) { const tg = c.atk != null ? this.units.find((x) => x.id === c.atk) : null; this.executeBasicAttack(u, tg, c.dir); continue; }
+        if (c.atk !== undefined) { P.chestId = null; const tg = c.atk != null ? this.units.find((x) => x.id === c.atk) : null; this.executeBasicAttack(u, tg, c.dir); continue; }
         const def = u.hero.skills[c.k]; if (!def) continue;
         const a = def.ai || {};
         const ent = c.tgt != null ? this.units.find((x) => x.id === c.tgt) : t;
@@ -78,13 +79,21 @@
         }
         if (u.recast[c.k] || this.canCast(u, c.k)) { this.executeSkill(u, c.k, pt, ent && ent.alive ? ent : null); u.stats.pveCasts = (u.stats.pveCasts || 0) + 1; }
       }
-      if (u.cast || u.dash || u.disabled) return;
       const L = Math.hypot(P.mv.x, P.mv.y);
+      if (u.cast && u.cast.key === 'chest' && L > 0.15) u.cast = null;   // di chuyển = bỏ mở rương
+      if (u.cast || u.dash || u.disabled) return;
       if (L > 0.15) {
         const g = { x: u.x + P.mv.x / L * 2.5, y: u.y + P.mv.y / L * 2.5 }; MAP.pushOut(g, u.r);
-        u.attackTarget = null; u.goal = g; u.navP = null; P.atkId = null;   // di chuyển = hủy lệnh đánh
+        u.attackTarget = null; u.goal = g; u.navP = null; P.atkId = null; P.chestId = null;   // di chuyển = hủy lệnh đánh / mở rương
         u.face(g.x, g.y);
         return;
+      }
+      // đi tới rương đã chọn (≤ 2.5 đv ngoài tầm với) rồi tự mở
+      if (P.chestId != null) {
+        const ch = (this.chests || []).find((c) => c.id === P.chestId && !c.opened);
+        if (!ch) P.chestId = null;
+        else if (dist(u, ch) <= G.C.CHEST.r + u.r - 0.1) { P.chestId = null; u.goal = null; this.openChest(u, ch); return; }
+        else { u.goal = { x: ch.x, y: ch.y }; u.attackTarget = null; return; }
       }
       if (P.stepUntil > this.time) return;                       // đang bước ngắn tới kẻ địch (đánh thường hụt tầm)
       u.goal = null;
@@ -110,6 +119,8 @@
       if (o.forge) return this.forgeYNiem ? this.forgeYNiem(u, 0) : false;
       return false;
     },
+    // rương chưa mở gần nhất trong tầm với (mở bằng nút 🎁 / phím V — đứng yên 1.5s, bị đánh hoặc di chuyển thì hỏng)
+    pveChest(u, ext) { let best = null, bd = G.C.CHEST.r + u.r + (ext || 0); for (const c of this.chests || []) if (!c.opened) { const d = dist(u, c); if (d < bd) { bd = d; best = c; } } return best; },
     lastLifeGone(u) { return !!(u.place || u.out); },
   };
   G.PveMix = PveMix;

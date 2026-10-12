@@ -141,7 +141,12 @@
       this.startMatch(m.cfg, m);
       this.bk = bk;
     },
-    setSpeed(s) { this.speed = s; if (s) this.savePref(); this.hud.refreshCtrl(); },
+    setSpeed(s) {
+      // GĐ13: PvE — đang sống chỉ có tạm dừng / x1 (không tua, không lưu tốc độ); bị loại mới chỉnh tốc độ như xem trận
+      const lockSp = this.pveMode && this.m && this.m.pve && !this.m.pve.out;
+      if (lockSp && s) s = 1;
+      this.speed = s; if (s && !lockSp) this.savePref(); this.hud.refreshCtrl();
+    },
     quitMatch(sure) {
       if (this.bk && this.m && !this.m.over) {   // GĐ9b: trận có cược — không thoát ngang, chỉ tua nhanh tới hết (mọi câu hỏi bị bỏ qua)
         const sp = this.speed; this.setSpeed(0);
