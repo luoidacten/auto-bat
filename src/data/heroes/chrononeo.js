@@ -36,7 +36,7 @@
       init(m, u) { u.ws.stance = 'neo'; u.ws.ammo = { chrono: magOf(u, 'chrono'), neo: magOf(u, 'neo') }; u.ws.rl = 0; u.ws.hist = []; applyStance(m, u); },
       update(m, u, dt) {
         const s = u.ws.stance;
-        if (u.ws.rl > 0) { u.ws.rl -= dt; if (u.ws.rl <= 0) { u.ws.ammo[s] = magOf(u, s); H.reloadDone(m, u); } }
+        if (u.ws.rl > 0 && !H.rlHold(m, u, 'rl')) { u.ws.rl -= dt; if (u.ws.rl <= 0) { u.ws.ammo[s] = magOf(u, s); H.reloadDone(m, u); } }
         if (u.ws.ammo[s] <= 0) { if (u.ws.rl <= 0) { u.ws.rl = u.ws.rlMax = rlOf(u, s); H.reloadStart(m, u); } u.atkT = Math.max(u.atkT, u.ws.rl); }
         if (m.tick % 10 === 0) { u.ws.hist.push({ x: u.x, y: u.y, hp: u.hp, t: m.time }); if (u.ws.hist.length > 8) u.ws.hist.shift(); }
         // Thời Khắc của Chrono: Liên Xạ
@@ -85,7 +85,7 @@
           if (isC(u)) {
             const marks = m.units.filter((e) => e.alive && e.team !== u.team && (e.kind === 'hero' || e.kind === 'monster') && e.targetable && M.dist(e, u) <= 12)
               .sort((a, b) => (b.kind === 'hero') - (a.kind === 'hero') || M.dist2(a, u) - M.dist2(b, u) || a.id - b.id).slice(0, 6);
-            for (const e of marks) m.addStatus(e, 'mark', 2.5, 1, { key: 'cn_lock', src: u });
+            for (const e of marks) { m.addStatus(e, 'mark', 2.5, 1, { key: 'cn_lock', src: u }); if (m.fxOn) m.fx({ type: 'lock', id: e.id, life: 2.5, color: '#ffb04a' }); }   // GĐ12: thấy rõ dấu nhắm
             u.ws.barrage = m.time + 2.5; u.ws.rl = 0;
             m.addStatus(u, 'unstop', 2.5, 1, { key: 'cn_bar' }); m.addStatus(u, 'slow', 2.5, 0.3, { key: 'cn_bar' });
             m.later(2, (mm) => {
@@ -151,18 +151,28 @@
         } },
       },
       s4: {
-        name: 'Liên Hoa Thời Không', desc: 'Hợp nhất 5/6/8s: mỗi 0.5s xả 8/10/14 viên hoa sen tỏa 360° bay tới khi tự tan, xen kẽ đạn Chrono (nặng, xuyên thấu) và đạn Neo (nhanh); vẫn dùng được Bước Thời Gian. • Dạng Chrono: đạn to, mạnh hơn, đẩy lùi nhẹ; kết thúc Nở Rộ 30 viên đạn nặng, hất văng kẻ áp sát 3 đv. • Dạng Neo: gọi Ảnh Chiếu bất tử cùng xả đạn (dùng lại để đổi chỗ), +10/14/18% tốc chạy; kết thúc tỏa 10/15/20 viên và lướt ngắn 3 đv.',
+        name: 'Liên Hoa Thời Không', desc: 'Hợp nhất 5/6/8s: mỗi 0.5s xả 8/10/14 viên — giai đoạn đầu đạn bay HỖN LOẠN (góc, tốc độ, đường cong ngẫu nhiên), sau đó nở thành vòng hoa sen xoay đều uốn cong, xen kẽ đạn Chrono (nặng, xuyên thấu) và đạn Neo (nhanh); vẫn dùng được Bước Thời Gian. • Dạng Chrono: đạn to, mạnh hơn, đẩy lùi nhẹ; kết thúc Nở Rộ 30 viên đạn nặng, hất văng kẻ áp sát 3 đv. • Dạng Neo: gọi Ảnh Chiếu bất tử cùng xả đạn (dùng lại để đổi chỗ), +10/14/18% tốc chạy; kết thúc tỏa 10/15/20 viên và lướt ngắn 3 đv.',
         cd: [110, 90, 70], cost: [100, 100, 100],
         use(m, u, ctx) {
           const c = isC(u), life = ctx.v([5, 6, 8]), n = ctx.v([8, 10, 14]), dmg = H.amt(u, ctx.v([30, 45, 60]), 0.3) * (c ? 1.3 : 1);
-          let k = 0;
+          let k = 0; const t0 = m.time;
+          // GĐ12 (theo Legacy): GIAI ĐOẠN ĐẦU (45% thời lượng) đạn bay HỖN LOẠN — góc ngẫu nhiên, tốc độ lộn xộn, đường đạn uốn
+          // lượn đổi chiều liên tục như dòng thời gian vỡ vụn; sau đó mới "nở" thành các vòng hoa sen xoay đều.
+          const curl = (heavy, bend, wob) => (m3, p) => { const w = bend + Math.sin((p.trav + wob) * 0.9) * 2.2, dt = G.C.TICK, cs = Math.cos(w * dt), sn = Math.sin(w * dt), x = p.dx * cs - p.dy * sn; p.dy = p.dx * sn + p.dy * cs; p.dx = x; };
           const burst = (mm, src, scale) => {
             k++;
-            for (let i = 0; i < n; i++) { const heavy = (i + k) % 2 === 0, a = i * 6.2831853 / n + k * 0.39;
-              mm.proj({ owner: u, x: src.x, y: src.y, dx: M.cos(a), dy: M.sin(a), speed: heavy ? 18 : 28, range: 20, r: heavy ? (c ? 0.7 : 0.5) : 0.35, kind: heavy ? 'chrono_b' : 'neo_b', pierce: heavy,
-                onHit: (m3, p, e) => { m3.damage(u, e, dmg * scale * (heavy ? 1.3 : 0.8), 'phys', { tag: 's4', aoe: true }); if (c) m3.knock(u, e, p.dx || 0, p.dy || 0, 0.5, 0.1); } }); }
+            const chaos = mm.time - t0 < life * 0.45;
+            for (let i = 0; i < n; i++) {
+              const heavy = (i + k) % 2 === 0;
+              const a = chaos ? mm.rng.next() * 6.2831853 : i * 6.2831853 / n + k * 0.39;
+              const sp = chaos ? (heavy ? 10 + mm.rng.next() * 14 : 18 + mm.rng.next() * 20) : heavy ? 18 : 28;
+              const bend = chaos ? (mm.rng.next() * 2 - 1) * 3.2 : (k % 2 ? 1.3 : -1.3) * (heavy ? 1 : -1);
+              mm.proj({ owner: u, x: src.x, y: src.y, dx: M.cos(a), dy: M.sin(a), speed: sp, range: chaos ? 14 + mm.rng.next() * 8 : 20, r: heavy ? (c ? 0.7 : 0.5) : 0.35, kind: heavy ? 'chrono_b' : 'neo_b', pierce: heavy,
+                onTick: chaos ? curl(heavy, bend, mm.rng.next() * 9) : curl(heavy, bend * 0.5, 0),
+                onHit: (m3, p, e) => { m3.damage(u, e, dmg * scale * (heavy ? 1.3 : 0.8), 'phys', { tag: 's4', aoe: true }); if (c) m3.knock(u, e, p.dx || 0, p.dy || 0, 0.5, 0.1); } });
+            }
           };
-          m.zone({ owner: u, x: u.x, y: u.y, r: 6, life, every: 0.5, follow: u, kind: 'lotus', tick: (mm) => burst(mm, u, 1),
+          H.spin(m, u, life); m.zone({ owner: u, x: u.x, y: u.y, r: 6, life, every: 0.5, follow: u, kind: 'lotus', tick: (mm) => burst(mm, u, 1),
             onEnd: (mm) => {
               if (!u.alive) return;
               if (c) {

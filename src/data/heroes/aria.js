@@ -130,14 +130,14 @@
 
       onSkill(m, u, key) {
         if (key !== 's1' && key !== 's2' && key !== 's3') return;
-        const cdN = NOTE_CD * (1 - (u.st.cdr || 0));
-        for (const k of ['s1', 's2', 's3']) if (k !== key) u.cd[k] = Math.max(u.cd[k] || 0, cdN);   // 3 nốt dùng chung hồi chiêu
+        // GĐ12: mỗi nốt hồi chiêu ĐỘC LẬP (bỏ hồi chiêu dùng chung) — chỉ chặn bấm liền 0.25s để nốt kịp vang
+        for (const k of ['s1', 's2', 's3']) if (k !== key) u.cd[k] = Math.max(u.cd[k] || 0, 0.25);
         const h = note(m, u, key); if (h) m.later(0.3, (mm) => u.alive && harmony(mm, u, h));
       },
     },
     skills: {
       s1: {
-        name: 'Nốt Đỏ — Tấn Công', desc: 'Oktava NHẢY DẬM vào kẻ địch gần nhất (trong 9 đv; không có thì vào điểm chỉ định) — sát thương bán kính 2.2 và hất lùi; Aria phát sóng âm quanh mình (bán kính 2.5). 3 nốt dùng chung hồi chiêu.',
+        name: 'Nốt Đỏ — Tấn Công', desc: 'Oktava NHẢY DẬM vào kẻ địch gần nhất (trong 9 đv; không có thì vào điểm chỉ định) — sát thương bán kính 2.2 và hất lùi; Aria phát sóng âm quanh mình (bán kính 2.5). 3 nốt hồi chiêu độc lập.',
         cd: [4, 3.75, 3.5, 3.25, 3], cost: [35, 38, 41, 44, 47], castTime: 0.15,
         use(m, u, ctx) {
           const okt = u.ws.okt, dmg = H.amt(u, ctx.v([50, 70, 90, 110, 130]), 0, 0.45);
@@ -152,7 +152,7 @@
         ai: { use: 'poke', range: 6.5, aim: 'point', speed: 0, farm: 3 },
       },
       s2: {
-        name: 'Nốt Xanh — Linh Hoạt', desc: 'Aria, Oktava và đồng minh trong 6 đv tăng 25% tốc chạy 2s. Aria không thể bị chọn làm mục tiêu 0.5s, xóa mọi hiệu ứng xấu và miễn đẩy lùi chớp nhoáng. 3 nốt dùng chung hồi chiêu.',
+        name: 'Nốt Xanh — Linh Hoạt', desc: 'Aria, Oktava và đồng minh trong 6 đv tăng 25% tốc chạy 2s. Aria không thể bị chọn làm mục tiêu 0.5s, xóa mọi hiệu ứng xấu và miễn đẩy lùi chớp nhoáng. 3 nốt hồi chiêu độc lập.',
         cd: [4, 3.75, 3.5, 3.25, 3], cost: [35, 35, 35, 35, 35], whileDisabled: true,
         use(m, u) {
           m.removeStatus(u, 'slow'); m.cleanse(u);
@@ -163,7 +163,7 @@
         ai: { use: 'support', aim: 'self', range: 7, alsoEscape: true },
       },
       s3: {
-        name: 'Nốt Vàng — Phòng Thủ', desc: 'Oktava lao ngược về phía Aria, choáng 0.75s kẻ trên đường; khiên 60/90/120/150/180 (+40% SMPT) cho Aria hoặc đồng minh thấp máu nhất trong 6 đv (4s). 3 nốt dùng chung hồi chiêu.',
+        name: 'Nốt Vàng — Phòng Thủ', desc: 'Oktava lao ngược về phía Aria, choáng 0.75s kẻ trên đường; khiên 60/90/120/150/180 (+40% SMPT) cho Aria hoặc đồng minh thấp máu nhất trong 6 đv (4s). 3 nốt hồi chiêu độc lập.',
         cd: [4, 3.75, 3.5, 3.25, 3], cost: [40, 40, 40, 40, 40],
         use(m, u, ctx) {
           const okt = u.ws.okt;

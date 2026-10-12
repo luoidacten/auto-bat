@@ -72,7 +72,7 @@
         use(m, u, ctx) {
           const dmg = H.amt(u, ctx.v([22, 32, 42, 52, 62]), 0.28), R = H.T(u, '3a') ? 4.8 : 3.5;
           m.addStatus(u, 'haste', 2, 0.15, { key: 'boran_spin' });
-          m.zone({ owner: u, x: u.x, y: u.y, r: R, life: 2, every: 1 / 3, follow: u, kind: 'spin', tick: (mm) => {
+          H.spin(m, u, 2); m.zone({ owner: u, x: u.x, y: u.y, r: R, life: 2, every: 1 / 3, follow: u, kind: 'spin', tick: (mm) => {
             mm.removeStatus(u, 'slow');
             mm.hitCircle(u, u.x, u.y, R, (e) => {
               mm.damage(u, e, dmg, 'phys', { tag: 's2', aoe: true }); fury(mm, u, 5);

@@ -184,10 +184,10 @@
             if (u.ws.ammoB <= 0) { if (!(u.ws.rlB > 0)) { u.ws.rlB = u.ws.rlBMax = H.rlTime(u, RL_B); H.reloadStart(m, u); } u.atkT = Math.max(u.atkT, u.ws.rlB); }
           }
         }
-        if (u.ws.rlB > 0) { u.ws.rlB -= dt; if (u.ws.rlB <= 0) { u.ws.ammoB = magB(u); if (u.ws.scope) H.reloadDone(m, u); } }
+        if (u.ws.rlB > 0 && !H.rlHold(m, u)) { u.ws.rlB -= dt; if (u.ws.rlB <= 0) { u.ws.ammoB = magB(u); if (u.ws.scope) H.reloadDone(m, u); } }
         const mag = magA(u);
         const rlA = () => { u.ws.rl = u.ws.rlMax = H.rlTime(u, H.T(u, '1a') ? 2.2 : 3); H.reloadStart(m, u); };   // GĐ9: theo tốc đánh + Tốc Nạp
-        if (u.ws.rl > 0) { u.ws.rl -= dt; if (u.ws.rl <= 0) { u.ws.ammo = mag; H.reloadDone(m, u); } }
+        if (u.ws.rl > 0 && !H.rlHold(m, u, 'rl')) { u.ws.rl -= dt; if (u.ws.rl <= 0) { u.ws.ammo = mag; H.reloadDone(m, u); } }
         if (u.ws.ammo <= 0) { if (u.ws.rl <= 0) rlA(); u.atkT = Math.max(u.atkT, u.ws.rl); }
         if (u.ws.ammo < mag && u.ws.rl <= 0 && m.time - u.combatT > 5) rlA();
       },

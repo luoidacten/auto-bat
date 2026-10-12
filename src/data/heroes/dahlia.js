@@ -5,7 +5,10 @@
   const frenzy = (m, u) => u.ws.frenzyUntil > m.time;
   function gain(m, u, v) { if (frenzy(m, u)) return; u.ws.fz = Math.min(100, u.ws.fz + v); if (u.ws.fz >= 100) { u.ws.fz = 0; u.ws.frenzyUntil = m.time + (H.T(u, '9a') ? 12 : 8); if (m.fxOn) m.fx({ type: 'callout', id: u.id, text: '🎩 CUỒNG NHIỆT!', color: '#c040ff' }); } }
   const nonHeroNear = (m, u, R) => m.units.filter((x) => x.alive && x.kind !== 'hero' && (x.kind === 'monster' || x.kind === 'pet') && !(x.kind === 'monster' && (x.big || x.boss)) && M.dist(x, u) <= R);
-  const inStage = (m, u) => !!(u.ws.stage && u.ws.stage.until > m.time && M.dist(u, u.ws.stage) <= 9);
+  const inStage = (m, u) => !!(u.ws.stage && u.ws.stage.until > m.time && M.dist(u, u.ws.stage) <= u.ws.stage.r);
+  const HAT = (m, x, y, r) => { if (m.fxOn) m.fx({ type: 'tophat', x, y, r: r || 1.2, color: '#c040ff' }); };
+  // GĐ12: vật triệu hồi cấp cao (phân ảnh Mirage S4, lính Victoria, Oktava, P-Zero) & quái lớn/boss: KHÔNG biến được thành ảo ảnh — chỉ ăn sát thương lớn
+  const highTier = (x) => !!(x && (x.boss || x.big || (x.kind === 'pet' && x.owner && ['mirage', 'victoria', 'aria', 'roxie'].includes(x.owner.heroId))));
   function cloud(m, u, x, y) {
     m.zone({ owner: u, x, y, r: 2.5, life: 3.5, every: 0.5, kind: 'miasma', tick: (mm, z) => mm.hitCircle(u, x, y, 2.5, (e) => {
       mm.addStatus(e, 'blind', 0.6, 1, { src: u, key: 'dah_cloud' });
@@ -40,7 +43,7 @@
         if (u.hpPct < 0.5 && m.time >= u.ws.hatT && m.time - (u.lastDmgT || -99) < 1.2) {
           u.ws.hatT = m.time + 90 * (H.T(u, '12b') ? 0.5 : 1);
           const from = { x: u.x, y: u.y }, e = H.nearestEnemyHero(m, u, 10), v = e ? H.dirTo(e, u) : { x: -u.fx, y: -u.fy };
-          m.blink(u, u.x + v.x * 5.5, u.y + v.y * 5.5);
+          HAT(m, from.x, from.y, 1.6); m.blink(u, u.x + v.x * 5.5, u.y + v.y * 5.5);
           m.later(0.5, (mm) => mm.hitCircle(u, from.x, from.y, 3, (x) => { mm.damage(u, x, H.amt(u, 60 + 12 * u.level, 0, 0.5), 'magic', { tag: 'p', aoe: true }); mm.addStatus(x, 'stun', 1, 1, { src: u }); }, { color: '#c040ff' }));
           if (H.T(u, '3b')) m.shield(u, u, u.st.maxHp * 0.2, 3);
           if (m.fxOn) m.fx({ type: 'callout', id: u.id, text: '🎩 Để xem đêm nay sẽ thú vị như nào!', color: '#c040ff' });
@@ -68,7 +71,7 @@
         const fz = frenzy(m, u), dmg = u.ws.trickDmg * (fz ? 1.5 : 1);
         m.later(0, (mm) => {
           if (!a.alive || !u.alive) return;
-          mm.addStatus(a, 'root', 0.6, 1, { src: u }); mm.damage(u, a, dmg, 'magic', { tag: 's2' });
+          HAT(mm, a.x, a.y, 1.9); mm.addStatus(a, 'root', 0.6, 1, { src: u }); mm.damage(u, a, dmg, 'magic', { tag: 's2' });
           if (fz) mm.addStatus(a, 'stun', 1.25, 1, { src: u });
           if (H.T(u, '6b') && a.ga > 0) a.ga = Math.max(0, a.ga - 300);
           const v = H.dirTo(a, u); mm.blink(u, u.x + v.x * 3.5, u.y + v.y * 3.5);
@@ -90,17 +93,20 @@
         cd: [9, 8.5, 8, 7.5, 7], cost: [50, 50, 50, 50, 50], manualCd: true,
         can(m, u) { return inStage(m, u) || nonHeroNear(m, u, H.T(u, '6c') ? 11.5 : 8).length > 0 || m.decoysOf(u).length > 0; },
         use(m, u, ctx) {
-          if (inStage(m, u)) { u.cd.s1 = 1.2; u.mp += m.costOf(u, 's1'); const p = H.toward(u, ctx.pt, 2.5, false); m.blink(u, p.x, p.y); m.addStatus(u, 'stealth', 0.75, 1, { key: 'dah_step' }); return; }
+          if (inStage(m, u)) { HAT(m, u.x, u.y, 1); u.cd.s1 = 1.2; u.mp += m.costOf(u, 's1'); const p = H.toward(u, ctx.pt, 2.5, false); m.blink(u, p.x, p.y); m.addStatus(u, 'stealth', 0.75, 1, { key: 'dah_step' }); return; }
           u.cd.s1 = m.cdOf(u, 's1');
           if (frenzy(m, u)) {
-            const L = nonHeroNear(m, u, 6).filter((x) => x.owner !== u).slice(0, H.T(u, '6a') ? 5 : 3);
-            for (const x of L) { const px = x.x, py = x.y; m.damage(u, x, x.hp + 1, 'true', { tag: 's1' }); phantom(m, u, px, py, { life: 6 }); }
+            const all = m.units.filter((x) => x.alive && x.kind !== 'hero' && (x.kind === 'monster' || x.kind === 'pet') && x.owner !== u && M.dist(x, u) <= 6).slice(0, H.T(u, '6a') ? 5 : 3);
+            const L = all.filter((x) => !highTier(x));
+            for (const x of L) { const px = x.x, py = x.y; HAT(m, px, py, 1.1); m.damage(u, x, x.hp + 1, 'true', { tag: 's1' }); phantom(m, u, px, py, { life: 6 }); }
+            for (const x of all) if (highTier(x)) { HAT(m, x.x, x.y, 1.4); m.damage(u, x, Math.min(x.st.maxHp * 0.2, 400) + H.amt(u, 120 + 20 * u.level, 0, 1), 'magic', { tag: 's1' }); }
+            if (all.length && !L.length) return;
             if (L.length) return;
           }
           const R = H.T(u, '6c') ? 11.5 : 8;
           const cand = nonHeroNear(m, u, R).concat(m.decoysOf(u)).sort((a, b) => M.dist(a, ctx.pt) - M.dist(b, ctx.pt) || a.id - b.id)[0];
           if (!cand) return;
-          const x = u.x, y = u.y; m.blink(u, cand.x, cand.y); cand.x = x; cand.y = y;
+          const x = u.x, y = u.y; HAT(m, x, y, 1.1); HAT(m, cand.x, cand.y, 1.1); m.blink(u, cand.x, cand.y); cand.x = x; cand.y = y;
           m.addStatus(u, 'stealth', 1.5, 1, { key: 'dah_s1' });
           m.addStatus(u, 'buff', 3, 1, { key: 'dah_s1', mods: { asPct: 0.3, dmgAmp: 0.2, tenacity: H.T(u, '1c') ? 0.35 : 0 } });
         },
@@ -123,19 +129,23 @@
         ai: { use: 'burst', range: 7, aim: 'point', speed: 0 },
       },
       s4: {
-        name: 'Sân Khấu Chết Chóc', desc: 'Cắm gậy mở vũ đài bóng tối bán kính 9 đv trong 7s: Thoát Nguy thành Hư Ảnh Bước; +60% tốc đánh, +30% sát thương đòn đánh; mỗi 10 đòn trúng (của Dahlia và ảo ảnh) sinh một ảo ảnh mới cạnh mục tiêu; ảo ảnh trong sân khấu +50% máu và đánh chắc chắn gây độc.',
+        name: 'Sân Khấu Chết Chóc', desc: 'Cắm gậy mở vũ đài bóng tối bán kính 10/15/20 đv trong 8/10/12s (thấy rõ vành rèm nhung tím): Thoát Nguy thành Hư Ảnh Bước; +60% tốc đánh, +30% sát thương đòn đánh; mỗi 10 đòn trúng (của Dahlia và ảo ảnh) sinh một ảo ảnh mới cạnh mục tiêu; ảo ảnh trong sân khấu +50% máu và đánh chắc chắn gây độc. Dahlia cố đánh trong vòng sân khấu.',
         cd: [90, 75, 60], cost: [100, 100, 100],
-        use(m, u) {
-          const life = H.T(u, '9c') ? 10 : 7;
-          u.ws.stage = { x: u.x, y: u.y, until: m.time + life }; u.ws.stageHits = 0;
+        use(m, u, ctx) {
+          const R = ctx.v([10, 15, 20]), life = ctx.v([8, 10, 12]) + (H.T(u, '9c') ? 3 : 0);
+          u.ws.stage = { x: u.x, y: u.y, r: R, until: m.time + life }; u.ws.stageHits = 0;
           m.addStatus(u, 'buff', life, 1, { key: 'dah_stage', mods: { asPct: 0.6 } });
-          m.hitCircle(u, u.x, u.y, 9, (e) => m.damage(u, e, H.amt(u, 100 + 15 * u.level, 0, 0.5), 'magic', { tag: 's4', aoe: true }), { color: '#c040ff' });
-          if (m.fxOn) m.fx({ type: 'ring', x: u.x, y: u.y, r: 9, color: '#7a20b0', life });
+          m.zone({ owner: u, x: u.x, y: u.y, r: R, life, every: 1, kind: 'darkstage', tick: () => {} });
+          m.hitCircle(u, u.x, u.y, Math.min(R, 9), (e) => m.damage(u, e, H.amt(u, 100 + 15 * u.level, 0, 0.5), 'magic', { tag: 's4', aoe: true }), { color: '#c040ff' });
+          HAT(m, u.x, u.y, 2.2);
+          if (m.fxOn) m.fx({ type: 'callout', id: u.id, text: '🎩 Màn diễn bắt đầu!', color: '#c040ff' });
         },
         ai: { use: 'ult', aim: 'self', range: 7, aoe: 8 },
       },
     },
-    ai: { order: ['s3', 's1', 's2'], engageRange: 6, role: 'mage' },
+    ai: { order: ['s3', 's1', 's2'], engageRange: 6, role: 'mage',
+      // GĐ12: đang mở Sân Khấu — kéo giao tranh về trong vòng (mục tiêu chạy ra ngoài thì không đuổi quá mép)
+      micro(ai, enemies) { if (G.T12 && G.T12.dahliaEscape(ai, enemies)) return true; const m = ai.m, u = ai.u, st = u.ws.stage; if (!st || st.until <= m.time || u.cast || u.dash) return false; const d = M.dist(u, st); if (d > st.r - 1.2 && d < st.r + 8) { const v = H.dirTo(u, st); u.goal = { x: u.x + v.x * 3, y: u.y + v.y * 3 }; u.attackTarget = null; return true; } return false; } },
     tags: ['illusion', 'stealth'],
   });
   // Cỗ Máy Sinh Ảnh: đủ số đòn trong sân khấu thì sinh ảo ảnh mới cạnh mục tiêu
@@ -163,7 +173,7 @@
     [
       { name: 'Cuồng Nhiệt Vô Tận', desc: 'Cuồng Nhiệt kéo dài 12s.' },
       { name: 'Ảo Ảnh Đao Phong', desc: 'Ảo ảnh đánh 55% sát thương.' },
-      { name: 'Sân Khấu Kéo Dài', desc: 'Sân Khấu Chết Chóc kéo dài 10s.' },
+      { name: 'Sân Khấu Kéo Dài', desc: 'Sân Khấu Chết Chóc kéo dài thêm 3s.' },
     ],
     [
       { name: 'Vua Bầy Ảo Ảnh', desc: 'Phong cách: trong sân khấu chỉ cần 5 đòn để sinh ảo ảnh.' },

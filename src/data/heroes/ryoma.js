@@ -149,7 +149,8 @@
         ai: { use: 'ult', aim: 'unit', range: 5, cond: (m, u, t) => t.kind === 'hero' && t.hpPct < 0.6 },
       },
     },
-    ai: { order: ['s1', 's3', 's2'], engageRange: 4, role: 'fighter', bait: true },
+    ai: { micro: (ai, en) => G.T12 && G.T12.ryoma(ai, en),   // GĐ12: ghép cặp BB/BC/CC + Kiếm Khí chém đạn
+      order: ['s1', 's3', 's2'], engageRange: 4, role: 'fighter', bait: true },
     tags: ['dive'],
   });
   G.HEROES.ryoma.tree = [

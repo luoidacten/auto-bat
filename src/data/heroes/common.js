@@ -88,6 +88,19 @@
     rlScale(u, k) { if (u.ws.reload > 0) u.ws.reload *= k; if (u.ws.rl > 0) u.ws.rl *= k; if (u.ws.rlMax) u.ws.rlMax *= k; u.atkT = Math.min(u.atkT, Math.max(u.ws.reload || 0, u.ws.rl || 0, 0.05)); },
     // bắt đầu / xong một lần nạp: báo cho mảnh hồn & AI (hook onReloadStart / onReload), ghi mốc thời gian
     reloadStart(m, u) { u.ws.rlStartT = m.time; u.ws.rlHurt = m.time - (u.lastDmgT || -99) < 1; if (m.heroHook) m.heroHook(u, 'onReloadStart'); },
+    // GĐ12: nạp đạn không tức thì — vừa bắn / đang đánh nhau phải chờ 1–2s mới bắt đầu nạp; trúng đòn khi đang nạp thì NGẮT
+    // (lần nạp đang chạy quay về đầu). Trả true = đứng yên không trừ thời gian nạp trong nhịp này.
+    rlHold(m, u, key) {
+      const fight = m.time - (u.combatT || -99) < 3, wait = (fight ? 1.6 : 1.0) - (u.st.reload > 0 ? 0.4 : 0);
+      if (key && (u.lastDmgT || -99) > (u.ws.rlChk || -99) && u.lastDmgSrcHero && u.ws[key] > 0 && u.ws[key] < (u.ws.rlMax || 9) - 0.05) {
+        u.ws[key] = u.ws.rlMax || u.ws[key]; u.stats.rlCut = (u.stats.rlCut || 0) + 1;
+        if (m.fxOn && H.ready(m, u, 'rlcut', 1.2)) m.fx({ type: 'callout', id: u.id, text: '✋ Ngắt nạp', color: '#ffb0a0' });
+      }
+      u.ws.rlChk = m.time;
+      return m.time - (u.shotT || -99) < wait;
+    },
+    // GĐ12: thân tướng xoay tít theo chiêu xoay (trình vẽ đọc u.ws.spinT) — Boran S2, Chrono & Neo S4, Kazuki AA, Roxie, Jack…
+    spin(m, u, dur) { u.ws.spinT = Math.max(u.ws.spinT || 0, m.time + dur); },
     reloadDone(m, u) { u.ws.rlDoneT = m.time; if (m.heroHook) m.heroHook(u, 'onReload'); },
     // GĐ10: "đồng minh" trong đấu trường đánh đơn = người đang liên minh tạm / người cùng phe nhà cái / bạn bè cốt truyện
     isAlly(m, u, h) {

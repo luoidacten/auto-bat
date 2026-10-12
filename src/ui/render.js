@@ -67,6 +67,7 @@
     }
     // hướng mặt hiển thị (GĐ5c): xoay dần về hướng thật (tối đa ~12 rad/s) — đỡ giật khi tướng đổi hướng liên tục; chỉ để vẽ
     faceAng(u, now) {
+      if (u.ws && u.ws.spinT > (this.m ? this.m.time : 0)) { const f0 = this.faces && this.faces.get(u.id); const a = now * 15 + u.id; if (f0) { f0.a = a; f0.t = now; } return a; }   // GĐ12: xoay theo chiêu xoay
       const want = Math.atan2(u.fy, u.fx), f = this.faces || (this.faces = new Map());
       let o = f.get(u.id);
       if (!o) { o = { a: want, t: now }; f.set(u.id, o); return want; }
@@ -392,6 +393,38 @@
         case 'ice': {
           ctx.strokeStyle = 'rgba(220,245,255,0.7)'; ctx.lineWidth = 1.5;
           for (let i = 0; i < 5; i++) { const q = spot(i, 5), s = 0.35 * z; ctx.globalAlpha = al * 0.8; ctx.beginPath(); for (let j = 0; j < 3; j++) { const a = j * Math.PI / 3; ctx.moveTo(q.x - Math.cos(a) * s, q.y - Math.sin(a) * s); ctx.lineTo(q.x + Math.cos(a) * s, q.y + Math.sin(a) * s); } ctx.stroke(); }
+          break;
+        }
+        case 'stage': case 'darkstage': {
+          // GĐ12: SÂN KHẤU — sàn gỗ/bóng tối, vành rèm nhung xếp nếp, viền vàng chạy, 2 cột đèn quét, gậy/hoa hồng ở tâm
+          const dk = zn.kind === 'darkstage', c1 = dk ? '#7a20b0' : '#d03050', c2 = dk ? '#2a0a40' : '#ffd24a', glow = dk ? '#c040ff' : '#ffb0c8';
+          const fl = ctx.createRadialGradient(p.x, p.y, R * 0.1, p.x, p.y, R);
+          fl.addColorStop(0, dk ? 'rgba(60,10,90,0.35)' : 'rgba(255,220,160,0.22)'); fl.addColorStop(0.8, dk ? 'rgba(20,0,40,0.4)' : 'rgba(120,40,30,0.18)'); fl.addColorStop(1, dk ? 'rgba(10,0,20,0.55)' : 'rgba(90,20,30,0.3)');
+          ctx.globalAlpha = al; ctx.fillStyle = fl; ctx.beginPath(); ctx.arc(p.x, p.y, R, 0, TAU); ctx.fill();
+          // đèn sân khấu quét
+          ctx.globalCompositeOperation = 'lighter';
+          for (let i = 0; i < 2; i++) {
+            const a0 = now * (0.7 + i * 0.25) + i * Math.PI, sx = p.x + Math.cos(a0) * R * 0.45, sy = p.y + Math.sin(a0) * R * 0.45;
+            const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, R * 0.35);
+            g.addColorStop(0, dk ? 'rgba(200,120,255,0.35)' : 'rgba(255,240,200,0.4)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.globalAlpha = al * 0.8; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(sx, sy, R * 0.35, 0, TAU); ctx.fill();
+          }
+          ctx.globalCompositeOperation = 'source-over';
+          // rèm nhung xếp nếp quanh mép
+          const n = Math.max(16, Math.min(48, Math.round(R / 7)));
+          for (let i = 0; i < n; i++) {
+            const a0 = i * TAU / n, a1 = (i + 1) * TAU / n, am = (a0 + a1) / 2, sw = 0.35 + 0.08 * Math.sin(now * 2 + i);
+            ctx.globalAlpha = al * 0.85; ctx.fillStyle = i % 2 ? c1 : shade(c1, 0.65);
+            ctx.beginPath(); ctx.arc(p.x, p.y, R, a0, a1); ctx.lineTo(p.x + Math.cos(am) * R * (1 - 0.06 - 0.03 * sw), p.y + Math.sin(am) * R * (1 - 0.06 - 0.03 * sw)); ctx.closePath(); ctx.fill();
+          }
+          // viền vàng chạy + vạch sân khấu
+          ctx.globalAlpha = al; ctx.strokeStyle = c2 === '#2a0a40' ? glow : c2; ctx.lineWidth = Math.max(2.5, 0.16 * z); ctx.shadowColor = glow; ctx.shadowBlur = 12;
+          ctx.setLineDash([R * 0.05, R * 0.035]); ctx.beginPath(); ctx.arc(p.x, p.y, R, now * 0.5, now * 0.5 + TAU); ctx.stroke(); ctx.setLineDash([]);
+          ctx.globalAlpha = al * 0.35; ctx.lineWidth = Math.max(1, 0.06 * z); ctx.beginPath(); ctx.arc(p.x, p.y, R * 0.55, 0, TAU); ctx.stroke(); ctx.shadowBlur = 0;
+          // tâm: gậy đen cắm (Dahlia) / bông hồng (Luca)
+          ctx.globalAlpha = al; const h = Math.max(10, 1.6 * z);
+          if (dk) { ctx.strokeStyle = '#111'; ctx.lineWidth = Math.max(2, 0.18 * z); ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x, p.y - h); ctx.stroke(); ctx.fillStyle = '#e0e0e0'; ctx.beginPath(); ctx.arc(p.x, p.y - h, Math.max(2, 0.18 * z), 0, TAU); ctx.fill(); }
+          else { ctx.fillStyle = '#e02050'; for (let i = 0; i < 5; i++) { const q = i * TAU / 5 + now; ctx.beginPath(); ctx.arc(p.x + Math.cos(q) * h * 0.18, p.y - h * 0.2 + Math.sin(q) * h * 0.18, h * 0.16, 0, TAU); ctx.fill(); } }
           break;
         }
         case 'arena': case 'flag': case 'barrier': case 'field': case 'lotus': {
@@ -1244,8 +1277,17 @@
           ctx.restore();
         }
       }
-      G.Draw.drawHero(ctx, p.x, p.y + lift, rp, {
-        color: u.hero ? u.hero.color : u.color || '#3a8a5a', gfx: u.ws && u.ws.scope ? 'sniper' : u.hero ? u.hero.gfx : u.gfx || 'guardian', team: u.team,
+      // GĐ12: ngoại hình theo trạng thái — Galo hóa thú (vuốt + tai + nanh, thân to, xanh sẫm); Luca dùng bộ chiêu cải trang → mang
+      // hình dáng & vũ khí nạn nhân kèm quầng hoa hồng
+      const tm = this.m ? this.m.time : 0, beastOn = u.heroId === 'galo' && u.ws && u.ws.beast > tm;
+      const lucaCopy = u.heroId === 'luca' && u.ws && u.ws.copy && u.ws.copyUntil > tm && u.ws.kit === 'copy' && G.HEROES[u.ws.copy];
+      let hColor = u.hero ? u.hero.color : u.color || '#3a8a5a', hGfx = u.ws && u.ws.scope ? 'sniper' : u.hero ? u.hero.gfx : u.gfx || 'guardian';
+      if (beastOn) { hColor = '#3f8a24'; hGfx = 'beastclaw'; }
+      // Chrono & Neo: thân đổi màu theo dạng — CHRONO cam đồng cổ, NEO xanh năng lượng; hợp thể (S4) có cả hai vòng
+      if (u.heroId === 'chrononeo' && u.ws) { const c = u.ws.stance === 'chrono'; hColor = c ? '#d8902e' : '#4ab0ff'; rings.push(c ? '#ffb04a' : '#7ac8ff'); if (u.ws.spinT > tm) rings.push(c ? '#7ac8ff' : '#ffb04a'); }
+      if (lucaCopy) { hColor = lucaCopy.color; hGfx = lucaCopy.gfx; rings.push('#ff6a9a'); }
+      G.Draw.drawHero(ctx, p.x, p.y + lift, beastOn ? rp * 1.18 : rp, {
+        color: hColor, gfx: hGfx, team: u.team, beast: beastOn, rose: !!lucaCopy,
         ang: this.faceAng(u, now), anim, hurt: now - u.lastDmgT < 0.08, stunned, stealth: !!u.has('stealth') || !!u.has('untarget'),
         st: u.ws, time: now, rings, soul: u.yNiem || 0,   // GĐ7: vũ khí đổi màu theo Ý NIỆM
       });
@@ -1280,6 +1322,8 @@
         ctx.beginPath(); ctx.arc(p.x, p.y, rp + 7, -Math.PI / 2, -Math.PI / 2 + TAU * k); ctx.stroke();
         ctx.font = Math.round(Math.max(11, rp * 0.9)) + 'px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(ch ? '🎁' : '🌀', p.x, p.y - rp - 10);
       }
+      // GĐ12 — vòng Tứ Ấn của Florian: 4 cung Đông/Nam/Tây/Bắc, cung nào vỡ thì biến mất
+      if (u.statuses.length) { const wp = u.hasKey('flo_wp'); if (wp && wp.pts && !wp.done) { ctx.save(); ctx.strokeStyle = '#ff9ad5'; ctx.lineWidth = 3; ctx.shadowColor = '#ff9ad5'; ctx.shadowBlur = 6; for (const q of wp.pts) { const a0 = q * Math.PI / 2; ctx.beginPath(); ctx.arc(p.x, p.y, rp + 6, a0 - 0.55, a0 + 0.55); ctx.stroke(); ctx.fillStyle = '#fff0fa'; ctx.beginPath(); ctx.arc(p.x + Math.cos(a0) * (rp + 6), p.y + Math.sin(a0) * (rp + 6), 2.2, 0, TAU); ctx.fill(); } ctx.restore(); } }
       // phù hộ mệnh đang dán: vòng xanh nhạt mảnh
       if (u.statuses.length && u.hasKey('fu_ho')) { ctx.save(); ctx.globalAlpha = 0.55; ctx.strokeStyle = '#7fd8ff'; ctx.lineWidth = 1.2; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.arc(p.x, p.y, rp + 3.5, 0, TAU); ctx.stroke(); ctx.restore(); }
       // hiệu ứng trạng thái
@@ -1447,6 +1491,18 @@
           trail(1.6, Math.max(2.5, r * 0.7), 'rgba(90,200,255,0.9)');
           ctx.shadowColor = '#5ac8ff'; ctx.shadowBlur = 10; ctx.fillStyle = '#e8f8ff'; ctx.beginPath(); ctx.ellipse(p.x, p.y, Math.max(3, r), Math.max(1.5, r * 0.35), ang, 0, TAU); ctx.fill(); break;
         }
+        case 'tornado': {   // GĐ12: Thanh Phong — cơn lốc xoáy nhỏ (phễu gió xoắn ốc xoay tít, bụi lá cuốn quanh)
+          trail(1.0, Math.max(2, r * 0.6), 'rgba(190,255,224,0.45)');
+          const R = Math.max(6, r * 1.6);
+          ctx.translate(p.x, p.y); ctx.lineCap = 'round'; ctx.shadowColor = '#7ad0b0'; ctx.shadowBlur = 8;
+          for (let i = 0; i < 4; i++) {
+            const w = R * (1 - i * 0.2), yy = -R * 0.55 + i * R * 0.35, sp = now * (16 - i * 2) + i;
+            ctx.globalAlpha = 0.85 - i * 0.12; ctx.strokeStyle = i % 2 ? '#bfffe0' : '#ffffff'; ctx.lineWidth = Math.max(1.2, R * 0.13);
+            ctx.beginPath(); ctx.ellipse(0, yy, w * 0.75, w * 0.24, 0, sp, sp + 4.4); ctx.stroke();
+          }
+          ctx.globalAlpha = 0.9; ctx.fillStyle = '#7ad0b0'; for (let i = 0; i < 2; i++) { const q = now * 11 + i * Math.PI; ctx.beginPath(); ctx.arc(Math.cos(q) * R * 0.7, Math.sin(q) * R * 0.25 - R * 0.2, Math.max(1.2, R * 0.1), 0, TAU); ctx.fill(); }
+          break;
+        }
         case 'wind': {    // Thanh Phong: lưỡi gió lưỡi liềm xanh nhạt
           ctx.translate(p.x, p.y); ctx.rotate(ang); const R = Math.max(5, r * 1.3);
           ctx.strokeStyle = 'rgba(200,255,230,0.9)'; ctx.lineWidth = 2.5; ctx.shadowColor = '#9fffd0'; ctx.shadowBlur = 8;
@@ -1491,6 +1547,15 @@
         }
         case 'note':
           ctx.fillStyle = '#7ae0a0'; ctx.shadowColor = '#7ae0a0'; ctx.shadowBlur = 10; ctx.font = `bold ${Math.max(12, 0.8 * z)}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('♪', p.x, p.y); break;
+        case 'alicedao': {   // GĐ12: Phi Dao Ảo Thuật — dao găm bạc chuôi tím bay thẳng mũi, vệt sáng mảnh
+          trail(1.4, 1.6, 'rgba(220,220,255,0.7)');
+          const R = Math.max(5, r * 1.5);
+          ctx.translate(p.x, p.y); ctx.rotate(ang); ctx.shadowColor = '#d070ff'; ctx.shadowBlur = 8;
+          ctx.fillStyle = '#eef2ff'; ctx.beginPath(); ctx.moveTo(R, 0); ctx.lineTo(-R * 0.15, -R * 0.22); ctx.lineTo(-R * 0.15, R * 0.22); ctx.closePath(); ctx.fill();
+          ctx.shadowBlur = 0; ctx.fillStyle = '#ffd24a'; ctx.fillRect(-R * 0.25, -R * 0.32, R * 0.1, R * 0.64);
+          ctx.fillStyle = '#7a2ab0'; ctx.fillRect(-R * 0.7, -R * 0.1, R * 0.45, R * 0.2);
+          break;
+        }
         case 'alicecard': {   // GĐ11: Alice ném bài — lá bài lưng tím viền vàng xoay tít, vệt hạt kim tuyến tím
           trail(0.9, 2, 'rgba(208,112,255,0.6)');
           if (V && (now * 60 | 0) % 3 === 0) V.burstParts(now, pj.x, pj.y, 1, { color: '#ffd24a', speed: 0.6, life: 0.3, size: 0.08, a: ang + Math.PI, spread: 1.2 });
@@ -1756,7 +1821,7 @@
     oca: 'rgba(0,0,0,0)', arena: 'rgba(255,120,70,0.12)', flag: 'rgba(230,70,70,0.14)', heal: 'rgba(120,255,160,0.2)', spears: 'rgba(224,192,112,0.18)', blades: 'rgba(154,208,255,0.2)',
     field: 'rgba(74,224,208,0.12)', oil: 'rgba(40,30,20,0.4)', spring: 'rgba(255,220,90,0.3)', barrier: 'rgba(190,255,224,0.18)', drone: 'rgba(0,0,0,0)', lotus: 'rgba(110,190,255,0.12)',
     crack: 'rgba(120,90,50,0.3)', spin: 'rgba(255,200,100,0.2)', wind: 'rgba(190,255,224,0.25)', eye: 'rgba(0,0,0,0)',
-    miasma: 'rgba(120,80,160,0.28)', poison: 'rgba(150,220,50,0.26)', goldsand: 'rgba(230,190,70,0.28)' };
+    miasma: 'rgba(120,80,160,0.28)', stage: 'rgba(0,0,0,0)', darkstage: 'rgba(0,0,0,0)', poison: 'rgba(150,220,50,0.26)', goldsand: 'rgba(230,190,70,0.28)' };
   // nhân độ sáng màu hex (k < 1 tối đi, k > 1 sáng lên)
   function shade(c, k) { const n = parseInt(c.slice(1), 16), f = (v) => Math.max(0, Math.min(255, Math.round(v * k))); return `rgb(${f((n >> 16) & 255)},${f((n >> 8) & 255)},${f(n & 255)})`; }
   function zoneColor(z) {

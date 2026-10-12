@@ -14,7 +14,7 @@
   const behind = (t, d) => ({ x: t.x - t.fx * (t.r + d), y: t.y - t.fy * (t.r + d) });
   H.def({
     id: 'thanhphong', name: 'Diệp Thanh Phong', color: '#7ad0b0', gfx: 'fan', kit: 'mage', pos: ['mid', 'sup'], dmgType: 'magic',
-    ranged: true, projSpeed: 18, projKind: 'wind', r: 0.58, resource: 'none',
+    ranged: true, projSpeed: 18, projKind: 'tornado', r: 0.58, resource: 'none',
     stats: { range: 4.8, hp: 560, hpG: 88, armor: 24, ms: 3.45 },
     passive: {
       name: 'Khí Áp Phong Vũ',
@@ -42,12 +42,12 @@
           const st = state(u); wind(u, -15);
           const v = H.dirTo(u, ctx.pt), dmg = H.amt(u, ctx.v([60, 95, 130, 165, 200]), 0, 0.6);
           if (H.T(u, '6b')) {   // Phiến Khí Bát Đoạn: 5 luồng khí
-            for (const a of [-0.5, -0.25, 0, 0.25, 0.5]) { const c = M.cos(a), s = M.sin(a); m.proj({ owner: u, x: u.x, y: u.y, dx: v.x * c - v.y * s, dy: v.x * s + v.y * c, speed: 20, range: 6, r: 0.4, kind: 'note', onHit: (mm, p, e) => { mm.damage(u, e, dmg * 0.6, 'magic', { tag: 's1' }); mm.addStatus(e, 'slow', 1.5, 0.3, { src: u }); } }); }
+            for (const a of [-0.5, -0.25, 0, 0.25, 0.5]) { const c = M.cos(a), s = M.sin(a); m.proj({ owner: u, x: u.x, y: u.y, dx: v.x * c - v.y * s, dy: v.x * s + v.y * c, speed: 20, range: 6, r: 0.4, kind: 'tornado', onHit: (mm, p, e) => { mm.damage(u, e, dmg * 0.6, 'magic', { tag: 's1' }); mm.addStatus(e, 'slow', 1.5, 0.3, { src: u }); } }); }
             return;
           }
           let hitHero = false;
           const end = { x: u.x + v.x * 7, y: u.y + v.y * 7 };
-          H.shoot(m, u, end, { speed: 16, range: 7, r: 0.8, pierce: true, kind: 'note',
+          H.shoot(m, u, end, { speed: 16, range: 7, r: 0.8, pierce: true, kind: 'tornado',
             onHit: (mm, p, e) => { mm.damage(u, e, dmg, 'magic', { tag: 's1' }); if (st !== 'thuan') mm.knockup(u, e, 0.6); if (e.kind === 'hero') hitHero = true; },
             onEnd: (mm, p) => {
               if (st === 'thuan') {

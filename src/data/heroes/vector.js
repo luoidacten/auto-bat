@@ -18,7 +18,7 @@
       desc: 'Đánh thường là tia laser bắn tức thời, xuyên mọi mục tiêu thẳng hàng (mục tiêu sau nhận 65%). Ổ 8 viên, cạn đạn nạp 1.8s. Sẵn 40% chí mạng, 20% xuyên giáp và 25% Xuyên Thủng Hộ Giáp.',
       init(m, u) { u.ws.ammo = MAG; u.ws.reload = 0; u.ws.oc = 0; },
       update(m, u, dt) {
-        if (u.ws.reload > 0) { u.ws.reload -= dt; if (u.ws.reload <= 0) { u.ws.ammo = mag(u); H.reloadDone(m, u); } }
+        if (u.ws.reload > 0 && !H.rlHold(m, u, 'reload')) { u.ws.reload -= dt; if (u.ws.reload <= 0) { u.ws.ammo = mag(u); H.reloadDone(m, u); } }
         if (u.ws.ammo <= 0) u.atkT = Math.max(u.atkT, u.ws.reload);
         if (u.ws.ammo < mag(u) && u.ws.reload <= 0 && m.time - (u.combatT || -99) > 4) startReload(m, u);
         if (m.tick % 10 === 0 && !u.hasKey('vec_calc')) m.addStatus(u, 'buff', 9999, 1, { key: 'vec_calc', mods: { crit: H.T(u, '1b') ? 0.55 : 0.4, armorPen: 0.2, bypass: 0.25 } });

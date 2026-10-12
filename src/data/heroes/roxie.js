@@ -189,7 +189,7 @@
           if (riding(m, u)) {
             const v = H.dirTo(u, ctx.pt);
             // Vòng Xoáy Lửa: vừa Húc xong → xoay tròn quét lửa
-            if (H.T(u, '12b') && m.time - (u.ws.ramT || -9) < 1.5) { m.hitCircle(u, u.x, u.y, 3, (e) => { m.damage(u, e, dmg * 0.8, 'magic', { tag: 's2', aoe: true }); m.knockup(u, e, 1); }, { color: '#ff7a1a' }); return; }
+            if (H.T(u, '12b') && m.time - (u.ws.ramT || -9) < 1.5) { H.spin(m, u, 0.6); m.hitCircle(u, u.x, u.y, 3, (e) => { m.damage(u, e, dmg * 0.8, 'magic', { tag: 's2', aoe: true }); m.knockup(u, e, 1); }, { color: '#ff7a1a' }); return; }
             m.hitCone(u, u.x, u.y, v.x, v.y, 4.5, 0.55, (e) => { m.damage(u, e, dmg * 0.6, 'magic', { tag: 's2', aoe: true }); m.dot(u, e, 10 + 3 * u.level, 3, 'magic', 'rox_fire'); if (H.T(u, '9c')) m.addStatus(e, 'slow', 1.5, 0.4, { src: u }); }, { color: '#ff7a1a' });
             return;
           }

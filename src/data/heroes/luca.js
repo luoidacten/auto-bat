@@ -24,12 +24,18 @@
     u.ws.ccd[k] = m.time + cd;
     m.hook(def.use, m, u, ctx);
     hype(m, u, 4);
+    // GĐ12: ghi loại chiêu vừa mượn để phối hợp chéo (khống chế cứng → về bộ Luca mở Sân Khấu; khiên → Ánh Đèn)
+    const x = G.Brain && G.Brain.tax(def, k);
+    u.ws.lastCopy = { t: m.time, cc: !!(x && x.sub.HardCC), def: !!(x && (x.cat & G.Brain.CAT.Defense)), mob: !!(x && (x.cat & G.Brain.CAT.Mobility)) };
     return true;
   }
   function endDisguise(m, u) {
     if (!u.ws.copy) return;
     u.ws.copy = null; m.removeStatus(u, 'buff', 'luca_copy');
     const o = u.ws.copyFrom; u.ws.copyFrom = null;
+    if (m.fxOn && u.alive) m.fx({ type: 'ring', x: u.x, y: u.y, r: 1.8, color: '#ff6a9a', fx: 'boom' });
+    // GĐ12: nạn nhân dưới 20% máu và đang ở gần → ở lại kết liễu, không giật về
+    const v = u.ws.copyVic; if (v && v.alive && v.hpPct < 0.2 && M.dist(u, v) < 7) { u.ws.copyVic = null; return; }
     if (o && u.alive) { m.blink(u, o.x, o.y); if (m.fxOn) m.fx({ type: 'callout', id: u.id, text: '🌹 Hạ màn!', color: '#ff6a9a' }); }
   }
   // khi đang cải trang và đang dùng bộ chiêu sao chép: S1–S3 gọi chiêu của nạn nhân (hồi chiêu riêng)
@@ -55,8 +61,9 @@
   }
   H.def({
     id: 'luca', name: 'Luca', color: '#ff4a7a', gfx: 'cane', kit: 'mage', pos: ['mid'], dmgType: 'magic',
-    ranged: true, projSpeed: 20, projKind: 'card', r: 0.58, resource: 'mana',
-    stats: { range: 5.0, hp: 700, hpG: 104, ms: 3.5, armor: 26, mr: 32 },
+    // GĐ12: Luca thành tướng CẬN CHIẾN — gậy ba toong múa sát người
+    ranged: false, r: 0.58, resource: 'mana',
+    stats: { range: 1.7, armorG: 4, mrG: 1.8, hp: 700, hpG: 104, ms: 3.5, armor: 26, mr: 32 },
     gauge: (u) => ({ v: u.ws.hype || 0, max: 100, label: 'Náo Nhiệt', color: '#ff6a9a' }),
     passive: {
       name: 'Sân Khấu Náo Nhiệt',
@@ -99,13 +106,13 @@
     },
     skills: {
       s1: {
-        name: 'Sân Khấu Mở Ra / Bước Nhảy Ngàn Hoa', desc: 'Mở Vùng Sân Khấu bán kính 6 đv trong 6s: trong vùng +20% tốc chạy, +15% hút máu phép. Trong sân khấu, S1 thành Bước Nhảy Ngàn Hoa: hồi 1.2s, tốn 25 mana, lướt 2.5 đv phóng cánh hoa hồng thép gây sát thương phép kẻ địch lướt qua.',
+        name: 'Sân Khấu Mở Ra / Bước Nhảy Ngàn Hoa', desc: 'Mở Vùng Sân Khấu bán kính 6 đv trong 6s: trong vùng +20% tốc chạy, +15% hút máu phép. Trong sân khấu, S1 thành Bước Nhảy Ngàn Hoa: hồi chỉ 0.6s, tốn 25 mana, lướt 2.5 đv phóng cánh hoa hồng thép gây sát thương phép kẻ địch lướt qua.',
         cd: [10, 9, 8, 7, 7], cost: [55, 55, 55, 55, 55], manualCd: true,
         use: wrap('s1', (m, u, ctx) => {
           const dmg = H.amt(u, ctx.v([75, 110, 145, 180, 215]), 0, 0.6);
           if (inStage(m, u)) {
             u.mp += m.costOf(u, 's1') - (H.T(u, '12b') ? 0 : 25 * G.C.MANA_COST);
-            u.cd.s1 = 1.2;
+            u.cd.s1 = 0.6;                                                    // GĐ12: trong sân khấu hồi chiêu S1 giảm mạnh
             u.ws.waltz = m.time - (u.ws.waltzT || -9) < 2.5 ? Math.min(3, u.ws.waltz + 1) : 0; u.ws.waltzT = m.time;
             const k = 1 + (H.T(u, '3c') ? 0.15 * u.ws.waltz : 0);
             const p = H.toward(u, ctx.pt, 2.5, false), v = H.dirTo(u, p);
@@ -120,7 +127,7 @@
           m.zone({ owner: u, x: u.x, y: u.y, r: R, life: 6, every: 0.5, kind: 'stage', tick: (mm, z) => {
             if (u.alive && M.dist(u, z) <= R) { mm.addStatus(u, 'haste', 0.6, 0.2, { key: 'luca_stage' }); mm.addStatus(u, 'buff', 0.6, 1, { key: 'luca_stage', mods: { lifesteal: 0.15 } }); }
           } });
-          if (m.fxOn) m.fx({ type: 'ring', x: u.x, y: u.y, r: R, color: '#ff6a9a', life: 6 });
+          if (m.fxOn) m.fx({ type: 'callout', id: u.id, text: '🌹 Sân khấu mở màn!', color: '#ff6a9a' });
         }),
         ai: { use: 'burst', range: 6, aim: 'point', speed: 0 },
       },
@@ -153,7 +160,7 @@
         name: 'Hoán Đổi Bộ Chiêu', desc: 'Khi đang Cải Trang: lật qua lại giữa bộ chiêu của Luca và bộ chiêu đang sao chép (hai bộ hồi chiêu độc lập).',
         cd: 1,
         can(m, u) { return disguised(m, u); },
-        use(m, u) { u.ws.kit = u.ws.kit === 'copy' ? 'own' : 'copy'; if (m.fxOn) m.fx({ type: 'callout', id: u.id, text: u.ws.kit === 'copy' ? '🎭 Bộ chiêu sao chép' : '🌹 Bộ chiêu Luca', color: '#ff6a9a' }); },
+        use(m, u) { u.ws.kit = u.ws.kit === 'copy' ? 'own' : 'copy'; if (m.fxOn) m.fx({ type: 'ring', x: u.x, y: u.y, r: 1.6, color: '#ff6a9a', fx: 'boom' }); if (m.fxOn) m.fx({ type: 'callout', id: u.id, text: u.ws.kit === 'copy' ? '🎭 Bộ chiêu sao chép' : '🌹 Bộ chiêu Luca', color: '#ff6a9a' }); },
         ai: { use: 'custom', aim: 'self', pick: (m, u) => {
           if (!disguised(m, u)) return null;
           // còn chiêu sao chép sẵn sàng thì dùng bộ sao chép; hết thì lật về bộ của Luca
@@ -180,7 +187,7 @@
             if (mm.fxOn) mm.fx({ type: 'callout', id: u.id, text: '🎭 Cải trang: ' + e.hero.name, color: '#ffd24a' });
             mm.allowRecast(u, 's4', 2, (m3, u3) => {
               if (!e.alive) return;
-              const x = u3.x, y = u3.y; m3.blink(u3, e.x, e.y); e.x = x; e.y = y; e.navP = null; e.dash = null;
+              const x = u3.x, y = u3.y; m3.blink(u3, e.x, e.y); e.x = x; e.y = y; e.navP = null; e.dash = null; u3.ws.swapT2 = m3.time + 1.2;
               if (H.T(u3, '6b')) m3.addStatus(e, 'stun', 1, 1, { src: u3 });
             });
           } });
@@ -196,7 +203,32 @@
     ai: { order: ['s3', 's1', 's2'], engageRange: 6, role: 'assassin',
       // GĐ11: Alice đang đánh nhau → tới nơi mở Sân Khấu chia lửa
       bondOpen: (m, u, foe) => { if (inStage(m, u) || M.dist(u, foe) > 7 || !m.canCast(u, 's1')) return false; return !!m.castSkill(u, 's1', foe, { x: u.x, y: u.y }); },
-      guard: (m, u) => (u.ws.spotUntil > m.time ? { t: 1, punish: true } : null) },
+      guard: (m, u) => (u.ws.spotUntil > m.time ? { t: 1, punish: true } : null),
+      // GĐ12: đang có Sân Khấu gần đó — cố đánh trong vùng (ra mép thì lách vào; mục tiêu đứng trong vùng thì Bước Nhảy liên hoàn)
+      micro(ai) {
+        const m = ai.m, u = ai.u, st = u.ws.stage;
+        if (u.cast || u.dash) return false;
+        if (disguised(m, u)) {
+          const left = u.ws.copyUntil - m.time, t = ai.target, o = u.ws.copyFrom;
+          // 13.5–14s: an toàn quanh điểm gốc → chủ động giật về sớm; mục tiêu < 20% máu → ở lại
+          if (left < 1.5 && left > 0.9 && o && !(t && t.alive && t.hpPct < 0.2 && M.dist(u, t) < 7)) {
+            const safe = !m.heroes.some((h) => h.alive && h !== u && h.team !== u.team && M.dist(h, o) < 6);
+            if (safe) { u.ws.copyUntil = m.time; endDisguise(m, u); u.stats.lucaSnap = (u.stats.lucaSnap || 0) + 1; return true; }
+          }
+          // phối hợp chéo: vừa dùng khống chế cứng mượn → lật về bộ Luca, mở Sân Khấu, nhảy múa; vừa dùng khiên mượn → Ánh Đèn
+          const lc = u.ws.lastCopy;
+          if (lc && m.time - lc.t < 1.2 && u.ws.kit === 'copy' && t && t.alive && (lc.cc || lc.def)) {
+            u.ws.kit = 'own'; if (m.fxOn) m.fx({ type: 'ring', x: u.x, y: u.y, r: 1.6, color: '#ff6a9a', fx: 'boom' });
+            const k = lc.cc ? 's1' : 's2'; u.ws.lastCopy = null;
+            if (m.canCast(u, k) && m.castSkill(u, k, t, { x: t.x, y: t.y })) { u.stats.lucaCross = (u.stats.lucaCross || 0) + 1; return true; }
+          }
+        }
+        if (!st || st.until <= m.time) return false;
+        const R = stageR(u), d = M.dist(u, st), t = ai.target;
+        if (d > R - 0.6 && d < R + 6) { const v = H.dirTo(u, st); u.goal = { x: u.x + v.x * 2.5, y: u.y + v.y * 2.5 }; if (t && t.alive && M.dist(t, st) < R && m.canCast(u, 's1')) m.castSkill(u, 's1', t, { x: t.x, y: t.y }); return true; }
+        if (t && t.alive && d <= R && M.dist(u, t) < 4 && m.canCast(u, 's1') && M.dist(t, st) < R + 1) { u.stats.waltz = (u.stats.waltz || 0) + 1; return !!m.castSkill(u, 's1', t, { x: t.x, y: t.y }); }
+        return false;
+      } },
     tags: ['dive'],
   });
   G.HEROES.luca.tree = [

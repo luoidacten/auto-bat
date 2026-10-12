@@ -37,6 +37,9 @@
     else if (an === 'spin') rot = eo(p * 1.15) * TAU;
     else if (an === 'raise') rot = p < 0.45 ? -1.4 * (p / 0.45) : lerp(-1.4, 0.3, Math.min(1, (p - 0.45) * 4));
     ctx.lineCap = 'round';
+    // GĐ12: tướng hai vũ khí đánh LUÂN PHIÊN trái/phải — tay theo số đòn (st.atkN chẵn/lẻ); tay còn lại chỉ nhích nhẹ (xoay chiêu thì cả hai)
+    const side = an === 'spin' ? 0 : (st && st.atkN & 1) ? 1 : -1;
+    const hand = (s) => (side === 0 || s === side ? 1 : 0.15);
     switch (gfx) {
       case 'swordshield': {
         ctx.save();
@@ -69,7 +72,7 @@
         ctx.strokeStyle = tc('#d4af37'); ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(14, 10, 5, 0, TAU); ctx.stroke();
         blade(ctx, 14, 10, 56, 2, '#f4f4ff'); break;
       case 'dagger':
-        ctx.rotate(rot); ctx.translate(ext, 0); blade(ctx, 12, 14, 24, 3, '#d8c8ff'); blade(ctx, 12, -14, 22, 3, '#d8c8ff'); break;
+        for (const s of [1, -1]) { ctx.save(); ctx.rotate(rot * hand(s)); ctx.translate(ext * hand(s), 0); blade(ctx, 12, s * 14, s > 0 ? 24 : 22, 3, '#d8c8ff'); ctx.restore(); } break;
       case 'katana':
         ctx.rotate(rot); ctx.translate(ext, 0);
         ctx.strokeStyle = '#222'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(8, 14); ctx.lineTo(18, 14); ctx.stroke();
@@ -102,7 +105,7 @@
         break;
       case 'twinblades':
         for (const s of [-1, 1]) {
-          ctx.save(); ctx.translate(0, s * 11); ctx.rotate(rot * (s > 0 ? 1 : -1) * (an === 'spin' ? 1 : 0.8)); ctx.translate(ext, 0);
+          ctx.save(); ctx.translate(0, s * 11); ctx.rotate(rot * (s > 0 ? 1 : -1) * (an === 'spin' ? 1 : 0.8) * hand(s)); ctx.translate(ext * hand(s), 0);
           blade(ctx, 8, 0, 36, 3, s > 0 ? '#e8f4ff' : '#b8d8ff'); ctx.restore();
         }
         break;
@@ -144,6 +147,11 @@
         ctx.fillStyle = tc('#ff9a6a'); ctx.strokeStyle = '#5a2a1a'; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.arc(18 + punch, 11, 7, 0, TAU); ctx.fill(); ctx.stroke();
         ctx.beginPath(); ctx.arc(16, -11, 7, 0, TAU); ctx.fill(); ctx.stroke();
+        break;
+      }
+      case 'beastclaw': {   // GĐ12: Galo hóa thú — hai bộ vuốt to cong, cào theo đòn
+        ctx.rotate(rot * 0.8); ctx.strokeStyle = tc('#f0f0d0'); ctx.lineWidth = 3.2; ctx.lineCap = 'round';
+        for (const s of [-1, 1]) for (let i = -1; i <= 1; i++) { ctx.beginPath(); ctx.moveTo(14, s * 13 + i * 3.5); ctx.quadraticCurveTo(28 + ext, s * 15 + i * 6, 36 + ext, s * 10 + i * 7); ctx.stroke(); }
         break;
       }
       case 'claw':
@@ -221,10 +229,9 @@
         ctx.strokeStyle = 'rgba(200,240,255,0.6)'; ctx.beginPath(); ctx.arc(24 + ext * 0.6, -6 + Math.sin(time * 3) * 3, 11, time * 2, time * 2 + 2); ctx.stroke();
         break;
       case 'axes':        // song rìu (Boran)
-        ctx.rotate(rot);
         for (const yy of [-12, 14]) {
-          ctx.strokeStyle = '#5a3a1a'; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(6, yy); ctx.lineTo(34, yy); ctx.stroke();
-          ctx.fillStyle = tc('#b8bcc4'); ctx.beginPath(); ctx.moveTo(28, yy); ctx.lineTo(40, yy - 9); ctx.lineTo(42, yy + 7); ctx.closePath(); ctx.fill();
+          ctx.save(); ctx.rotate(rot * hand(yy < 0 ? -1 : 1)); ctx.strokeStyle = '#5a3a1a'; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(6, yy); ctx.lineTo(34, yy); ctx.stroke();
+          ctx.fillStyle = tc('#b8bcc4'); ctx.beginPath(); ctx.moveTo(28, yy); ctx.lineTo(40, yy - 9); ctx.lineTo(42, yy + 7); ctx.closePath(); ctx.fill(); ctx.restore();
         }
         break;
       case 'cleaver':     // đại bản đao (Ariston)
@@ -297,8 +304,7 @@
         break;
       }
       case 'voidknife': { // phi đao hư không (Kip): dao đen viền tím, vệt nứt không gian
-        ctx.rotate(rot); ctx.translate(ext, 0);
-        blade(ctx, 12, 14, 22, 3, '#2a2040'); blade(ctx, 12, -14, 20, 3, '#2a2040');
+        for (const s of [1, -1]) { ctx.save(); ctx.rotate(rot * hand(s)); ctx.translate(ext * hand(s), 0); blade(ctx, 12, s * 14, s > 0 ? 22 : 20, 3, '#2a2040'); ctx.restore(); }
         ctx.strokeStyle = tc('#a59aff'); ctx.lineWidth = 1.2; ctx.shadowColor = '#a59aff'; ctx.shadowBlur = 6;
         ctx.beginPath(); ctx.moveTo(14, 14); ctx.lineTo(34, 14); ctx.moveTo(14, -14); ctx.lineTo(32, -14); ctx.stroke(); ctx.shadowBlur = 0;
         break;
@@ -345,7 +351,13 @@
     ctx.beginPath(); ctx.arc(0, 0, rpx, 0, TAU); ctx.fill();
     ctx.lineWidth = Math.max(1.5, rpx * 0.12); ctx.strokeStyle = '#20232a'; ctx.stroke();
     if (o.stunned) { ctx.fillStyle = 'rgba(150,150,150,0.45)'; ctx.fill(); }
-    ctx.fillStyle = '#111';
+    if (o.beast) {   // tai nhọn + nanh + vằn lưng
+      ctx.fillStyle = '#2a5a18'; for (const s of [-1, 1]) { ctx.beginPath(); ctx.moveTo(-rpx * 0.1, s * rpx * 0.55); ctx.lineTo(-rpx * 0.55, s * rpx * 1.05); ctx.lineTo(-rpx * 0.5, s * rpx * 0.35); ctx.closePath(); ctx.fill(); }
+      ctx.strokeStyle = '#1e3e10'; ctx.lineWidth = Math.max(1, rpx * 0.1); for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.arc(-rpx * 0.15, 0, rpx * (0.35 + i * 0.18), Math.PI * 0.75, Math.PI * 1.25); ctx.stroke(); }
+      ctx.fillStyle = '#fff8e0'; for (const s of [-1, 1]) { ctx.beginPath(); ctx.moveTo(rpx * 0.8, s * rpx * 0.12); ctx.lineTo(rpx * 1.08, s * rpx * 0.2); ctx.lineTo(rpx * 0.82, s * rpx * 0.3); ctx.closePath(); ctx.fill(); }
+    }
+    if (o.rose) { ctx.fillStyle = '#e02050'; for (let i = 0; i < 6; i++) { const q = i * TAU / 6 + o.time * 1.5; ctx.globalAlpha = 0.7; ctx.beginPath(); ctx.arc(Math.cos(q) * rpx * 1.35, Math.sin(q) * rpx * 1.35, rpx * 0.13, 0, TAU); ctx.fill(); } ctx.globalAlpha = o.stealth ? 0.45 : 1; }
+    ctx.fillStyle = o.beast ? '#ffd020' : '#111';
     const ey = rpx * 0.33, er = Math.max(1.2, rpx * 0.15);
     ctx.beginPath(); ctx.arc(rpx * 0.5, -ey, er, 0, TAU); ctx.arc(rpx * 0.5, ey, er, 0, TAU); ctx.fill();
     ctx.restore();

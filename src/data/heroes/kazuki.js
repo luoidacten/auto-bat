@@ -116,7 +116,7 @@
           u.ws.ky = Math.min(10, (u.ws.ky || 0) + 1);
           const iaido = H.T(u, '12a');
           const form = iaido ? 'BB' : seq;
-          if (form === 'AA') {
+          if (form === 'AA') { H.spin(m, u, 0.5);
             const R = H.T(u, '9c') ? 3.9 : 2.8;
             m.hitCircle(u, u.x, u.y, R, (e) => {
               m.damage(u, e, dmg, 'phys', { tag: 's3', aoe: true });
@@ -194,7 +194,7 @@
         ai: { use: 'ult', aim: 'point', speed: 0, range: 6, aoe: 3 },
       },
     },
-    ai: { order: ['s1', 's2', 's3'], engageRange: 4, role: 'fighter', bait: true, guard: (m, u) => (u.ws.guard > m.time ? { t: u.ws.guard - m.time, punish: true } : null) },
+    ai: { order: ['s1', 's2', 's3'], engageRange: 4, role: 'fighter', bait: true, micro: (ai, en) => G.T12 && G.T12.kazuki(ai, en), /* GĐ12: chọn nhịp AA/AB/BA/BB */ guard: (m, u) => (u.ws.guard > m.time ? { t: u.ws.guard - m.time, punish: true } : null) },
     tags: ['dive'],
   });
   G.HEROES.kazuki.tree = [

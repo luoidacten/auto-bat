@@ -19,7 +19,7 @@
       desc: 'Đánh thường dùng băng 9 viên; hết đạn phải nạp 1.6s. Đạn mạnh.',
       init(m, u) { u.ws.ammo = MAG; u.ws.reload = 0; u.ws.hits = 0; u.ws.emp = false; u.ws.fastRl = 0; },
       update(m, u, dt) {
-        if (u.ws.reload > 0) { u.ws.reload -= dt; if (u.ws.reload <= 0) { u.ws.ammo = mag(u); H.reloadDone(m, u); } }
+        if (u.ws.reload > 0 && !H.rlHold(m, u, 'reload')) { u.ws.reload -= dt; if (u.ws.reload <= 0) { u.ws.ammo = mag(u); H.reloadDone(m, u); } }
         if (u.ws.ammo <= 0) u.atkT = Math.max(u.atkT, u.ws.reload);
         // tự nạp khi rảnh tay lâu
         if (u.ws.ammo < mag(u) && u.ws.reload <= 0 && m.time - (u.combatT || -99) > 4) startReload(m, u);

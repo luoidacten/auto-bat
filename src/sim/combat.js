@@ -147,7 +147,7 @@
         info.hpDealt = dealt; info.gaDealt = gaDealt;
         if (this.sbx) this.sbOnDmg(owner, tgt, info, shAbs);   // GĐ11: bảng đo Sandbox
         // sổ sách
-        tgt.lastDmgT = this.time;
+        tgt.lastDmgT = this.time; tgt.lastDmgSrcHero = !!(owner && (owner.kind === 'hero' || owner.owner));
         if (tgt.ai && tgt.ai.cog && tot > 0) G.Cog.onHit(this, tgt, owner, tot);   // GĐ10: bất ngờ / mù tiêu điểm
         if (tgt.ai && G.Brain && tot > 0) G.Brain.onHit(this, tgt, owner, info, tot);   // GĐ11: suy luận hướng đòn
         // kẻ vừa đánh (mọi loại: tướng, vật triệu hồi, quái) — hộ vệ của chủ dùng để nhắm kẻ đánh chủ
@@ -169,6 +169,7 @@
             owner.stats.dmgHero += tot; tgt.stats.dmgTaken += tot;
             if ((tgt.allyRec || tgt.permWith) && G.Persona) G.Persona.allyHit(this, owner, tgt, tot);   // GĐ7b: trúng nhầm đồng minh (GĐ9b: cả người cùng phe nhà cái)
             this.heroHit.push({ att: owner, vic: tgt, t: this.time });
+            if (owner.bigCast && G.T12) G.T12.noteHit(owner, tgt, info);
           }
           // GĐ8: hút máu tính trên mọi sát thương gây ra (đánh thường 100%, chiêu đơn 60%, chiêu diện rộng 30%; không tính độc / bão)
           if (owner.st.lifesteal > 0 && tot > 0 && info.tag !== 'dot') {

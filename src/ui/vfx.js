@@ -30,6 +30,8 @@
     // phi đao hư không (Kip): đâm + vết nứt tím
     voidknife: (V, now, e, a, R, c) => { V.add(now, { k: 'thrust', x: e.x, y: e.y, a, len: R + 0.3, w: 0.32, c: '#a59aff', life: 0.18 }); V.add(now, { k: 'spr', key: 'spark', x: e.tx, y: e.ty, s: 1.0, c: '#7a6aff', life: 0.22 }); },
     // côn (Wukong): xoáy côn nhỏ
+    // gậy ba toong (Luca, cận chiến từ GĐ12): vụt cong + cánh hoa hồng bung ở đầu gậy
+    cane: (V, now, e, a, R, c) => { V.add(now, { k: 'slash', x: e.x, y: e.y, a, r: R * 0.85, arc: 1.7, w: 0.45, c: '#ff6a9a', life: 0.24, flip: FLIP(now) }); V.add(now, { k: 'spr', key: 'halo', x: e.x + Math.cos(a) * R, y: e.y + Math.sin(a) * R, s: 1.0, c: '#ff4a7a', life: 0.25 }); },
     pole: (V, now, e, a, R, c) => { V.add(now, { k: 'whirl', x: e.x, y: e.y, a, r: R * 0.7, w: 0.35, c: '#ffd24a', life: 0.24 }); },
     // song rìu (Boran): hai nhát bổ nặng + vụn băng
     axes: (V, now, e, a, R, c) => { V.add(now, { k: 'slash', x: e.x, y: e.y, a, r: R * 0.8, arc: 1.4, w: 0.55, c: '#9fe0ff', heavy: true, life: 0.26, flip: FLIP(now) }); V.burstParts(now, e.tx, e.ty, 5, { color: '#d8f4ff', speed: 2, life: 0.35, size: 0.12 }); },
@@ -332,6 +334,7 @@
         case 'heal': if (e.v >= 40) this.add(now, { k: 'spr', key: 'flower', x: e.x, y: e.y, s: 1.6, c: '#7aff9a', life: 0.5, alpha: 0.8 }); return;
         case 'death': this.add(now, { k: 'spr', key: 'skull', x: e.x, y: e.y, s: 2.6, c: '#ffffff', life: 1.0 }); this.add(now, { k: 'spr', key: 'smoke', x: e.x, y: e.y, s: 3, tint: '#9a9aa8', life: 0.8, alpha: 0.7 }); this.shake(3); return;
         case 'aura': if (e.id != null) this.add(now, { k: 'aura', id: e.id, c: e.color || '#ffffff', life: Math.max(0.35, Math.min(e.life || 0.5, 6)) }); return;
+        case 'tophat': this.add(now, { k: 'tophat', x: e.x, y: e.y, r: e.r || 1.2, c: e.color || '#c040ff', life: e.life || 1.1 }); return;   // GĐ12: Mũ Cao của Dahlia rơi từ trời
         case 'lock': if (e.id != null) this.add(now, { k: 'lock', id: e.id, c: e.color || '#e0e0ff', life: Math.min(e.life || 3, 8) }); return;
         case 'shades': if (e.id != null) this.add(now, { k: 'shades', id: e.id, c: '#8a7aa8', life: Math.min(e.life || 5, 8) }); return;
         case 'cast': {
@@ -442,6 +445,19 @@
           ctx.globalAlpha = 0.25 * fade; ctx.strokeStyle = f.c; ctx.lineWidth = 3;
           ctx.beginPath(); ctx.arc(p.x, p.y, f.r * z * (0.9 + 0.15 * k), 0, TAU); ctx.stroke();
           ctx.globalAlpha = 0.8 * fade; Slash.draw(ctx, 2, f.c, k, f.r * z * 2, f.r * z * 2);
+          break;
+        }
+        case 'tophat': {
+          // mũ chóp cao đen viền tím rơi từ trên trời (35% đầu), chụp xuống, nảy nhẹ, rồi mờ dần; bóng đổ lớn dần dưới đất
+          const W = f.r * z * 1.6, Hh = f.r * z * 1.5, fall = Math.min(1, k / 0.35), drop = (1 - easeOut(fall)) * 7 * z, bounce = fall >= 1 ? Math.sin(Math.min(1, (k - 0.35) / 0.15) * Math.PI) * 0.12 * z : 0;
+          const al = k > 0.75 ? (1 - k) / 0.25 : 1, y = p.y - drop - bounce;
+          ctx.globalAlpha = 0.35 * al * fall; ctx.fillStyle = '#000'; ctx.beginPath(); ctx.ellipse(p.x, p.y, W * 0.75 * (0.4 + 0.6 * fall), W * 0.22 * (0.4 + 0.6 * fall), 0, 0, TAU); ctx.fill();
+          ctx.globalAlpha = al; ctx.fillStyle = '#141018'; ctx.strokeStyle = f.c; ctx.lineWidth = Math.max(1.5, 0.08 * z); ctx.shadowColor = f.c; ctx.shadowBlur = 10;
+          ctx.beginPath(); ctx.ellipse(p.x, y, W * 0.8, W * 0.2, 0, 0, TAU); ctx.fill(); ctx.stroke();              // vành mũ
+          ctx.fillRect(p.x - W * 0.45, y - Hh, W * 0.9, Hh); ctx.strokeRect(p.x - W * 0.45, y - Hh, W * 0.9, Hh);   // thân mũ
+          ctx.beginPath(); ctx.ellipse(p.x, y - Hh, W * 0.45, W * 0.12, 0, 0, TAU); ctx.fill(); ctx.stroke();       // chóp
+          ctx.shadowBlur = 0; ctx.fillStyle = f.c; ctx.fillRect(p.x - W * 0.45, y - Hh * 0.32, W * 0.9, Hh * 0.14);  // dải ruy băng tím
+          if (fall >= 1 && k < 0.5) { ctx.globalAlpha = (0.5 - k) * 2 * al; ctx.strokeStyle = f.c; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(p.x, p.y, W * (1 + (k - 0.35) * 6), 0, TAU); ctx.stroke(); }
           break;
         }
         case 'expl':

@@ -80,7 +80,7 @@
     aria: 'hoabinh', valerius: 'vosi', roxie: 'thuongnhan', wukong: 'quayphan', thanhphong: 'cuongtin', lyra: 'chuotlui',
     koda: 'cuongloan', clint: 'gaccong', joker: 'bipbom', gideon: 'lanhchua', theron: 'vesi', kazuki: 'doimang',
     percy: 'bacle', vesper: 'thoatxac', raven: 'tientri', ryoma: 'tramtuong', ignatius: 'honloan', alice: 'moicau',
-    galo: 'riabao', florian: 'nguyquan',
+    galo: 'riabao', florian: 'tramtuong',
     // GĐ10
     luca: 'khatnuoc', kip: 'quayphan', olivia: 'cuongtin', justus: 'cuongtin', ratok: 'hobao', caelus: 'thucdung', boran: 'cuongloan',
     ariston: 'cuongtin', mirage: 'bipbom', dahlia: 'nguyquan', vector: 'cauton', bachdiep: 'tramtuong', tsukiyo: 'amsat',
@@ -93,17 +93,18 @@
     allin: { name: 'Lì đòn', icon: '🛡', desc: 'Đã vào trận là đánh tới cùng, không bỏ chạy.' },
     fight: { name: 'Xông xáo', icon: '⚔', desc: 'Đánh tới khi còn khoảng 10% máu mà thấy không thắng nổi mới chạy.' },
     kite: { name: 'Thả diều', icon: '🏹', desc: 'Giữ đối thủ ở mép tầm bắn, đi lên xuống giữa hai phát bắn, lướt né khi bị áp sát.' },
+    assassin: { name: 'Sát thủ phép', icon: '🗡', desc: 'Đọc vị mục tiêu: máu giấy thì lao vào dồn sát thương rồi rút; trâu bò thì cấu rỉa tới ngưỡng kết liễu. Thấy đối thủ hụt chiêu lớn là lao vào ngay.' },
     stand: { name: 'Đứng bắn', icon: '🎯', desc: 'Đánh tầm xa nhưng ít di chuyển, không cố thả diều.' },
   };
   const STYLE_BY_HERO = {
     valerius: 'allin', borg: 'allin', kazuki: 'allin', wukong: 'allin', ryoma: 'allin', theron: 'allin',
     gideon: 'fight', koda: 'fight', vesper: 'fight', death: 'fight', florian: 'fight',
     elara: 'kite', zero: 'kite', percy: 'kite', chrononeo: 'kite', raven: 'kite', jack: 'kite',
-    ignatius: 'kite', alice: 'kite', thanhphong: 'kite', roxie: 'kite', joker: 'kite', lyra: 'kite',
+    ignatius: 'kite', alice: 'assassin', thanhphong: 'assassin', roxie: 'kite', joker: 'kite', lyra: 'kite',
     aria: 'stand', victoria: 'stand', galo: 'stand', clint: 'stand',
     // GĐ10
-    ratok: 'allin', boran: 'allin', ariston: 'allin', luca: 'fight', kip: 'fight', dahlia: 'fight', tsukiyo: 'fight',
-    olivia: 'kite', justus: 'kite', caelus: 'kite', mirage: 'kite', vector: 'kite', bachdiep: 'kite',
+    ratok: 'allin', boran: 'allin', ariston: 'allin', luca: 'assassin', kip: 'fight', dahlia: 'assassin', tsukiyo: 'fight',
+    olivia: 'kite', justus: 'kite', caelus: 'kite', mirage: 'assassin', vector: 'kite', bachdiep: 'kite',
   };
   G.FIGHT_STYLE = STYLE; G.FIGHT_STYLE_BY_HERO = STYLE_BY_HERO;
   G.fightStyleOf = (heroId) => STYLE_BY_HERO[heroId] || 'fight';

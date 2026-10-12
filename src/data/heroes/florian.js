@@ -1,12 +1,11 @@
 'use strict';
 // ===== Florian — Kiếm Liễu • đấu sĩ múa kiếm quanh mục tiêu • mana • vật lý + chuẩn =====
-// GĐ8: làm lại theo bản Di sản.
-//   • Tứ Ấn đặt 4 ấn Đông–Tây–Nam–Bắc lên kẻ địch. Đánh trúng từ ĐÚNG HƯỚNG của ấn để phá: mỗi ấn giảm 1.5s mọi hồi chiêu
-//     (Phân Ảnh, Thế Thủ, Lướt, Đâm Lao) và làm chậm mạnh. Chỉ cần phá 3/4 ấn: CHOÁNG lâu + đòn kế tiếp đẩy cực mạnh + Florian hồi máu.
-//     Tứ Ấn chỉ bắt đầu hồi chiêu khi ấn đã hết; ném trượt thì hồi chiêu giảm một nửa.
-//   • Đâm Lao: đòn đánh thường cứ 3s được cường hóa thành cú lao thẳng tới hướng ấn gần nhất (vòng quanh mục tiêu mà "múa").
-//   • Kiếm Thế Tứ Ấn (chiêu cuối): 4s ấn liên tục đặt lại sau mỗi lần phá; Phân Ảnh thành dịch chuyển ra sau lưng địch rồi lao;
-//     Đâm Lao kèm phân ảnh lao từ phía sau; mỗi lần phá ấn (3/4) tung ngay nhát đâm XUYÊN THỦNG mọi thứ (xuyên tường).
+// GĐ12: làm lại lần hai (đấu kiếm ba điểm).
+//   • Đâm Lao 3.5s tự khóa vào ẤN CHƯA VỠ GẦN NHẤT, chạm xong lướt nhỏ 1 đv đổi góc.
+//   • MỖI ấn vỡ: −1.5s mọi hồi chiêu, chậm 60% 1s, làm mới Đâm Lao, 5% máu tối đa sát thương chuẩn, hồi 0.5% máu.
+//     Mốc 2/4: choáng 0.25s + hồi 2.5%. Mốc 4/4: 25% máu tối đa sát thương chuẩn, hồi 5%, đòn kế trong 3s +40% & đẩy 3 đv.
+//   • Phân Ảnh xuất hiện 8 đv phía ĐỐI DIỆN qua mục tiêu, khựng 0.25s rồi lao ngược về — phá ấn phía bên kia (gọng kìm).
+//   • Lướt 0 hồi chiêu, chỉ dùng trong 1.5s sau Đâm Lao/chiêu, miễn nhiễm khi lướt. Kiếm Thế Tứ Ấn giữ nguyên.
 (function () {
   const G = globalThis.G, H = G.H, M = G.M;
   const WP = 'flo_wp', HALF = 1.5707963;
@@ -44,29 +43,35 @@
     if (i < 0) return false;
     s.pts.splice(i, 1); s.broken++;
     const cap = t.kind === 'hero' ? 1e9 : 150;
-    // mỗi ấn: −1.5s mọi hồi chiêu, làm chậm mạnh, một nhát chuẩn nhỏ
-    for (const k of ['s2', 's3', 'sub']) if (u.cd[k] > 0) u.cd[k] = Math.max(0, u.cd[k] - 1.5);
-    u.ws.lungeT = Math.min(u.ws.lungeT || 0, m.time + 0.2);
+    // GĐ12 — MỖI ẤN: −1.5s mọi hồi chiêu, chậm 60% 1s, làm mới ngay Đâm Lao, 5% máu tối đa sát thương chuẩn, Florian hồi 0.5% máu
+    for (const k of ['s1', 's2', 's3', 's4', 'sub']) if (u.cd[k] > 0 && u.cd[k] < 50) u.cd[k] = Math.max(0, u.cd[k] - 1.5);
+    u.ws.lungeT = m.time;
     m.addStatus(t, 'slow', 1, 0.6, { src: u, key: 'flo_slow' });
-    m.damage(u, t, Math.min(cap, t.st.maxHp * (0.01 + 0.0005 * u.level)), 'true', { tag: 'p' });
+    m.damage(u, t, Math.min(cap, t.st.maxHp * 0.05), 'true', { tag: 'p' });
+    m.heal(u, u, u.st.maxHp * 0.005, true);
     if (H.T(u, '1b')) m.addStatus(u, 'haste', 2, 0.25, { key: 'flo_step' });
     if (H.T(u, '3b')) m.dot(u, t, Math.min(cap / 3, t.st.maxHp * 0.01), 3, 'phys', 'flo_bleed');
     if (m.fxOn) { const v = qDir(q); m.fx({ type: 'burst', x: t.x + v.x * (t.r + 0.4), y: t.y + v.y * (t.r + 0.4), color: '#ff9ad5' }); }
-    if (s.pts.length > 1) return true;                                   // chỉ cần phá 3/4 ấn là kích hoạt
-    // ---- PHÁ ẤN: choáng lâu, đòn kế tiếp đẩy cực mạnh, Florian hồi máu ----
+    // mốc 2/4: choáng 0.25s ngắt chiêu, hồi 2.5% máu
+    if (s.broken === 2) { m.addStatus(t, 'stun', 0.25, 1, { src: u }); m.heal(u, u, u.st.maxHp * 0.025, true); if (m.fxOn) m.fx({ type: 'callout', id: t.id, text: '2/4 ẤN', color: '#ffd0f0' }); }
+    if (s.pts.length > 0) return true;
+    // ---- mốc 4/4 — PHÁ TRỌN BỘ: 25% máu tối đa sát thương chuẩn, hồi 5% máu, đòn kế tiếp trong 3s +40% & đẩy lùi 3 đv ----
     s.done = true; s.t = 0;
-    m.addStatus(t, 'stun', 1.1, 1, { src: u });
-    u.ws.empNext = true;
+    m.damage(u, t, Math.min(cap * 3, t.st.maxHp * 0.25), 'true', { tag: 'p' });
+    u.ws.empNext = true; u.ws.empT = m.time + 3;
     m.heal(u, u, u.st.maxHp * 0.05, true);
+    u.stats.floFull = (u.stats.floFull || 0) + 1;
     if (H.T(u, '3c')) m.addStatus(u, 'invuln', 1, 1, { key: 'flo_imm' });
     if (H.T(u, '12a') && t.alive) { t.revealedT = Math.max(t.revealedT, m.time + 3); m.addStatus(t, 'slow', 3, 0.4, { src: u }); }
     if (H.T(u, '12c')) for (const k of ['s2', 's3', 'sub']) u.cd[k] = 0;
-    if (m.fxOn) { m.fx({ type: 'callout', id: t.id, text: 'PHÁ ẤN!', color: '#ff9ad5' }); m.fx({ type: 'ring', x: t.x, y: t.y, r: 1.8, color: '#ff9ad5' }); }
+    if (m.fxOn) { m.fx({ type: 'callout', id: t.id, text: 'PHÁ TRỌN TỨ ẤN!', color: '#ff9ad5' }); m.fx({ type: 'ring', x: t.x, y: t.y, r: 1.8, color: '#ff9ad5' }); }
     if (inForm(m, u)) m.later(0.12, (mm) => pierce(mm, u, t));
     marksGone(m, u, t);
     if (H.T(u, '12a')) u.cd.s1 = 0;
     return true;
   }
+  // phá đúng ấn q (Phân Ảnh đâm từ phía đối diện)
+  function breakAt(m, u, t, q) { const fake = { x: t.x + qDir(q).x * 2, y: t.y + qDir(q).y * 2 }; const ox = u.x, oy = u.y; u.x = fake.x; u.y = fake.y; const r = breakWP(m, u, t, false); u.x = ox; u.y = oy; return r; }
   // Nộ Florian: nhát đâm xuyên thủng mọi thứ (xuyên tường, mọi kẻ địch trên đường)
   function pierce(m, u, t) {
     if (!u.alive) return;
@@ -92,7 +97,8 @@
     stats: { hp: 590, hpG: 92, mp: 300, mpG: 38, mpr: 1.5, mprG: 0.08, ad: 60, adG: 3.6, armor: 29, armorG: 3.8, as: 0.7, asG: 0.028, ms: 3.55, range: 1.75 },
     passive: {
       name: 'Đâm Lao & Tứ Ấn',
-      desc: 'Cứ 3.5s, đòn đánh thường kế tiếp thành cú lao tới mục tiêu (tới 3.5 đv ngoài tầm), +20 (+4/cấp, +30% SMVL) sát thương — mục tiêu có ấn thì lao thẳng tới hướng ấn gần nhất. Ấn (từ Tứ Ấn): đánh trúng từ ĐÚNG HƯỚNG để phá — mỗi ấn giảm 1.5s mọi hồi chiêu và làm chậm 60% 1s. Phá 3/4 ấn: CHOÁNG 1.1s, đòn kế tiếp đẩy cực mạnh (+40% sát thương), Florian hồi 5% máu.',
+      desc: 'Cứ 3.5s, đòn đánh thường kế tiếp thành cú Đâm Lao lướt tới mục tiêu (tới 3.5 đv ngoài tầm), +20 (+4/cấp, +30% SMVL) sát thương — mục tiêu có ấn thì tự khóa lao vào ẤN CHƯA VỠ GẦN NHẤT; chạm mũi kiếm xong lướt nhỏ 1 đv đổi góc. Đánh trúng từ ĐÚNG GÓC PHẦN TƯ của ấn để phá — MỖI ẤN: −1.5s mọi hồi chiêu, chậm 60% 1s, làm mới ngay Đâm Lao, 5% máu tối đa sát thương chuẩn, Florian hồi 0.5% máu. MỐC 2/4: choáng 0.25s, hồi 2.5% máu. MỐC 4/4: thêm 25% máu tối đa sát thương chuẩn, hồi 5% máu, đòn kế tiếp trong 3s +40% sát thương và đẩy lùi 3 đv.',
+      onSkill(m, u, k) { if (k !== 'sub') u.ws.actT = m.time; },
       init(m, u) { u.ws.lungeT = 0; u.ws.parry = 0; u.ws.formT = 0; u.ws.empNext = false; u.ws.s1Safe = 0; },
       update(m, u) {
         // chốt an toàn: ấn đã mất (mục tiêu gục, đạn biến mất…) mà Tứ Ấn vẫn khóa → bắt đầu hồi chiêu
@@ -111,7 +117,11 @@
         m.dashTo(u, p.x, p.y, 22, { untarget: H.T(u, '6c'), onEnd: (mm) => {
           if (!t.alive || M.dist(u, t) > u.st.range + u.r + t.r + 0.6) return;
           u.ws.lunging = true; u.face(t.x, t.y); mm.autoHit(u, t); u.atkT = u.atkPeriod;
+          u.ws.actT = mm.time;                                                   // mở khóa Lướt (0 hồi chiêu) 1.5s
           if (H.T(u, '6c')) breakWP(mm, u, t, true);
+          // vi dịch chuyển 1.0 đv sau cú đâm: đổi góc về phía ấn kế tiếp
+          const s2 = t.alive && t.hasKey(WP);
+          if (s2 && s2.src === u && s2.pts && s2.pts.length && !s2.done) { const v = qDir(nearestPt(t, u, s2)), R = t.r + u.r + 0.35, q = { x: t.x + v.x * R, y: t.y + v.y * R }, d = M.dist(u, q); if (d > 0.3) { const p2 = H.toward(u, q, Math.min(1, d), true); G.MAP.pushOut(p2, u.r); mm.dashTo(u, p2.x, p2.y, 20, {}); } }
           // Kiếm Thế: kèm một phân ảnh lao tới từ phía sau mục tiêu
           if (inForm(mm, u) && t.alive) { const w = H.dirTo(u, t), s0 = { x: t.x + w.x * 4, y: t.y + w.y * 4 }; phantom(mm, u, s0, -w.x, -w.y, 4.5, H.amt(u, 30 + 6 * u.level, 0.5), false); }
         } });
@@ -119,10 +129,10 @@
       },
       onAuto(m, u, t, info) {
         if (u.ws.lunging) { u.ws.lunging = false; info.amt += lungeBonus(u); }
-        if (u.ws.empNext) {                                                  // đòn cường hóa sau khi phá ấn: đẩy cực mạnh
+        if (u.ws.empNext && m.time < (u.ws.empT || 1e9)) {                  // đòn cường hóa trong 3s sau khi phá trọn: +40%, đẩy 3 đv
           u.ws.empNext = false; info.amt *= 1.4;
           const k9 = H.T(u, '9c');
-          info.extra.push(() => { if (!t.alive) return; const v = H.dirTo(u, t); m.knock(u, t, v.x, v.y, k9 ? 3.5 : 2.5, 0.25); if (k9) m.damage(u, t, info.amt * 0.5, 'true', { tag: 'p' }); if (m.fxOn) m.fx({ type: 'callout', id: t.id, text: 'ĐẨY CỰC MẠNH!', color: '#ffffff' }); });
+          info.extra.push(() => { if (!t.alive) return; const v = H.dirTo(u, t); m.knock(u, t, v.x, v.y, k9 ? 4 : 3, 0.25); if (k9) m.damage(u, t, info.amt * 0.5, 'true', { tag: 'p' }); if (m.fxOn) m.fx({ type: 'callout', id: t.id, text: 'ĐẨY CỰC MẠNH!', color: '#ffffff' }); });
         }
         if (H.T(u, '12b')) info.amt *= 1.35;                                  // Song Kiếm Quý Tộc: nhát đâm thứ hai
       },
@@ -168,7 +178,7 @@
         ai: { use: 'cc', range: 6.6, aim: 'point', speed: 20, skillshot: true, farm: 99, cond: (m, u, t) => { const s = t.hasKey && t.hasKey(WP); return !(s && s.src === u && !s.done); } },
       },
       s2: {
-        name: 'Phân Ảnh', desc: 'Phân ảnh xuất hiện cách 6 đv rồi lao ngược về phía Florian: kẻ trúng chịu sát thương, bị kéo về phía Florian và chậm 30% 1.5s. Đang Kiếm Thế: Florian dịch chuyển ra sau lưng mục tiêu rồi lao xuyên qua.',
+        name: 'Phân Ảnh', desc: 'Sinh Phân Ảnh ở phía ĐỐI DIỆN Florian qua tâm mục tiêu, cách Florian 8 đv; đứng khựng 0.25s rồi lao ngược hết tốc lực về chỗ Florian, gây sát thương vật lý mọi kẻ trên đường. Cú lao mang đặc tính Đâm Lao: chạm mục tiêu từ góc có ấn chưa vỡ thì PHÁ ẤN ĐÓ từ phía đối diện (gọng kìm phá 2 ấn cùng lúc). Đang Kiếm Thế: Florian dịch chuyển ra sau lưng mục tiêu rồi lao xuyên qua.',
         cd: [7, 6.5, 6, 5.5, 5], cost: [40, 40, 40, 40, 40], castTime: 0.12,
         use(m, u, ctx) {
           const dmg = H.amt(u, ctx.v([60, 95, 130, 165, 200]), 0.6);
@@ -179,11 +189,23 @@
             m.dashTo(u, t.x - w.x * 2, t.y - w.y * 2, 24, { invuln: true, onContact: (mm, uu, e) => { mm.damage(u, e, dmg * 1.1, 'phys', { tag: 's2' }); } });
             return;
           }
-          const v = H.dirTo(u, ctx.pt), far = { x: u.x + v.x * 6, y: u.y + v.y * 6 };
-          phantom(m, u, far, -v.x, -v.y, 6, dmg, true);
+          const v = t && t.alive ? H.dirTo(u, t) : H.dirTo(u, ctx.pt), src = { x: u.x + v.x * 8, y: u.y + v.y * 8 };
+          if (m.fxOn) m.fx({ type: 'ring', x: src.x, y: src.y, r: 0.7, color: '#c8c8d8', life: 0.3 });
+          m.later(0.25, (mm) => {
+            if (!u.alive) return;
+            const w = H.dirTo(src, u), L = M.dist(src, u);
+            mm.hitLine(u, src.x, src.y, w.x, w.y, L, 1.4, (e) => {
+              mm.damage(u, e, dmg, 'phys', { tag: 's2' });
+              mm.addStatus(e, 'slow', 1.5, 0.3, { src: u });
+              const sx = e.hasKey && e.hasKey(WP);
+              if (sx && sx.src === u && !sx.done) { const q = quad(e, src), i = sx.pts.indexOf(q); if (i >= 0) breakAt(mm, u, e, q); }
+            }, { color: '#c8c8d8', fx: 'phantom' });
+            if (H.T(u, '3a')) mm.hitCircle(u, u.x, u.y, 2, (e) => { mm.damage(u, e, dmg * 0.5, 'phys', { tag: 's2', aoe: true }); }, { color: '#ff9ad5' });
+          });
           if (H.T(u, '12b')) m.later(0.12, (mm) => { if (!u.alive) return; const a = M.atan2(v.y, v.x) + 0.35, w = { x: M.cos(a), y: M.sin(a) }, f2 = { x: u.x + w.x * 5.6, y: u.y + w.y * 5.6 }; phantom(mm, u, f2, -w.x, -w.y, 5.6, dmg * 0.7, true); });
         },
-        ai: { use: 'burst', range: 5.8, aim: 'point', speed: 0, farm: 3 },
+        // AI: gọng kìm — mục tiêu có ấn và ấn phía đối diện (nơi Phân Ảnh xuất hiện) còn nguyên
+        ai: { use: 'burst', range: 7.5, aim: 'unit', farm: 3, cond: (m, u, t) => { const s = t.hasKey && t.hasKey(WP); if (!s || s.src !== u || s.done) return t.hpPct < 0.4; const v = H.dirTo(u, t); return s.pts.includes(quad(t, { x: t.x + v.x * 3, y: t.y + v.y * 3 })); } },
       },
       s3: {
         name: 'Thế Thủ', desc: 'Vào thế thủ 1s, đỡ mọi sát thương và khống chế. Bị tấn công: phản đòn gây sát thương và CHOÁNG kẻ tấn công 1s (cận chiến bị đẩy lùi). Không ai tấn công: hoàn 25% hồi chiêu.',
@@ -198,11 +220,12 @@
         ai: { use: 'defend', aim: 'self', range: 5 },
       },
       sub: {
-        name: 'Lướt', desc: 'Lướt rất ngắn (2.4 đv) theo bất kỳ hướng nào, né mọi sát thương khi lướt. Dùng để vòng ra đúng hướng ấn hoặc tránh chiêu định hướng.',
-        cd: 3,
+        name: 'Lướt', desc: 'KHÔNG hồi chiêu — chỉ dùng được trong 1.5s sau một cú Đâm Lao hoặc sau bất kỳ chiêu nào. Lướt nhanh 2.4 đv theo hướng chọn, MIỄN NHIỄM mọi sát thương & khống chế khi lướt: bẻ góc 90° sang mặt ấn kế tiếp hoặc né chiêu định hướng.',
+        cd: 0.15,
+        can(m, u) { return m.time - (u.ws.actT || -9) < 1.5; },
         use(m, u, ctx) {
           const p = H.toward(u, ctx.pt, H.T(u, '1a') ? 3 : 2.4, true); G.MAP.pushOut(p, u.r);
-          m.dashTo(u, p.x, p.y, 26, { invuln: true });
+          m.dashTo(u, p.x, p.y, 26, { invuln: true, unstop: true }); u.ws.actT = -9;
           if (m.fxOn) m.fx({ type: 'dashtrail', id: u.id, x: u.x, y: u.y, x2: p.x, y2: p.y, color: '#e0e0ff' });
         },
         ai: {
@@ -220,7 +243,7 @@
         },
       },
       s4: {
-        name: 'Kiếm Thế Tứ Ấn', desc: 'Trong 4s: đặt 4 ấn lên một tướng trong 5 đv; mỗi lần phá ấn (3/4) ấn được đặt lại sau 0.35s và Florian tung ngay nhát đâm XUYÊN THỦNG 10 đv (xuyên tường, 100/160/220 +70% SMVL sát thương chuẩn). Phân Ảnh thành dịch chuyển ra sau địch rồi lao; Đâm Lao kèm phân ảnh lao từ phía sau.',
+        name: 'Kiếm Thế Tứ Ấn', desc: 'Trong 4s: đặt 4 ấn lên một tướng trong 5 đv; mỗi lần phá trọn 4/4 ấn được đặt lại sau 0.35s và Florian tung ngay nhát đâm XUYÊN THỦNG 10 đv (xuyên tường, 100/160/220 +70% SMVL sát thương chuẩn). Phân Ảnh thành dịch chuyển ra sau địch rồi lao; Đâm Lao kèm phân ảnh lao từ phía sau.',
         cd: [90, 75, 60], cost: [100, 100, 100], castTime: 0.1,
         can(m, u) { const t = u.ai && u.ai.target; return !!(t && t.kind === 'hero' && M.dist(u, t) < 5.5); },
         use(m, u, ctx) {
@@ -247,7 +270,7 @@
     [
       { name: 'Hư Ảnh Trùng Điệp', desc: 'Phân Ảnh phát nổ khi biến mất (bán kính 2, 50% sát thương, đẩy lùi 1 đv).' },
       { name: 'Tử Huyệt', desc: 'Phá ấn gây thêm Chảy Máu 1% máu tối đa/giây trong 3s.' },
-      { name: 'Điệu Nhạc Bất Tử', desc: 'Phá ấn (3/4): miễn sát thương 1s.' },
+      { name: 'Điệu Nhạc Bất Tử', desc: 'Phá trọn 4/4 ấn: miễn sát thương 1s.' },
     ],
     [
       { name: 'Đột Kích Hồi Mã', desc: 'Thế Thủ đỡ được đòn: lướt đâm xuyên qua kẻ tấn công ra sau lưng nó.' },

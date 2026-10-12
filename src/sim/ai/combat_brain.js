@@ -299,7 +299,10 @@
     const safer = !near || dist(A, near) > dist(u, near) + 1.5;
     const z = m.zoneSt;
     let why = null;
-    if (z && z.dps > 0 && !m.inZone(u) && m.inZone(A)) why = 'zone';
+    // GĐ12: né chiêu lớn bằng snapback — đang đứng trong vùng cảnh báo sắp nổ (< 0.7s) mà điểm neo nằm ngoài vùng
+    const big = m.dangers.find((d) => d.until > m.time && d.until - m.time < 0.7 && d.team !== u.team && G.Danger.inside(d, u.x, u.y, u.r) && !G.Danger.inside(d, A.x, A.y, u.r));
+    if (big) why = 'dodge';
+    else if (z && z.dps > 0 && !m.inZone(u) && m.inZone(A)) why = 'zone';
     else if (near && u.hpPct < 0.4 && m.time - (u.lastDmgT || -99) < 1.5 && safer) why = 'danger';
     else if (near && rc.until - m.time < 0.3 && dist(near, u) < 6 && safer) why = 'expire';
     if (!why) return false;

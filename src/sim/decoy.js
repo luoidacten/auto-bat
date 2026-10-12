@@ -9,9 +9,11 @@
     if (m.time >= d.lifeT) { d.alive = false; d.hp = 0; if (d.onExpire) m.hook(d.onExpire, m, d); return; }
     if (d.thinkT > m.time) return;
     d.thinkT = m.time + 0.25;
-    if (d.runTo) { d.attackTarget = null; d.goal = d.runTo; return; }
     let best = null, bd = 10;
     for (const h of m.heroes) if (h.alive && h.team !== d.team && h.vis[d.team]) { const x = M.dist(h, d); if (x < bd) { bd = x; best = h; } }
+    // GĐ12: đang bước theo đường định sẵn — tới nơi, hoặc có tướng địch trong tầm đánh (+1.5) thì bỏ đường, quay sang đánh
+    if (d.runTo && (M.dist(d, d.runTo) < 1 || (best && d.st.ad > 0 && bd < d.st.range + d.r + best.r + 1.5))) d.runTo = null;
+    if (d.runTo) { d.attackTarget = null; d.goal = d.runTo; return; }
     // GĐ11: PHÂN THÂN LỪA ĐẢO — ảo ảnh không đứng ì như bia:
     //  • chủ đang bỏ chạy (máu < 35%) → ảo ảnh chạy theo hướng NGƯỢC chủ, lạng lách, kéo kẻ đuổi đi sai đường
     //  • ảo ảnh tụt dưới 40% máu → giả vờ tháo chạy (như tướng thật sắp chết) để dụ kẻ địch đuổi theo
@@ -26,7 +28,9 @@
     d.fake = null;
     if (best) {
       const reach = d.st.range + d.r + best.r;
-      if (d.atkT > 0.2 && bd < reach + 0.3) { const v = M.dir(best, d), g = { x: best.x + v.x * (reach - 0.3) - v.y * 1.2 * zig, y: best.y + v.y * (reach - 0.3) + v.x * 1.2 * zig }; G.MAP.pushOut(g, d.r); d.attackTarget = null; d.goal = g; return; }
+      // GĐ12: đánh-rồi-lùi (hit & run) — giữa hai đòn lùi ra mép tầm (+1 đv nếu là ảo ảnh cận chiến) và lạng ngang
+      const back = d.ranged ? reach - 0.3 : reach + 1;
+      if (d.atkT > 0.2 && bd < reach + 0.3) { const v = M.dir(best, d), g = { x: best.x + v.x * back - v.y * 1.2 * zig, y: best.y + v.y * back + v.x * 1.2 * zig }; G.MAP.pushOut(g, d.r); d.attackTarget = null; d.goal = g; return; }
       d.attackTarget = best; d.goal = null;
     } else { d.attackTarget = null; d.goal = d.home || null; }
   }

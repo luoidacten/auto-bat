@@ -91,6 +91,7 @@
     }
     // đoán vị trí mục tiêu khi chiêu bay tới (người giỏi đoán chuẩn hơn)
     lead(t, speed, extra) {
+      if (G.T12) return G.T12.lead(this, t, speed, extra);   // GĐ12: đón đầu + sai số người thật ±0.2–0.6 đv
       const u = this.u, d = dist(u, t), tt = (speed ? d / speed : 0) + (extra || 0);
       const acc = 0.35 + 0.6 * this.sk('meca');
       const noise = (1 - this.sk('meca')) * 2.2;
@@ -183,6 +184,7 @@
         this.mode = 'idle';
       }
       this.target = null;
+      if (G.T12 && G.T12.idle(this, enemies)) return;                    // GĐ12: check bụi bằng chiêu rẻ / ném thử chiêu vu vơ
       if (this.track && this.trackStep(enemies)) return;
       // ---- vật bay trinh sát của đối phương (quạ Oca…) ở gần: bắn hạ ----
       const scout = this.enemyScout();
@@ -362,6 +364,8 @@
       const m = this.m, u = this.u;
       // GĐ11: Đường Cùng Phản Sát — không thoát được thì quay đầu khô máu thay vì chạy và cố uống bình
       if (G.Brain && G.Brain.lastStand(this, enemies)) { this.mode = 'fight'; this.target = this.turnTgt; this.fightMicro(this.turnTgt, enemies, this.alliesNear || []); return; }
+      // GĐ12: Tử Thủ All-In — bị đánh trong 2s / kẻ đuổi sát & nhanh hơn / kẹt góc tường (lướt xuyên địch nếu được)
+      if (G.T12 && G.T12.berserk(this, enemies)) { if (this.turnT > m.time) { this.mode = 'fight'; this.target = this.turnTgt; this.fightMicro(this.turnTgt, enemies, this.alliesNear || []); } return; }
       this.fleeing = true;
       this.target = null;
       // bị đuổi → chấm điểm chạy / chiêu thoát thân / cắt đuôi qua bụi / quay lại đánh
@@ -586,7 +590,8 @@
       let base = u.fstyle === 'allin' ? 0 : Math.max(0.06, 0.1 + 0.03 * (this.sk('disc') - 0.5) - 0.02 * Math.max(0, this.aggr - 1));
       // GĐ8: đối thủ mang xuyên thủng cao → Hộ Giáp không còn che chắn → bỏ chạy sớm hơn
       if (base > 0 && (this.enemiesNear || []).some((e) => (e.penLv || 0) >= 0.5 && dist(e, u) < 10)) base += 0.05;
-      return G.Persona ? G.Persona.retreatHp(this, base) : base;   // GĐ7: Thoát Xác rút ở 75%, Chuột Lũi / Hòa Bình 45%…
+      const r = G.Persona ? G.Persona.retreatHp(this, base) : base;   // GĐ7: Thoát Xác rút ở 75%, Chuột Lũi / Hòa Bình 45%…
+      return G.T12 ? G.T12.retreatHp(this, r) : r;                   // GĐ12: kỷ luật bỏ chạy 5–10% (hèn / mỏng: 10–25%)
     }
     // mạng cuối: đã dùng lượt hồi sinh hoặc đã quá thời gian hồi sinh
     lastLife() { return this.u.revived || this.m.time >= C.REVIVE_UNTIL; }
@@ -724,6 +729,8 @@
       }
       // GĐ11: chống thả diều (lướt chéo áp sát rồi khống chế) • ép bo (khóa chân ngoài bão, đẩy văng ra ngoài bo)
       if (G.Brain && (G.Brain.arrival(this, t) || G.Brain.antiKite(this, t, enemies) || G.Brain.zoneFight(this, t, enemies))) return;
+      // GĐ12: tử thủ (khống chế cứng → dồn sát thương) • pháp sư sát thủ (FSM cấu → lao → dồn → rút)
+      if (G.T12 && (G.T12.berserkSkills(this, t) || G.T12.backstab(this, t) || G.T12.assassin(this, t, enemies, allies))) return;
       // 4) chiêu — GĐ7b: đang/đủ điều kiện "múa" thì đi theo chuỗi combo, không thì chiêu lẻ như cũ
       if (this.comboStep(t, enemies)) return;
       this.useSkills(t, this.holdT && m.time < this.holdT ? ['defend', 'support', 'escape', 'custom'] : null, false);   // đang gom chiêu: chỉ dùng chiêu thủ / hỗ trợ
@@ -753,7 +760,7 @@
       else if (ready && !(this.bait && this.bait.until > m.time)) { u.attackTarget = null; u.goal = this.strafeGoal(t, Math.min(this.prefDist(t), u.st.range + u.r + t.r - 0.35), allies, enemies); }   // áp sát theo góc riêng (không chen chân đồng đội)
       else { u.attackTarget = null; u.goal = this.strafeGoal(t, this.prefDist(t), allies, enemies); }
       // thả diều (tướng tầm xa kiểu "Thả diều"): giữa hai phát bắn giữ đối thủ ở mép tầm, đi lên xuống; bị áp sát thì lướt né
-      if ((u.ranged || u.hero.ai.role === 'mage') && !u.hero.ai.noKite && !(u.ws.hold > m.time) && !u.windup) this.kite(t, enemies, ready, d);
+      if ((u.ranged || u.hero.ai.role === 'mage') && u.fstyle !== 'assassin' && !u.hero.ai.noKite && !(u.ws.hold > m.time) && !u.windup) this.kite(t, enemies, ready, d);
       // biết buông (GĐ6b: truy đuổi tới cùng) — chỉ bỏ khi mất dấu, hoặc bị đối thủ trả đòn quá đau trong lúc đuổi
       if (!allIn && t.kind === 'hero') {
         const ch = this.chase;
@@ -795,13 +802,15 @@
       if (d > reach + 0.2) { gx = t.x + v.x * (want - 0.3); gy = t.y + v.y * (want - 0.3); }   // ra ngoài tầm: áp lại
       const g = { x: gx, y: gy }; MAP.pushOut(g, u.r);
       if (m.zoneSt.dps > 0 && !m.inZone(g, 1)) return;                    // không thả diều ra ngoài bo
+      if (G.T12) G.T12.slide(this, g);                                     // GĐ12: lùi vào tường → trượt tiếp tuyến
       u.attackTarget = null; u.goal = g;
     }
     // cự ly ưa thích quanh mục tiêu (từng tướng): tầm xa đứng sát mép tầm bắn, cận chiến ngay trong tầm với
     prefDist(t) {
       const m = this.m, u = this.u, reach = u.st.range + u.r + t.r;
       let p = u.ranged ? reach - 0.5 : reach - 0.35;
-      if (u.hero.ai.tip || (u.bind && u.bind.tip && !u.ranged)) p = reach - 0.12;                                   // Gideon: giữ đối thủ ở mũi kiếm
+      if (u.hero.ai.tip || (u.bind && u.bind.tip && !u.ranged)) p = reach - 0.12;
+      if (u.hero.ai.artillery && (this.m.canCast(u, 's1') || this.m.canCast(u, 's2')) && t.kind === 'hero' && this.turnT <= this.m.time) p = Math.max(p, 8);   // GĐ12: pháo binh giữ cự ly chiêu                                   // Gideon: giữ đối thủ ở mũi kiếm
       if (this.bait && this.bait.until > m.time) p = this.bait.dist;
       if (this.punishT > m.time) p = Math.min(p, reach - 0.6);
       p *= 1 + 0.2 * Math.max(0, 0.5 - u.hpPct) - 0.12 * Math.max(0, 0.5 - t.hpPct);

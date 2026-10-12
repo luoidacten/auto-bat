@@ -294,14 +294,19 @@
         if (!solid(u)) continue;
         this.grid.query(u.x, u.y, u.r + 1.6, (v) => {
           if (v.id <= u.id || !solid(v)) return;
-          const min = (u.r + v.r) * 0.82;
+          // GĐ12: va chạm CỨNG hơn — tướng/quái không lồng vào nhau (0.82 → 0.97 tổng bán kính, đẩy 0.45 → 0.8 phần chồng)
+          const min = (u.r + v.r) * 0.97;
           let dx = v.x - u.x, dy = v.y - u.y, d2 = dx * dx + dy * dy;
           if (d2 >= min * min) return;
           let d = Math.sqrt(d2);
           if (d < 1e-4) { const a = ((u.id * 7 + v.id * 13) % 16) / 16 * Math.PI * 2; dx = G.M.cos(a); dy = G.M.sin(a); d = 1; }
           else { dx /= d; dy /= d; }
-          const push = (min - Math.min(d, min)) * 0.45, mu = mass(u), mv = mass(v), ku = mv / (mu + mv), kv = mu / (mu + mv);
-          u.x -= dx * push * ku; u.y -= dy * push * ku; v.x += dx * push * kv; v.y += dy * push * kv;
+          const push = (min - Math.min(d, min)) * 0.8, mu = mass(u), mv = mass(v), ku = mv / (mu + mv), kv = mu / (mu + mv);
+          // chống "dính chùm": thêm lực trượt NGANG (vuông góc trục va chạm) cho bên đang di chuyển, để lách qua nhau thay vì đứng ì đẩy nhau
+          const tg = 0.35 * push, sx = -dy, sy = dx, side = (u.id + v.id) & 1 ? 1 : -1;
+          const um = u.goal || u.attackTarget ? 1 : 0, vm = v.goal || v.attackTarget ? 1 : 0;
+          u.x -= dx * push * ku - sx * tg * side * um * ku; u.y -= dy * push * ku - sy * tg * side * um * ku;
+          v.x += dx * push * kv - sx * tg * side * vm * kv; v.y += dy * push * kv - sy * tg * side * vm * kv;
           u.sepT = v.sepT = this.tick;
         });
       }
@@ -437,7 +442,7 @@
         // chiêu nhiều lượt dùng (charges): nạp lại từng lượt
         for (const k in u.chT) if (u.chT[k] > 0) {
           u.chT[k] -= dt;
-          if (u.chT[k] <= 0) { const n = u.hero.skills[k].charges; u.ch[k] = Math.min(n, (u.ch[k] || 0) + 1); u.chT[k] = u.ch[k] < n ? this.cdOf(u, k) : 0; }
+          if (u.chT[k] <= 0) { const n = this.chargesOf(u, k); u.ch[k] = Math.min(n, (u.ch[k] || 0) + 1); u.chT[k] = u.ch[k] < n ? this.cdOf(u, k) : 0; }
         }
         if ((this.tick + u.slot) % 10 === 0 && u.fxl.tick) this.updateItems(u);
         if (u.hero.passive && u.hero.passive.update) { this.hook(u.hero.passive.update, this, u, dt); if (!u.alive) return; }
@@ -461,6 +466,7 @@
       if (ch && ch.src && ch.src.alive) { this.moveToward(u, ch.src, dt, 0.35); return; }
       if (u.kind === 'monster') this.monsterThink(u);
       if (u.kind === 'pet' && u.petThink) this.hook(u.petThink, this, u);
+      if (u.kind === 'pet' && u.petTick && u.alive) this.hook(u.petTick, this, u);   // GĐ12: phân thân tự dùng chiêu (Mirage S4)
       this.updateAttackMove(u, dt);
     }
     updateDash(u, dt) {
@@ -536,7 +542,7 @@
           if (d <= u.st.range) {
             if (u.atkT <= 0) {
               u.windup = { t: Math.max(0.08, u.atkPeriod * C.WINDUP), target: t };
-              u.atkT = u.atkPeriod * (1 + (u.atkLag || 0)); u.face(t.x, t.y);
+              u.atkT = u.atkPeriod * (1 + (u.atkLag || 0)); u.face(t.x, t.y); u.shotT = this.time; if (u.ws) u.ws.atkN = (u.ws.atkN || 0) + 1;
             }
             return;
           }
@@ -559,7 +565,7 @@
       if (u.ranged) {
         const sp = (u.projSpeed || C.HERO_PROJ) * (1 + (u.st.projSpd || 0));   // GĐ9: mảnh hồn tăng tốc đạn
         const ex = u.hero && u.hero.autoProj ? u.hero.autoProj(this, u, t) : null;   // GĐ9: tướng tự chỉnh đạn đánh thường (súng tỉa của Raven)
-        this.proj(Object.assign({ owner: u, x: u.x + u.fx * u.r, y: u.y + u.fy * u.r, target: t, speed: sp, auto: true, soft: !!u.st.passSoft, kind: u.kind === 'hero' ? (u.projKindNow || u.hero.projKind || 'auto') : 'auto',
+        this.proj(Object.assign({ owner: u, x: u.x + u.fx * u.r, y: u.y + u.fy * u.r, target: t, speed: sp, auto: true, soft: !!u.st.passSoft, kind: u.kind === 'hero' || (u.decoy && u.hero) ? (u.projKindNow || u.hero.projKind || 'auto') : 'auto',
           onHit: (m, p, v) => m.autoHit(u, v, p) }, ex || {}));
       } else this.autoHit(u, t);
       u.lastAtkT = this.time;
@@ -791,7 +797,7 @@
       const def = u.hero.skills[key]; if (!def) return false;
       if (key !== 'sub' && !(u.ranks[key] > 0)) return false;
       if (u.recast[key] && u.recast[key].until > this.time) return !u.disabled && !u.has('silence');
-      if (def.charges) { if (u.ch[key] == null) u.ch[key] = def.charges; if (u.ch[key] <= 0) return false; }
+      if (def.charges) { if (u.ch[key] == null) u.ch[key] = this.chargesOf(u, key); if (u.ch[key] <= 0) return false; }
       if ((u.cd[key] || 0) > 0) return false;
       if (def.whileDisabled) { if (u.cast || (u.dash && !u.dash.cc)) return false; }   // dùng được cả khi bị khống chế (Bất Ngờ Chưa)
       else if (u.disabled || u.has('silence') || u.cast || u.dash) return false;
@@ -828,6 +834,7 @@
         this.hook(def.use, this, u, ctx);
         this.heroHook(u, 'onSkill', key, ctx);
         if (u.ai) u.ai.onCast(key);
+        if (G.T12 && u.kind === 'hero') G.T12.noteCast(this, u, key);   // GĐ12: theo dõi hụt chiêu lớn
       };
       const ct = typeof def.castTime === 'function' ? def.castTime(this, u, ctx) : def.castTime || 0;
       if (ct > 0) { u.cast = { key, t: ct, total: ct, fire: run, move: typeof def.castMove === 'function' ? def.castMove(this, u) : def.castMove || 0, unstop: !!def.castUnstop, ctx }; if (u.fxl.onCastStart) this.heroHook(u, 'onCastStart', key, u.cast); }
@@ -841,12 +848,15 @@
     refund(u, key, n) {
       const def = u.hero.skills[key]; if (!def) return;
       if (def.charges) {
-        u.ch[key] = Math.min(def.charges, (u.ch[key] == null ? def.charges : u.ch[key]) + (n || 1));
-        if (u.ch[key] >= def.charges) u.chT[key] = 0;
+        const N = this.chargesOf(u, key);
+        u.ch[key] = Math.min(N, (u.ch[key] == null ? N : u.ch[key]) + (n || 1));
+        if (u.ch[key] >= N) u.chT[key] = 0;
         u.cd[key] = Math.min(u.cd[key] || 0, 0.1);
       } else u.cd[key] = 0;
     }
     // cho phép tái kích hoạt chiêu key trong dur giây
+    // GĐ12: số lượt tích trữ của chiêu (số cố định hoặc hàm theo cấp chiêu)
+    chargesOf(u, k) { const c = u.hero.skills[k] && u.hero.skills[k].charges; return typeof c === 'function' ? c(u) : c || 0; }
     allowRecast(u, key, dur, fn, anchor) { u.recast[key] = { until: this.time + dur, fn, anchor: anchor || null }; }   // GĐ11: anchor = điểm neo snapback
 
     // ---------- chạy cả trận (không cần hình) ----------

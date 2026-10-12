@@ -29,6 +29,21 @@
       onDeath: (mm, dd) => mm.hitCircle(u, dd.x, dd.y, 4, (e) => { mm.damage(u, e, dmg * (H.T(u, '9a') ? 1.5 : 1), 'magic', { tag: 's4', aoe: true }); mm.addStatus(e, 'stun', 1.5, 1, { src: u }); if (H.T(u, '9a')) mm.addStatus(e, 'nodash', 3, 1, { src: u }); }, { color: '#c9a0ff' }),
       onExpire: (mm, dd) => mm.hitCircle(u, dd.x, dd.y, 4, (e) => { mm.damage(u, e, dmg, 'magic', { tag: 's4', aoe: true }); mm.addStatus(e, 'stun', 1.5, 1, { src: u }); }, { color: '#c9a0ff' }) });
     d.perfect = true; d.runTo = null;
+    // GĐ12: Phân Thân Hoàn Hảo mang theo TRANG BỊ & MẢNH HỒN của Mirage (chép toàn bộ chỉ số cộng thêm) và tự dùng chiêu
+    Object.assign(d.bonus, u.bonus); d.base.ad = u.st.ad * (H.T(u, '6a') ? 0.6 : 0.35); d.base.ap = u.st.ap; d.calc(); d.hp = d.st.maxHp;
+    d.items = u.items; d.shOn = u.shOn; d.yNiem = u.yNiem;
+    d.skT = m.time + 1.2;
+    d.petTick = (mm, dd) => {
+      if (mm.time < dd.skT || !dd.alive) return;
+      const e = H.nearestEnemyHero(mm, dd, 9); if (!e) return;
+      dd.skT = mm.time + 2.6;
+      const k = (dd.skN = (dd.skN || 0) + 1) % 3, sd = H.amt(u, 50 + 12 * u.level, 0, 0.45);
+      if (k === 0 && M.dist(dd, e) < 5) {          // bản sao Hộp Tử Thần thu nhỏ
+        const x = e.x, y = e.y; mm.telegraph({ x, y, r: 2.5, life: 1.2, team: u.team });
+        mm.later(1.2, (m3) => m3.hitCircle(u, x, y, 2.5, (v) => { m3.damage(u, v, sd * 1.4, 'magic', { tag: 's4', aoe: true }); m3.addStatus(v, 'stun', 0.5, 1, { src: u }); }, { color: '#c9a0ff' }));
+      } else H.shoot(mm, dd, e, { speed: 24, range: 9, r: 0.4, kind: 'mirror', hitMinions: false, onHit: (m3, p, v) => { m3.damage(u, v, sd, 'magic', { tag: 's4' }); if (v.alive) m3.addStatus(v, 'mark', 5, 1, { key: 'mir_mark', src: u }); } });
+      dd.stats = dd.stats || {}; u.stats.dblSkill = (u.stats.dblSkill || 0) + 1;
+    };
     return d;
   }
   H.def({
@@ -86,7 +101,7 @@
         ai: { use: 'engage', range: 5, aim: 'point', speed: 0, skillshot: true, alsoEscape: true, recastWhen: (m, u) => u.hpPct < 0.35 },
       },
       s2: {
-        name: 'Phi Dao Hoán Vị', desc: 'Tốn 25 Náo Nhiệt: ném phi dao 9 đv, trúng tướng gây sát thương phép và cắm 3s. Dùng lại trong 3s: búng tay hoán đổi vị trí với nạn nhân, choáng nó 1s.',
+        name: 'Phi Dao Hoán Vị', desc: 'Tốn 25 Náo Nhiệt: ném phi dao 9 đv, trúng tướng gây sát thương phép và cắm 3s. Dùng lại trong 3.5s: búng tay hoán đổi vị trí với nạn nhân, choáng nó 1s.',
         cd: [11, 10, 9.5, 9, 8.5],
         can(m, u) { return u.ws.nn >= 25; },
         use(m, u, ctx) {
@@ -95,34 +110,42 @@
           H.shoot(m, u, ctx.pt, { speed: 24, range: H.T(u, '1b') ? 12 : 9, r: 0.4, kind: 'arrow', hitMinions: false, onHit: (mm, p, e) => {
             mm.damage(u, e, dmg, 'magic', { tag: 's2' });
             if (e.kind !== 'hero') return;
-            u.ws.knife = { e, until: mm.time + 3 };
-            mm.allowRecast(u, 's2', 3, (m3, u3) => {
+            u.ws.knife = { e, until: mm.time + 3.5 };
+            mm.allowRecast(u, 's2', 3.5, (m3, u3) => {
               if (!e.alive) return;
               const x = u3.x, y = u3.y; m3.blink(u3, e.x, e.y); e.x = x; e.y = y; e.navP = null; e.dash = null;
-              m3.addStatus(e, 'stun', 1, 1, { src: u3 }); if (H.T(u3, '3a')) m3.addStatus(e, 'silence', 1, 1, { src: u3 });
+              u3.ws.swapT2 = m3.time + 1.2; m3.addStatus(e, 'stun', 1, 1, { src: u3 }); if (H.T(u3, '3a')) m3.addStatus(e, 'silence', 1, 1, { src: u3 });
               u3.ws.knife = null;
             });
           } });
         },
         ai: { use: 'poke', range: 8.5, aim: 'point', speed: 24, heroOnly: true,
           // Bẫy Hoán Vị: đổi chỗ đưa nạn nhân vào tâm Hộp Tử Thần sắp nổ
-          recastWhen: (m, u, t) => !!(u.ws.box && u.ws.box.at - m.time < 0.6 && u.ws.box.at > m.time && M.dist(u, u.ws.box) < 2.5) || !!(t && t.hpPct < 0.25 && u.hpPct > 0.5) },
+          recastWhen: (m, u, t) => !!(u.ws.box && u.ws.box.at - m.time < 0.5 && u.ws.box.at > m.time && M.dist(u, u.ws.box) < 3.5 && u.ws.knife && u.ws.knife.e.alive && M.dist(u.ws.knife.e, u.ws.box) > 4) || !!(t && t.hpPct < 0.25 && u.hpPct > 0.5) },
       },
       s3: {
-        name: 'Hộp Tử Thần', desc: 'Tốn 30 Náo Nhiệt: đặt vùng cảnh báo đỏ bán kính 4.5 đv dưới chân; sau đúng 3s phát nổ — sát thương phép cực lớn mọi mục tiêu bên trong và phá 350 Hộ Giáp. (Mẹo: dùng Phi Dao đổi chỗ để kéo nạn nhân vào tâm vụ nổ.)',
+        name: 'Hộp Tử Thần', desc: 'Tốn 30 Náo Nhiệt: đặt vùng cảnh báo đỏ bán kính 6.5 đv tại chỗ hoặc một điểm trong 8 đv; sau 2.2s phát nổ — sát thương phép CỰC LỚN, CHOÁNG 1.25s mọi mục tiêu bên trong và phá 350 Hộ Giáp. (Combo: Phi Dao trúng → Hộp Tử Thần dưới chân → dùng lại Phi Dao đổi chỗ, ném nạn nhân vào tâm vụ nổ.)',
         cd: [13, 12, 11, 10, 9.5],
         can(m, u) { return u.ws.nn >= 30; },
         use(m, u, ctx) {
           if (!spend(u, 30)) return;
-          const x = u.x, y = u.y, dmg = H.amt(u, ctx.v([150, 220, 290, 360, 430]), 0, 1.0);
-          u.ws.box = { x, y, at: m.time + 3 };
-          m.telegraph({ x, y, r: 4.5, life: 3, team: u.team });
-          m.later(3, (mm) => {
-            mm.hitCircle(u, x, y, 4.5, (e) => { mm.damage(u, e, dmg, 'magic', { tag: 's3', aoe: true }); if (e.ga > 0) e.ga = Math.max(0, e.ga - 350); }, { color: '#c9a0ff' });
-            if (H.T(u, '3b')) mm.zone({ owner: u, x, y, r: 4.5, life: 3, every: 0.25, kind: 'smoke', tick: (m3, z) => m3.hitCircle(u, x, y, 4.5, (e) => m3.addStatus(e, 'slow', 0.4, 0.5, { src: u, key: 'mir_fog' }), { noFx: true }) });
+          const p = M.dist(u, ctx.pt) <= 8 ? ctx.pt : H.toward(u, ctx.pt, 8, true);
+          const x = p.x, y = p.y, R = 6.5, dmg = H.amt(u, ctx.v([230, 330, 430, 530, 640]), 0, 1.4);
+          u.ws.box = { x, y, at: m.time + 2.2 };
+          m.telegraph({ x, y, r: R, life: 2.2, team: u.team });
+          m.dangers.push({ id: 'mirbox' + u.id + '_' + Math.round(m.time * 10), type: 'circle', x, y, r: R, until: m.time + 2.2, team: u.team });
+          m.later(2.2, (mm) => {
+            mm.hitCircle(u, x, y, R, (e) => { mm.damage(u, e, dmg, 'magic', { tag: 's3', aoe: true }); mm.addStatus(e, 'stun', 1.25, 1, { src: u }); if (e.ga > 0) e.ga = Math.max(0, e.ga - 350); }, { color: '#c9a0ff', fx: 'boom' });
+            if (H.T(u, '3b')) mm.zone({ owner: u, x, y, r: R, life: 3, every: 0.25, kind: 'smoke', tick: (m3, z) => m3.hitCircle(u, x, y, R, (e) => m3.addStatus(e, 'slow', 0.4, 0.5, { src: u, key: 'mir_fog' }), { noFx: true }) });
           });
         },
-        ai: { use: 'custom', aim: 'self', pick: (m, u, t) => (t && t.kind === 'hero' && M.dist(u, t) < 6 && (m.canCast(u, 's2') || M.dist(u, t) < 3) ? { pt: { x: u.x, y: u.y } } : null) },
+        // AI: Phi Dao vừa cắm vào nạn nhân → đặt hộp DƯỚI CHÂN MIRAGE (rồi đổi chỗ); không thì đặt lên kẻ địch đứng yên / bị khống chế
+        ai: { use: 'custom', aim: 'point', pick: (m, u, t) => {
+          if (u.ws.knife && u.ws.knife.until > m.time + 1.6 && u.ws.knife.e.alive) { u.stats.mirCombo = (u.stats.mirCombo || 0) + 1; return { pt: { x: u.x, y: u.y } }; }
+          if (!t || t.kind !== 'hero' || M.dist(u, t) > 8) return null;
+          const slow = t.disabled || t.has('slow') || t.has('root') || !H.moving(t);
+          return slow || M.dist(u, t) < 3 ? { pt: { x: t.x, y: t.y } } : null;
+        } },
       },
       sub: {
         name: 'Biến Ảnh / Phân Hình', desc: 'Sẵn sàng: tạo một ảo ảnh tĩnh 8s tại chỗ. Khi đã có ảo ảnh: đổi vị trí tức thì với ảo ảnh an toàn nhất. Hồi 12s → 4s theo cấp.',
@@ -141,7 +164,7 @@
         ai: { use: 'defend', aim: 'self', range: 6, alsoEscape: true },
       },
       s4: {
-        name: 'Nghệ Thuật Ảo Ảnh: Phân Thân Hoàn Hảo', desc: 'Tốn 50 Náo Nhiệt: tạo Phân Thân Hoàn Hảo 15s (máu 100% bản gốc, tự đánh, tự né); bị phá hoặc hết giờ thì nổ bán kính 4 đv: sát thương phép và choáng 1.5s. Dùng lại (hồi riêng 4s): đổi chỗ với phân thân. Nội tại: học chiêu này thì mọi ảo ảnh đều đánh thường (35% sát thương).',
+        name: 'Nghệ Thuật Ảo Ảnh: Phân Thân Hoàn Hảo', desc: 'Tốn 50 Náo Nhiệt: tạo Phân Thân Hoàn Hảo 15s (máu 100% bản gốc, mang theo trang bị & mảnh hồn, tự đánh, tự né, tự dùng Phi Dao và Hộp Tử Thần thu nhỏ); bị phá hoặc hết giờ thì nổ bán kính 4 đv: sát thương phép và choáng 1.5s. Dùng lại (hồi riêng 4s): đổi chỗ với phân thân. Nội tại: học chiêu này thì mọi ảo ảnh đều đánh thường (35% sát thương).',
         cd: [85, 70, 55],
         can(m, u) { return u.ws.nn >= 50 || u.ws.doubles.some((d) => d.alive); },
         use(m, u, ctx) {

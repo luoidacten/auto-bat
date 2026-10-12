@@ -60,6 +60,7 @@
   }
   function castMob(ai, o, land) {
     const m = ai.m, u = ai.u;
+    if (G.T12 && !o.back) land = G.T12.clampDash(ai, o, land);           // GĐ12: lướt vừa đủ (ra khỏi vùng nguy + 0.8 / trước tường 0.5)
     const pt = o.back ? { x: 2 * u.x - land.x, y: 2 * u.y - land.y } : land;      // nhảy lùi: chỉ về phía ngược lại
     return m.castSkill(u, o.k, null, pt);
   }

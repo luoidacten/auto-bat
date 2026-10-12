@@ -60,7 +60,7 @@
           const e = H.nearestEnemyHero(m, d, 7); if (!e) continue;
           const dmg = H.amt(u, 40 + 8 * u.level, 0, 0.35);
           if (M.dist(d, e) < 4 && H.ready(m, u, 'cp2' + d.id, 4)) { const p = H.toward(d, e, 4, false); m.dashTo(d, p.x, p.y, 20, { onContact: (mm, uu, x) => mm.damage(u, x, dmg * (behind(d, x) ? 2 : 1), 'magic', { tag: 's2' }) }); }
-          else H.shoot(m, d, e, { speed: 20, range: 7, r: 0.4, kind: 'star', onHit: (mm, p, x) => mm.damage(u, x, dmg, 'magic', { tag: 's1' }) });
+          else H.shoot(m, d, e, { speed: 20, range: 7, r: 0.4, kind: 'alicedao', onHit: (mm, p, x) => mm.damage(u, x, dmg, 'magic', { tag: 's1' }) });
         }
       },
       onAuto(m, u, t, info) { info.type = 'magic'; info.amt = u.st.ad + u.st.ap * 0.3; },
@@ -101,10 +101,10 @@
           const dmg = H.amt(u, ctx.v([70, 110, 150, 190, 230]), 0, 0.65), fast = H.T(u, '1b') ? 1.25 : 1;
           if (spend(u, 5)) {
             const n = ctx.v([8, 10, 12, 14, 20]), k = ctx.v([0.5, 0.6, 0.7, 0.9, 1.0]);
-            for (let i = 0; i < n; i++) { const a = i * 6.2831853 / n; m.proj({ owner: u, x: u.x, y: u.y, dx: M.cos(a), dy: M.sin(a), speed: 18 * fast, range: 5.5 * fast, r: 0.4, kind: 'star', onHit: (mm, p, e) => mm.damage(u, e, dmg * k, 'magic', { tag: 's1', aoe: true }) }); }
+            for (let i = 0; i < n; i++) { const a = i * 6.2831853 / n; m.proj({ owner: u, x: u.x, y: u.y, dx: M.cos(a), dy: M.sin(a), speed: 18 * fast, range: 5.5 * fast, r: 0.4, kind: 'alicedao', onHit: (mm, p, e) => mm.damage(u, e, dmg * k, 'magic', { tag: 's1', aoe: true }) }); }
             return;
           }
-          const pr = H.shoot(m, u, ctx.pt, { speed: 20 * fast, range: 7 * fast, r: 0.4, kind: 'star', onHit: (mm, p, e) => {
+          const pr = H.shoot(m, u, ctx.pt, { speed: 20 * fast, range: 7 * fast, r: 0.4, kind: 'alicedao', onHit: (mm, p, e) => {
             mm.damage(u, e, dmg, 'magic', { tag: 's1' });
             // Phi Dao Hoán Vị: dịch chuyển tới chỗ dao
             if (H.T(u, '6a')) { const q = { x: p.x, y: p.y }; mm.allowRecast(u, 's1', 1, (m3, u3) => m3.blink(u3, q.x, q.y)); }

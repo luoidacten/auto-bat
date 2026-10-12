@@ -29,7 +29,7 @@
       desc: 'Ổ 6 viên, nạp 2s; mỗi lần nạp gieo xúc xắc: ⚀ tự mất 4% máu • ⚁–⚄ cả ổ +5/10/15/20% sát thương • ⚅ cả ổ chí mạng và choáng 0.25s.',
       init(m, u) { u.ws.ammo = 6; u.ws.rl = 0; u.ws.die = 3; u.ws.bonus = 0; u.ws.fate = -1; },
       update(m, u, dt) {
-        if (u.ws.rl > 0) { u.ws.rl -= dt; if (u.ws.rl <= 0) reload(m, u); }
+        if (u.ws.rl > 0 && !H.rlHold(m, u, 'rl')) { u.ws.rl -= dt; if (u.ws.rl <= 0) reload(m, u); }
         if (u.ws.ammo <= 0) { if (u.ws.rl <= 0) startRl(m, u); u.atkT = Math.max(u.atkT, u.ws.rl); }
         if (H.T(u, '1b') && u.ws.rl > 0 && m.tick % 10 === 0) m.addStatus(u, 'haste', 0.6, 0.35, { key: 'jack_rl' });
         if (u.ws.ammo < mag(u) && u.ws.rl <= 0 && m.time - u.combatT > 4) startRl(m, u);
@@ -107,7 +107,7 @@
         can(m, u) { return u.ws.fate < 0; },
         use(m, u, ctx) {
           if (H.T(u, '6a')) {   // Nạp Đạn Liều Lĩnh: nạp đầy ổ + xoay súng xả đạn mù quanh người
-            reload(m, u);
+            reload(m, u); H.spin(m, u, 0.5);
             m.hitCircle(u, u.x, u.y, 3, (e) => m.damage(u, e, u.st.ad * 0.9, 'phys', { tag: 's3', aoe: true }), { color: '#c0a080' });
             return;
           }
