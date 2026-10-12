@@ -24,7 +24,10 @@
     ctx.strokeStyle = tc(color); ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + len, y); ctx.stroke();
   }
   // a = { anim, p (0..1), charge (0..1) } — trạng thái hoạt ảnh do bộ vẽ theo dõi
-  function drawWeapon(ctx, gfx, a, st, time) {
+  const DUAL = { twinblades: 1, axes: 1, dagger: 1, voidknife: 1, dual: 1, katana: 1, greatsword: 1, scythe: 1, pole: 1, claw: 1, beastclaw: 1, cleaver: 1 };
+  // GĐ12: đang xoay (chiêu xoay) → vũ khí chìa thẳng ra hai bên ĐỐI DIỆN (vẽ lần hai xoay 180°), thân xoay tròn theo
+  function drawWeapon(ctx, gfx, a, st, time, spinning) {
+    if (spinning && DUAL[gfx]) { ctx.save(); drawWeapon(ctx, gfx, null, st, time, false); ctx.restore(); ctx.save(); ctx.rotate(Math.PI); drawWeapon(ctx, gfx, null, st, time, false); ctx.restore(); return; }
     const an = a && a.anim, p = a ? a.p : 0;
     let rot = 0, ext = 0;
     const eo = (x) => 1 - Math.pow(1 - clamp(x, 0, 1), 3);
@@ -317,6 +320,8 @@
   function drawHero(ctx, x, y, rpx, o) {
     ctx.save();
     ctx.translate(x, y);
+    // GĐ12: bóng đổ mềm dưới chân (nổi khối hơn)
+    { const sh = ctx.createRadialGradient(0, rpx * 0.7, rpx * 0.15, 0, rpx * 0.7, rpx * 1.25); sh.addColorStop(0, 'rgba(0,0,0,0.38)'); sh.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = sh; ctx.beginPath(); ctx.ellipse(0, rpx * 0.7, rpx * 1.25, rpx * 0.55, 0, 0, TAU); ctx.fill(); }
     if (o.stealth) ctx.globalAlpha = 0.45;
     // vòng chân theo phe
     ctx.strokeStyle = TEAM_RING[o.team] || '#ccc'; ctx.lineWidth = Math.max(2, rpx * 0.14);
@@ -342,7 +347,7 @@
       const S = G.SOUL_TIER && G.SOUL_TIER[o.soul];
       if (S) { TINT = lighten(S.color, o.soul === 1 ? 0.2 : 0.12); ctx.shadowColor = S.color; ctx.shadowBlur = (4 + o.soul * 3) * (o.soul >= 4 ? 0.8 + 0.35 * Math.sin(o.time * 7) : 1); }
     }
-    ctx.save(); ctx.scale(rpx / 18, rpx / 18); drawWeapon(ctx, o.gfx, o.anim, o.st, o.time); ctx.restore();
+    ctx.save(); ctx.scale(rpx / 18, rpx / 18); drawWeapon(ctx, o.gfx, o.anim, o.st, o.time, o.spinning); ctx.restore();
     TINT = null; ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
     const g = ctx.createRadialGradient(-rpx * 0.28, -rpx * 0.33, rpx * 0.15, 0, 0, rpx);
     g.addColorStop(0, o.hurt ? '#ffffff' : lighten(o.color, 0.45));
@@ -350,6 +355,9 @@
     ctx.fillStyle = g;
     ctx.beginPath(); ctx.arc(0, 0, rpx, 0, TAU); ctx.fill();
     ctx.lineWidth = Math.max(1.5, rpx * 0.12); ctx.strokeStyle = '#20232a'; ctx.stroke();
+    // GĐ12: viền sáng phía trên-trái (ánh sáng chung của cảnh) + chớp trắng khi trúng đòn tắt dần
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = Math.max(1, rpx * 0.08); ctx.beginPath(); ctx.arc(0, 0, rpx * 0.82, Math.PI * 1.05, Math.PI * 1.55); ctx.stroke();
+    if (o.hurtK > 0) { ctx.fillStyle = `rgba(255,255,255,${0.55 * o.hurtK})`; ctx.beginPath(); ctx.arc(0, 0, rpx, 0, TAU); ctx.fill(); }
     if (o.stunned) { ctx.fillStyle = 'rgba(150,150,150,0.45)'; ctx.fill(); }
     if (o.beast) {   // tai nhọn + nanh + vằn lưng
       ctx.fillStyle = '#2a5a18'; for (const s of [-1, 1]) { ctx.beginPath(); ctx.moveTo(-rpx * 0.1, s * rpx * 0.55); ctx.lineTo(-rpx * 0.55, s * rpx * 1.05); ctx.lineTo(-rpx * 0.5, s * rpx * 0.35); ctx.closePath(); ctx.fill(); }

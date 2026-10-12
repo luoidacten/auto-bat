@@ -130,8 +130,8 @@
 
       onSkill(m, u, key) {
         if (key !== 's1' && key !== 's2' && key !== 's3') return;
-        // GĐ12: mỗi nốt hồi chiêu ĐỘC LẬP (bỏ hồi chiêu dùng chung) — chỉ chặn bấm liền 0.25s để nốt kịp vang
-        for (const k of ['s1', 's2', 's3']) if (k !== key) u.cd[k] = Math.max(u.cd[k] || 0, 0.25);
+        // GĐ12: mỗi nốt hồi chiêu ĐỘC LẬP (bỏ hồi chiêu dùng chung) — chỉ chặn bấm liền 1.2s để nốt kịp vang
+        for (const k of ['s1', 's2', 's3']) if (k !== key) u.cd[k] = Math.max(u.cd[k] || 0, 1.2);
         const h = note(m, u, key); if (h) m.later(0.3, (mm) => u.alive && harmony(mm, u, h));
       },
     },

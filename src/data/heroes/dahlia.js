@@ -89,11 +89,19 @@
     },
     skills: {
       s1: {
-        name: 'Thoát Nguy', desc: 'Hoán đổi vị trí tức thì với một đơn vị không phải tướng (quái, vật triệu hồi, ảo ảnh) trong 8 đv; tàng hình 1.5s, +30% tốc đánh và +20% sát thương phép 3s. Cuồng Nhiệt: chụp Mũ Đen lên tối đa 3 đơn vị không phải tướng trong 6 đv, biến chúng thành bản sao Dahlia 6s. Trong Sân Khấu Chết Chóc: thành Hư Ảnh Bước (dịch chuyển 2.5 đv, tàng hình 0.75s, hồi 1.2s).',
+        name: 'Thoát Nguy', desc: 'Hoán đổi vị trí tức thì với một đơn vị không phải tướng (quái, vật triệu hồi, ảo ảnh) trong 8 đv; tàng hình 1.5s, +30% tốc đánh và +20% sát thương phép 3s. Cuồng Nhiệt: chụp Mũ Đen lên tối đa 3 đơn vị không phải tướng trong 6 đv, biến chúng thành bản sao Dahlia 6s. Trong Sân Khấu Chết Chóc: thành Hư Ảnh Bước (dịch chuyển 2.5 đv, tàng hình 0.75s, hồi 1.2s, NỔ bóng tối ở điểm đầu và điểm cuối: bán kính 2, sát thương phép, làm chậm 30%).',
         cd: [9, 8.5, 8, 7.5, 7], cost: [50, 50, 50, 50, 50], manualCd: true,
         can(m, u) { return inStage(m, u) || nonHeroNear(m, u, H.T(u, '6c') ? 11.5 : 8).length > 0 || m.decoysOf(u).length > 0; },
         use(m, u, ctx) {
-          if (inStage(m, u)) { HAT(m, u.x, u.y, 1); u.cd.s1 = 1.2; u.mp += m.costOf(u, 's1'); const p = H.toward(u, ctx.pt, 2.5, false); m.blink(u, p.x, p.y); m.addStatus(u, 'stealth', 0.75, 1, { key: 'dah_step' }); return; }
+          if (inStage(m, u)) {
+            // Hư Ảnh Bước: dịch chuyển 2.5 đv — NỔ bóng tối ở cả điểm đầu và điểm cuối (bán kính 2, sát thương phép, làm chậm 30%)
+            HAT(m, u.x, u.y, 1); u.cd.s1 = 1.2; u.mp += m.costOf(u, 's1');
+            const boom = (x, y) => m.hitCircle(u, x, y, 2, (e) => { m.damage(u, e, H.amt(u, 40 + 10 * u.level, 0, 0.35), 'magic', { tag: 's1', aoe: true }); m.addStatus(e, 'slow', 1, 0.3, { src: u, key: 'dah_step' }); }, { color: '#c040ff', fx: 'boom' });
+            boom(u.x, u.y);
+            const p = H.toward(u, ctx.pt, 2.5, false); m.blink(u, p.x, p.y); m.addStatus(u, 'stealth', 0.75, 1, { key: 'dah_step' });
+            boom(u.x, u.y);
+            return;
+          }
           u.cd.s1 = m.cdOf(u, 's1');
           if (frenzy(m, u)) {
             const all = m.units.filter((x) => x.alive && x.kind !== 'hero' && (x.kind === 'monster' || x.kind === 'pet') && x.owner !== u && M.dist(x, u) <= 6).slice(0, H.T(u, '6a') ? 5 : 3);
@@ -129,10 +137,10 @@
         ai: { use: 'burst', range: 7, aim: 'point', speed: 0 },
       },
       s4: {
-        name: 'Sân Khấu Chết Chóc', desc: 'Cắm gậy mở vũ đài bóng tối bán kính 10/15/20 đv trong 8/10/12s (thấy rõ vành rèm nhung tím): Thoát Nguy thành Hư Ảnh Bước; +60% tốc đánh, +30% sát thương đòn đánh; mỗi 10 đòn trúng (của Dahlia và ảo ảnh) sinh một ảo ảnh mới cạnh mục tiêu; ảo ảnh trong sân khấu +50% máu và đánh chắc chắn gây độc. Dahlia cố đánh trong vòng sân khấu.',
+        name: 'Sân Khấu Chết Chóc', desc: 'Cắm gậy mở vũ đài bóng tối bán kính 10/15/20 đv trong 16/20/25s (thấy rõ vành rèm nhung tím): Thoát Nguy thành Hư Ảnh Bước; +60% tốc đánh, +30% sát thương đòn đánh; mỗi 10 đòn trúng (của Dahlia và ảo ảnh) sinh một ảo ảnh mới cạnh mục tiêu; ảo ảnh trong sân khấu +50% máu và đánh chắc chắn gây độc. Dahlia cố đánh trong vòng sân khấu.',
         cd: [90, 75, 60], cost: [100, 100, 100],
         use(m, u, ctx) {
-          const R = ctx.v([10, 15, 20]), life = ctx.v([8, 10, 12]) + (H.T(u, '9c') ? 3 : 0);
+          const R = ctx.v([10, 15, 20]), life = ctx.v([16, 20, 25]) + (H.T(u, '9c') ? 3 : 0);
           u.ws.stage = { x: u.x, y: u.y, r: R, until: m.time + life }; u.ws.stageHits = 0;
           m.addStatus(u, 'buff', life, 1, { key: 'dah_stage', mods: { asPct: 0.6 } });
           m.zone({ owner: u, x: u.x, y: u.y, r: R, life, every: 1, kind: 'darkstage', tick: () => {} });

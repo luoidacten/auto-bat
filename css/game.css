@@ -670,16 +670,31 @@ body.sbx-on #hud #roster, body.sbx-on #hud #bFold { display: none; }
 .pve-hero small { opacity: .6; font-size: 10px; }
 .pve-hero.on { outline: 2px solid #ffd24a; background: #3a2f10; }
 .pve-pad { position: absolute; inset: 0; pointer-events: none; z-index: 35; }
-.pve-pad.pve-dead .pve-stick, .pve-pad.pve-dead .pve-btns { opacity: .25; pointer-events: none; }
-.pve-stick { position: absolute; left: 22px; bottom: 26px; width: 128px; height: 128px; border-radius: 50%; background: rgba(255,255,255,.08); border: 2px solid rgba(255,255,255,.25); pointer-events: auto; touch-action: none; }
-.pve-stick i { position: absolute; left: 39px; top: 39px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,210,74,.55); }
-.pve-btns { position: absolute; right: 18px; bottom: 22px; display: grid; grid-template-columns: repeat(4, 62px); gap: 7px; pointer-events: auto; touch-action: none; }
-.pve-sk { position: relative; width: 62px; height: 62px; border-radius: 50%; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; background: #2a2440; border: 2px solid #a080ff; }
-.pve-sk b { font-size: 15px; } .pve-sk span { max-width: 56px; overflow: hidden; white-space: nowrap; font-size: 9px; opacity: .8; }
+.pve-pad.pve-dead .pve-left, .pve-pad.pve-dead .pve-btns { opacity: .2; pointer-events: none; }
+.pve-left { position: absolute; left: 0; top: 30%; width: 45%; bottom: 0; pointer-events: auto; touch-action: none; }
+.pve-stick { position: absolute; left: 24px; bottom: 26px; width: 128px; height: 128px; border-radius: 50%; background: rgba(255,255,255,.07); border: 2px solid rgba(255,255,255,.22); opacity: .55; transition: opacity .15s; }
+.pve-stick.on { opacity: 1; bottom: auto; }
+.pve-stick i { position: absolute; left: 39px; top: 39px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,210,74,.6); box-shadow: 0 0 12px rgba(255,210,74,.5); }
+.pve-btns { position: absolute; right: 16px; bottom: 18px; display: grid; grid-template-columns: repeat(4, 60px); gap: 7px; pointer-events: auto; touch-action: none; align-items: center; justify-items: center; }
+.pve-sk { position: relative; width: 60px; height: 60px; border-radius: 50%; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; background: radial-gradient(circle at 35% 30%, #4a3f70, #1e1830); border: 2px solid #a080ff; touch-action: none; }
+.pve-sk b { font-size: 15px; } .pve-sk span { max-width: 54px; overflow: hidden; white-space: nowrap; font-size: 9px; opacity: .8; }
 .pve-sk em { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-style: normal; font-size: 18px; font-weight: bold; color: #fff; text-shadow: 0 0 4px #000; }
 .pve-sk.off { filter: grayscale(.8) brightness(.6); } .pve-sk.re { border-color: #7affd0; box-shadow: 0 0 10px #7affd0; }
 .pve-s4 { border-color: #ffd24a; } .pve-sub { border-color: #7ac8ff; }
-.pve-sm { position: relative; width: 62px; height: 40px; border-radius: 10px; padding: 0; font-size: 18px; }
+.pve-atk { width: 72px; height: 72px; border-radius: 50%; font-size: 30px; padding: 0; background: radial-gradient(circle at 35% 30%, #a04040, #501818); border: 3px solid #ffd24a; touch-action: none; grid-column: 4; grid-row: 2 / span 2; }
+.pve-sm { position: relative; width: 60px; height: 38px; border-radius: 10px; padding: 0; font-size: 18px; touch-action: none; }
 .pve-sm em { position: absolute; right: 4px; bottom: 1px; font-style: normal; font-size: 11px; }
+.pve-cancel { position: absolute; right: 18px; top: 38%; width: 86px; height: 86px; border-radius: 50%; display: none; align-items: center; justify-content: center; font-weight: bold; color: #fff; background: rgba(120,20,20,.55); border: 3px dashed #ff6a6a; pointer-events: none; }
+.pve-cancel.on { display: flex; } .pve-cancel.hot { background: rgba(220,30,30,.85); transform: scale(1.12); }
+.pve-wheel { position: absolute; width: 0; height: 0; pointer-events: none; }
+.pve-wi { position: absolute; transform: translate(-50%,-50%); width: 58px; height: 58px; border-radius: 50%; background: rgba(20,20,30,.85); border: 2px solid #888; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 20px; }
+.pve-wi small { font-size: 8px; max-width: 54px; overflow: hidden; white-space: nowrap; } .pve-wi em { position: absolute; right: 2px; bottom: 0; font-size: 10px; font-style: normal; }
+.pve-wi.on { border-color: #ffd24a; background: rgba(80,60,10,.95); transform: translate(-50%,-50%) scale(1.15); }
 .pve-info { position: absolute; left: 50%; bottom: 44px; transform: translateX(-50%); background: rgba(0,0,0,.55); padding: 3px 10px; border-radius: 8px; font-size: 13px; white-space: nowrap; }
-@media (max-width: 700px) { .pve-btns { grid-template-columns: repeat(4, 52px); } .pve-sk { width: 52px; height: 52px; } .pve-sm { width: 52px; } .pve-stick { width: 110px; height: 110px; } .pve-stick i { left: 32px; top: 32px; } }
+@media (max-width: 700px) { .pve-btns { grid-template-columns: repeat(4, 50px); } .pve-sk { width: 50px; height: 50px; } .pve-sm { width: 50px; } .pve-atk { width: 60px; height: 60px; } }
+/* PvE: ẩn danh sách 10 tướng kiểu trọng tài (người chơi không được biết máu/vị trí mọi người); bố cục điện thoại gọn */
+body.pve-on #roster { display: none; }
+body.pve-on .pve-cancel { right: auto; left: 50%; top: 74px; transform: translateX(-50%); width: 120px; height: 46px; border-radius: 23px; }
+body.pve-on .pve-cancel.hot { transform: translateX(-50%) scale(1.12); }
+body.pve-on .pve-info { bottom: auto; top: 70px; }
+body.pve-on .pve-cancel.on ~ .pve-info { display: none; }

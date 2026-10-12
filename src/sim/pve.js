@@ -32,20 +32,46 @@
       P.lockId = best ? best.id : null;
       return best;
     },
+    // ===== ĐƯỜNG THỰC THI THỐNG NHẤT (Unified Action Pipeline) =====
+    // Người chơi (HUD cảm ứng / chuột-phím) và AI (lấy mẫu không gian, gom cụm, đón đầu) cùng đổ về 2 hàm này.
+    executeSkill(u, slot, pos, ent) { return this.castSkill(u, slot, ent || null, pos || { x: u.x + u.fx * 3, y: u.y + u.fy * 3 }); },
+    // target có sẵn → đánh; không có → chọn theo ưu tiên (tướng thấp máu nhất trong tầm → tướng gần nhất → quái đang giao tranh);
+    // vẫn không có → bước ngắn 1.5 đv về phía kẻ địch gần nhất trong 9 đv (hoặc theo hướng dir / hướng mặt)
+    executeBasicAttack(u, target, dir) {
+      const inR = (e) => Math.hypot(e.x - u.x, e.y - u.y) - e.r - u.r <= u.st.range + 0.15;
+      const ok = (e) => e && e.alive && e.team !== u.team && (!e.vis || e.vis[u.team] !== false) && !(e.statuses.length && e.has('untarget'));
+      let t = ok(target) ? target : null;
+      if (!t) {
+        const hs = this.heroes.filter((h) => h !== u && ok(h) && inR(h));
+        t = hs.sort((a, b) => a.hp / a.st.maxHp - b.hp / b.st.maxHp || a.id - b.id)[0] || null;
+        if (!t) { let bd = 1e9; this.grid.query(u.x, u.y, u.st.range + 3, (v) => { if ((v.kind === 'monster' || v.kind === 'pet') && ok(v) && inR(v)) { const d = Math.hypot(v.x - u.x, v.y - u.y) - (v.aggro === u ? 5 : 0); if (d < bd) { bd = d; t = v; } } }); }
+      }
+      if (t) { if (this.pve) this.pve.lockId = t.id; u.attackTarget = t; u.goal = null; return t; }
+      let e = null, bd = 9; for (const h of this.heroes) if (h !== u && ok(h)) { const d = Math.hypot(h.x - u.x, h.y - u.y); if (d < bd) { bd = d; e = h; } }
+      const v = e ? { x: (e.x - u.x) / bd, y: (e.y - u.y) / bd } : dir || { x: u.fx, y: u.fy };
+      const g = { x: u.x + v.x * 1.5, y: u.y + v.y * 1.5 }; MAP.pushOut(g, u.r); u.goal = g; u.attackTarget = null;
+      if (this.pve) this.pve.stepUntil = this.time + 0.45;
+      return null;
+    },
     pveStep(u) {
       const P = this.pve; if (!P || !u.alive) { if (P && !u.alive && !this.over && (u.out || this.lastLifeGone(u))) P.out = true; return; }
       const t = this.pveTarget(u);
       if (u.ai) { u.ai.target = t && t.kind === 'hero' ? t : null; u.ai.mode = t ? 'fight' : 'idle'; }   // chiêu đọc ai.target (Florian S4…)
-      // lệnh chiêu / vật phẩm
+      // lệnh: chiêu (vị trí ngắm từ chỉ thị), đánh thường (mục tiêu khóa / ưu tiên), vật phẩm balo
       while (P.queue.length) {
         const c = P.queue.shift();
-        if (c.bag) { const pt = P.aim || (t ? { x: t.x, y: t.y } : { x: u.x + u.fx * 3, y: u.y + u.fy * 3 }); this.useBag(u, c.bag, t, pt); continue; }
+        if (c.bag) { const pt = c.pt || (t ? { x: t.x, y: t.y } : { x: u.x + u.fx * 3, y: u.y + u.fy * 3 }); this.useBag(u, c.bag, t, pt); continue; }
+        if (c.atk !== undefined) { const tg = c.atk != null ? this.units.find((x) => x.id === c.atk) : null; P.manualAtkT = this.time + 1.2; this.executeBasicAttack(u, tg, c.dir); continue; }
         const def = u.hero.skills[c.k]; if (!def) continue;
         const a = def.ai || {};
-        let pt = P.aim;
-        if (!pt) pt = a.aim === 'self' ? { x: u.x, y: u.y } : t ? { x: t.x, y: t.y } : { x: u.x + u.fx * (a.range || 4), y: u.y + u.fy * (a.range || 4) };
-        const tgt = a.aim === 'unit' ? (t && dist(t, pt) < 3 ? t : t) : t;
-        if (u.recast[c.k] || this.canCast(u, c.k)) { this.castSkill(u, c.k, tgt, pt); u.stats.pveCasts = (u.stats.pveCasts || 0) + 1; }
+        const ent = c.tgt != null ? this.units.find((x) => x.id === c.tgt) : t;
+        let pt = c.pt;
+        if (!pt) {                                              // bấm nhanh: tự lấy mục tiêu ưu tiên + đón đầu nhẹ 0.25s
+          if (a.aim === 'self') pt = { x: u.x, y: u.y };
+          else if (ent && ent.alive) pt = { x: ent.x + (ent.vx || 0) * 0.25, y: ent.y + (ent.vy || 0) * 0.25 };
+          else pt = { x: u.x + u.fx * (a.range || 4), y: u.y + u.fy * (a.range || 4) };
+        }
+        if (u.recast[c.k] || this.canCast(u, c.k)) { this.executeSkill(u, c.k, pt, ent && ent.alive ? ent : null); u.stats.pveCasts = (u.stats.pveCasts || 0) + 1; }
       }
       if (u.cast || u.dash || u.disabled) return;
       const L = Math.hypot(P.mv.x, P.mv.y);
@@ -55,8 +81,9 @@
         u.face(g.x, g.y);
         return;
       }
+      if (P.stepUntil > this.time) return;                       // đang bước ngắn tới kẻ địch (đánh thường hụt tầm)
       u.goal = null;
-      if (P.autoAtk && t && dist(t, u) - t.r - u.r <= u.st.range + 0.1) u.attackTarget = t; else u.attackTarget = null;
+      if ((P.autoAtk || P.manualAtkT > this.time) && t && Math.hypot(t.x - u.x, t.y - u.y) - t.r - u.r <= u.st.range + 0.1) u.attackTarget = t; else u.attackTarget = null;
     },
     lastLifeGone(u) { return !!(u.place || u.out); },
   };

@@ -46,17 +46,28 @@
     },
     // GĐ11: chọn tâm chiêu diện rộng — thử tâm tại vị trí DỰ ĐOÁN (sau lead giây) của từng tướng địch thấy được trong tầm,
     // chấm điểm = số tướng địch lọt vùng (×10) − khoảng cách (ưu tiên kẻ gần mình nhất khi bằng nhau) + máu thấp; trả null nếu không có ai
+    // GĐ12 — chọn tâm chiêu vùng (AoE Ground Target Clustering): lấy mẫu mỗi kẻ địch (tướng ×3, quái / vật triệu hồi ×1) làm ứng viên
+    // ở vị trí đón đầu, đếm trọng số phủ trong bán kính; rồi kéo tâm về TRỌNG TÂM có trọng số của cụm nếu phủ không kém đi; kẹp trong tầm.
     bestAoe(m, u, range, R, lead) {
-      const es = m.heroes.filter((e) => e.alive && e !== u && e.team !== u.team && e.vis[u.team] && !(H.isAlly && H.isAlly(m, u, e)) && G.M.dist(u, e) <= range + R);
+      const ok = (e) => e.alive && e !== u && e.team !== u.team && (!e.vis || e.vis[u.team]) && !(H.isAlly && H.isAlly(m, u, e)) && G.M.dist(u, e) <= range + R;
+      const es = m.heroes.filter(ok);
+      if (!es.length) return null;
+      m.grid.query(u.x, u.y, range + R, (v) => { if ((v.kind === 'monster' || v.kind === 'pet') && ok(v)) es.push(v); });
+      const W = (e) => (e.kind === 'hero' ? 3 : 1);
       const fut = (e) => ({ x: e.x + (e.vx || 0) * (lead || 0), y: e.y + (e.vy || 0) * (lead || 0) });
-      let best = null, bs = -1e9;
+      const clamp = (p) => (G.M.dist(u, p) > range ? H.toward(u, p, range, true) : p);
+      const score = (p) => { let w = 0, n = 0, low = 0; for (const e of es) if (G.M.dist(fut(e), p) <= R * 0.85) { w += W(e); if (e.kind === 'hero') { n++; low += 1 - e.hpPct; } } return { w, n, s: w * 10 + low - G.M.dist(u, p) * 0.05 }; };
+      let best = null;
       for (const c of es) {
-        let p = fut(c); const d = G.M.dist(u, p); if (d > range) p = H.toward(u, p, range, true);
-        let n = 0, low = 0; for (const e of es) if (G.M.dist(fut(e), p) <= R * 0.85) { n++; low += 1 - e.hpPct; }
-        const s = n * 10 + low - G.M.dist(u, p) * 0.05;
-        if (s > bs) { bs = s; best = { x: p.x, y: p.y, n }; }
+        if (c.kind !== 'hero') continue;                       // chỉ đặt tâm khi có ít nhất 1 tướng trong vùng
+        const p = clamp(fut(c)), sc = score(p);
+        if (!best || sc.s > best.sc.s) best = { p, sc };
       }
-      return best;
+      if (!best) return null;
+      // trọng tâm có trọng số của các mục tiêu đang phủ
+      let sx = 0, sy = 0, sw = 0; for (const e of es) { const f = fut(e); if (G.M.dist(f, best.p) <= R * 0.85) { sx += f.x * W(e); sy += f.y * W(e); sw += W(e); } }
+      if (sw > 0) { const cp = clamp({ x: sx / sw, y: sy / sw }), cs = score(cp); if (cs.w >= best.sc.w && cs.n >= best.sc.n) best = { p: cp, sc: cs }; }
+      return { x: best.p.x, y: best.p.y, n: best.sc.n };
     },
     isHero: (x) => x && x.kind === 'hero',
     // nhánh tiến hóa đang có (vd H.T(u, '6b'))

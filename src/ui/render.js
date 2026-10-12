@@ -216,6 +216,7 @@
         const h = m.heroes.find((x) => x.id === this.idleHero && x.alive);
         if (h) { tgt = h; this.camWhy = '🎥 Dạo quanh: ' + this.nameOf(h); }
       }
+      if (tgt && cam.push && cam.focusId && tgt.id === cam.focusId) tgt = { x: tgt.x + cam.push.x, y: tgt.y + cam.push.y };   // GĐ12: đẩy camera theo hướng ngắm xa / mép chuột
       if (tgt) {
         const dx = tgt.x - cam.x, dy = tgt.y - cam.y;
         if (dx * dx + dy * dy > 40 * 40) { cam.x = tgt.x; cam.y = tgt.y; }
@@ -300,7 +301,9 @@
       if (this.vfx) this.vfx.draw(ctx, this, now, true);
       if (!m.soloArena || m.soloArena.overlay) this.drawArena(now, z);
       // lính, quái, vật triệu hồi & tướng (sắp theo y để vật dưới đè vật trên)
-      const list = m.units.filter((u) => u.alive);
+      // GĐ12 PvE: góc nhìn người chơi — chỉ thấy đơn vị đội mình nhìn thấy (sương mù như tướng thường), không phải trọng tài
+      const pov = this.pov;
+      const list = m.units.filter((u) => u.alive && (pov == null || u.team === pov || !u.vis || u.vis[pov] !== false));
       list.sort((a, b) => a.y - b.y || a.id - b.id);
       for (const u of list) {
         const p = this.pos(u, alpha);
@@ -338,7 +341,8 @@
         else if (u.hp < u.st.maxHp) this.drawBar(sp.x, sp.y - u.r * z - 5, Math.max(14, u.r * z * 2), 3, u.hp / u.st.maxHp, TEAM[u.team] || '#ddd');
       }
       this.drawTexts(now, z);
-      if (m.sbx && G.SandboxUI) G.SandboxUI.drawOverlay(this, ctx, m, alpha, z);   // GĐ11: lớp vẽ gỡ lỗi Sandbox
+      if (m.sbx && G.SandboxUI) G.SandboxUI.drawOverlay(this, ctx, m, alpha, z);
+      if (m.pve && G.PveUI && G.PveUI.el) G.PveUI.drawOverlay(this, ctx, m, alpha, z);   // GĐ12: sương mù, chỉ thị chiêu, âm thanh   // GĐ11: lớp vẽ gỡ lỗi Sandbox
       if (this.vfx) { ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0); this.vfx.drawFlash(ctx, this); }
     }
     // hoạt cảnh trong vùng chiêu (lửa lập lòe, mây khí, gió xoáy, lưỡi kiếm, mưa thương, hoa hồi máu…)
@@ -1287,8 +1291,8 @@
       if (u.heroId === 'chrononeo' && u.ws) { const c = u.ws.stance === 'chrono'; hColor = c ? '#d8902e' : '#4ab0ff'; rings.push(c ? '#ffb04a' : '#7ac8ff'); if (u.ws.spinT > tm) rings.push(c ? '#7ac8ff' : '#ffb04a'); }
       if (lucaCopy) { hColor = lucaCopy.color; hGfx = lucaCopy.gfx; rings.push('#ff6a9a'); }
       G.Draw.drawHero(ctx, p.x, p.y + lift, beastOn ? rp * 1.18 : rp, {
-        color: hColor, gfx: hGfx, team: u.team, beast: beastOn, rose: !!lucaCopy,
-        ang: this.faceAng(u, now), anim, hurt: now - u.lastDmgT < 0.08, stunned, stealth: !!u.has('stealth') || !!u.has('untarget'),
+        color: hColor, gfx: hGfx, team: u.team, beast: beastOn, rose: !!lucaCopy, spinning: !!(u.ws && u.ws.spinT > tm),
+        ang: this.faceAng(u, now), anim, hurt: false, hurtK: Math.max(0, 1 - (now - u.lastDmgT) / 0.18), stunned, stealth: !!u.has('stealth') || !!u.has('untarget'),
         st: u.ws, time: now, rings, soul: u.yNiem || 0,   // GĐ7: vũ khí đổi màu theo Ý NIỆM
       });
       // Raven đang ngắm: tia laser đỏ tới mục tiêu (bắn qua tầm nhìn của quạ)

@@ -334,6 +334,7 @@
         case 'heal': if (e.v >= 40) this.add(now, { k: 'spr', key: 'flower', x: e.x, y: e.y, s: 1.6, c: '#7aff9a', life: 0.5, alpha: 0.8 }); return;
         case 'death': this.add(now, { k: 'spr', key: 'skull', x: e.x, y: e.y, s: 2.6, c: '#ffffff', life: 1.0 }); this.add(now, { k: 'spr', key: 'smoke', x: e.x, y: e.y, s: 3, tint: '#9a9aa8', life: 0.8, alpha: 0.7 }); this.shake(3); return;
         case 'aura': if (e.id != null) this.add(now, { k: 'aura', id: e.id, c: e.color || '#ffffff', life: Math.max(0.35, Math.min(e.life || 0.5, 6)) }); return;
+        case 'petals': { this.burstParts(now, e.x, e.y, 14, { color: e.color || '#ff4a7a', speed: (e.r || 1.5) * 2.2, life: 0.7, size: 0.16 }); this.burstParts(now, e.x, e.y, 6, { color: '#ffd0e0', speed: (e.r || 1.5) * 1.4, life: 0.5, size: 0.1 }); this.add(now, { k: 'spr', key: 'halo', x: e.x, y: e.y, s: (e.r || 1.5) * 2.2, c: e.color || '#ff4a7a', life: 0.4 }); return; }   // GĐ12: cánh hoa bung
         case 'tophat': this.add(now, { k: 'tophat', x: e.x, y: e.y, r: e.r || 1.2, c: e.color || '#c040ff', life: e.life || 1.1 }); return;   // GĐ12: Mũ Cao của Dahlia rơi từ trời
         case 'lock': if (e.id != null) this.add(now, { k: 'lock', id: e.id, c: e.color || '#e0e0ff', life: Math.min(e.life || 3, 8) }); return;
         case 'shades': if (e.id != null) this.add(now, { k: 'shades', id: e.id, c: '#8a7aa8', life: Math.min(e.life || 5, 8) }); return;

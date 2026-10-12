@@ -60,10 +60,10 @@
     });
   }
   H.def({
-    id: 'luca', name: 'Luca', color: '#ff4a7a', gfx: 'cane', kit: 'mage', pos: ['mid'], dmgType: 'magic',
+    id: 'luca', name: 'Luca', color: '#ff4a7a', gfx: 'cane', kit: 'fighter', pos: ['mid'], dmgType: 'magic',
     // GĐ12: Luca thành tướng CẬN CHIẾN — gậy ba toong múa sát người
     ranged: false, r: 0.58, resource: 'mana',
-    stats: { range: 1.7, armorG: 4, mrG: 1.8, hp: 700, hpG: 104, ms: 3.5, armor: 26, mr: 32 },
+    stats: { range: 1.7, armorG: 4.2, mrG: 1.9, hp: 780, hpG: 112, mp: 420, mpG: 48, ms: 3.6, armor: 32, mr: 34, ad: 70, adG: 4.6, as: 0.8, asG: 0.025 },
     gauge: (u) => ({ v: u.ws.hype || 0, max: 100, label: 'Náo Nhiệt', color: '#ff6a9a' }),
     passive: {
       name: 'Sân Khấu Náo Nhiệt',
@@ -89,6 +89,8 @@
           if (m.fxOn) m.fx({ type: 'callout', id: u.id, text: '🌹 Biến mất!', color: '#ff6a9a' });
         }
       },
+      // GĐ12: gậy ba toong cận chiến — đòn đánh cộng 45% SMPT
+      onAuto(m, u, t, info) { info.amt += (u.st.ap || 0) * 0.45; },
       afterDeal(m, u, t, info) {
         if (t.kind !== 'hero') return;
         if (info.auto) hype(m, u, H.T(u, '1a') ? 8 : 5);
@@ -106,7 +108,7 @@
     },
     skills: {
       s1: {
-        name: 'Sân Khấu Mở Ra / Bước Nhảy Ngàn Hoa', desc: 'Mở Vùng Sân Khấu bán kính 6 đv trong 6s: trong vùng +20% tốc chạy, +15% hút máu phép. Trong sân khấu, S1 thành Bước Nhảy Ngàn Hoa: hồi chỉ 0.6s, tốn 25 mana, lướt 2.5 đv phóng cánh hoa hồng thép gây sát thương phép kẻ địch lướt qua.',
+        name: 'Sân Khấu Mở Ra / Bước Nhảy Ngàn Hoa', desc: 'Mở Vùng Sân Khấu bán kính 6 đv trong 6s: trong vùng +20% tốc chạy, +15% hút máu phép. Trong sân khấu, S1 thành Bước Nhảy Ngàn Hoa: hồi chỉ 0.6s, tốn 25 mana, lướt 2.5 đv phóng cánh hoa hồng thép gây sát thương phép kẻ địch lướt qua, chạm đất NỔ HOA bán kính 1.8 (50% sát thương).',
         cd: [10, 9, 8, 7, 7], cost: [55, 55, 55, 55, 55], manualCd: true,
         use: wrap('s1', (m, u, ctx) => {
           const dmg = H.amt(u, ctx.v([75, 110, 145, 180, 215]), 0, 0.6);
@@ -117,7 +119,10 @@
             const k = 1 + (H.T(u, '3c') ? 0.15 * u.ws.waltz : 0);
             const p = H.toward(u, ctx.pt, 2.5, false), v = H.dirTo(u, p);
             m.hitLine(u, u.x, u.y, v.x, v.y, 3, 1.1, (e) => { m.damage(u, e, dmg * k, 'magic', { tag: 's1' }); if (H.T(u, '1c')) m.dot(u, e, 6 + u.level, 2, 'phys', 'luca_thorn'); }, { color: '#ff6a9a' });
-            m.dashTo(u, p.x, p.y, 22, {});
+            m.dashTo(u, p.x, p.y, 22, { onEnd: (mm) => {   // GĐ12: hạ chân thì NỔ HOA ở điểm cuối
+              mm.hitCircle(u, u.x, u.y, 1.8, (e) => mm.damage(u, e, dmg * 0.5 * k, 'magic', { tag: 's1', aoe: true }), { color: '#ff4a7a', fx: 'boom' });
+              if (mm.fxOn) mm.fx({ type: 'petals', x: u.x, y: u.y, r: 1.8, color: '#ff4a7a' });
+            } });
             if (H.T(u, '12b')) m.addStatus(u, 'buff', 1.3, 1, { key: 'luca_noslow', mods: { tenacity: 0.6 } });
             return;
           }

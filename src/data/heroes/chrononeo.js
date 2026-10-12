@@ -151,26 +151,22 @@
         } },
       },
       s4: {
-        name: 'Liên Hoa Thời Không', desc: 'Hợp nhất 5/6/8s: mỗi 0.5s xả 8/10/14 viên — giai đoạn đầu đạn bay HỖN LOẠN (góc, tốc độ, đường cong ngẫu nhiên), sau đó nở thành vòng hoa sen xoay đều uốn cong, xen kẽ đạn Chrono (nặng, xuyên thấu) và đạn Neo (nhanh); vẫn dùng được Bước Thời Gian. • Dạng Chrono: đạn to, mạnh hơn, đẩy lùi nhẹ; kết thúc Nở Rộ 30 viên đạn nặng, hất văng kẻ áp sát 3 đv. • Dạng Neo: gọi Ảnh Chiếu bất tử cùng xả đạn (dùng lại để đổi chỗ), +10/14/18% tốc chạy; kết thúc tỏa 10/15/20 viên và lướt ngắn 3 đv.',
+        name: 'Liên Hoa Thời Không', desc: 'Hợp nhất 5/6/8s: mỗi 0.5s xả 2 vòng 10/12/16 viên BAY THẲNG chia góc đều — vòng đạn nặng Chrono xen vòng đạn nhanh Neo lệch nửa bước góc, mỗi đợt xoay thêm một chút thành bông sen nở xoay tròn, xen kẽ đạn Chrono (nặng, xuyên thấu) và đạn Neo (nhanh); vẫn dùng được Bước Thời Gian. • Dạng Chrono: đạn to, mạnh hơn, đẩy lùi nhẹ; kết thúc Nở Rộ 30 viên đạn nặng, hất văng kẻ áp sát 3 đv. • Dạng Neo: gọi Ảnh Chiếu bất tử cùng xả đạn (dùng lại để đổi chỗ), +10/14/18% tốc chạy; kết thúc tỏa 10/15/20 viên và lướt ngắn 3 đv.',
         cd: [110, 90, 70], cost: [100, 100, 100],
         use(m, u, ctx) {
-          const c = isC(u), life = ctx.v([5, 6, 8]), n = ctx.v([8, 10, 14]), dmg = H.amt(u, ctx.v([30, 45, 60]), 0.3) * (c ? 1.3 : 1);
-          let k = 0; const t0 = m.time;
-          // GĐ12 (theo Legacy): GIAI ĐOẠN ĐẦU (45% thời lượng) đạn bay HỖN LOẠN — góc ngẫu nhiên, tốc độ lộn xộn, đường đạn uốn
-          // lượn đổi chiều liên tục như dòng thời gian vỡ vụn; sau đó mới "nở" thành các vòng hoa sen xoay đều.
-          const curl = (heavy, bend, wob) => (m3, p) => { const w = bend + Math.sin((p.trav + wob) * 0.9) * 2.2, dt = G.C.TICK, cs = Math.cos(w * dt), sn = Math.sin(w * dt), x = p.dx * cs - p.dy * sn; p.dy = p.dx * sn + p.dy * cs; p.dx = x; };
+          const c = isC(u), life = ctx.v([5, 6, 8]), n = ctx.v([10, 12, 16]), dmg = H.amt(u, ctx.v([30, 45, 60]), 0.3) * (c ? 1.3 : 1);
+          // GĐ12 (theo Nộ Liên Hoa của bản Di sản): mỗi đợt 2 vòng đạn BAY THẲNG, GÓC CHIA ĐỀU — vòng đạn nặng Chrono (cam, to)
+          // xen vòng đạn nhanh Neo (xanh) lệch nửa bước góc; đế góc xoay 0.21 rad mỗi đợt → các vòng nở thành bông sen xoay tròn
+          let k = 0;
           const burst = (mm, src, scale) => {
             k++;
-            const chaos = mm.time - t0 < life * 0.45;
-            for (let i = 0; i < n; i++) {
-              const heavy = (i + k) % 2 === 0;
-              const a = chaos ? mm.rng.next() * 6.2831853 : i * 6.2831853 / n + k * 0.39;
-              const sp = chaos ? (heavy ? 10 + mm.rng.next() * 14 : 18 + mm.rng.next() * 20) : heavy ? 18 : 28;
-              const bend = chaos ? (mm.rng.next() * 2 - 1) * 3.2 : (k % 2 ? 1.3 : -1.3) * (heavy ? 1 : -1);
-              mm.proj({ owner: u, x: src.x, y: src.y, dx: M.cos(a), dy: M.sin(a), speed: sp, range: chaos ? 14 + mm.rng.next() * 8 : 20, r: heavy ? (c ? 0.7 : 0.5) : 0.35, kind: heavy ? 'chrono_b' : 'neo_b', pierce: heavy,
-                onTick: chaos ? curl(heavy, bend, mm.rng.next() * 9) : curl(heavy, bend * 0.5, 0),
-                onHit: (m3, p, e) => { m3.damage(u, e, dmg * scale * (heavy ? 1.3 : 0.8), 'phys', { tag: 's4', aoe: true }); if (c) m3.knock(u, e, p.dx || 0, p.dy || 0, 0.5, 0.1); } });
+            const base = k * 0.21, step = 6.2831853 / n;
+            for (let i = 0; i < n; i++) for (const heavy of [true, false]) {
+              const a = base + i * step + (heavy ? 0 : step / 2);
+              mm.proj({ owner: u, x: src.x, y: src.y, dx: M.cos(a), dy: M.sin(a), speed: heavy ? 17 : 27, range: heavy ? 16 : 19, r: heavy ? (c ? 0.7 : 0.5) : 0.35, kind: heavy ? 'chrono_b' : 'neo_b', pierce: heavy,
+                onHit: (m3, p, e) => { m3.damage(u, e, dmg * scale * (heavy ? 0.7 : 0.35), 'phys', { tag: 's4', aoe: true }); if (c && heavy) m3.knock(u, e, p.dx || 0, p.dy || 0, 0.5, 0.1); } });
             }
+            if (mm.fxOn) mm.fx({ type: 'ring', x: src.x, y: src.y, r: 1.4, color: k % 2 ? '#7ac8ff' : '#ffb04a' });
           };
           H.spin(m, u, life); m.zone({ owner: u, x: u.x, y: u.y, r: 6, life, every: 0.5, follow: u, kind: 'lotus', tick: (mm) => burst(mm, u, 1),
             onEnd: (mm) => {
