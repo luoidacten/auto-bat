@@ -738,7 +738,7 @@ body.pve-on:not(.pve-dead) #ctrl .spd, body.pve-on:not(.pve-dead) #ctrl .spc, bo
 
 /* GĐ13: thanh tài nguyên riêng + bảng chiêu */
 .pve-gauge { position: absolute; left: 50%; top: 96px; transform: translateX(-50%); display: flex; gap: 8px; pointer-events: none; }
-.pve-gauge .pg { display: flex; align-items: center; gap: 5px; background: rgba(10,10,20,.72); padding: 3px 8px; border-radius: 10px; font-size: 12px; }
+.pve-gauge .pg { display: flex; align-items: center; gap: 5px; white-space: nowrap; background: rgba(10,10,20,.72); padding: 3px 8px; border-radius: 10px; font-size: 12px; }
 .pve-gauge .pg i { display: block; width: 90px; height: 8px; background: rgba(255,255,255,.15); border-radius: 4px; overflow: hidden; }
 .pve-gauge .pg i b { display: block; height: 100%; transition: width .15s; }
 .pve-gauge .pg em { font-style: normal; font-weight: 700; }
@@ -775,3 +775,6 @@ body.pve-on:not(.pve-dead) #ctrl .spd, body.pve-on:not(.pve-dead) #ctrl .spc, bo
 .pve-aimbtn { position: absolute; left: 12px; top: 154px; pointer-events: auto; padding: 5px 10px; border-radius: 14px; font-size: 12px; background: rgba(40,40,60,.85); border: 2px solid #888; }
 .pve-aimbtn.on { border-color: #ff7a7a; }
 .pve-tree:not(.hidden) ~ .pve-aimbtn { top: auto; bottom: 52px; }
+
+.pve-ocabtn { position: absolute; left: 12px; top: 196px; pointer-events: auto; padding: 5px 10px; border-radius: 14px; font-size: 12px; background: rgba(30,40,70,.9); border: 2px solid #8aa0c8; color: #dfe8ff; }
+.pve-tree:not(.hidden) ~ .pve-ocabtn { top: auto; bottom: 92px; }

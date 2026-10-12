@@ -11,7 +11,7 @@
   function reveal(m, u) { if (!H.T(u, '9a') && u.has('stealth')) u.revealedT = Math.max(u.revealedT, m.time + 1.2); }
   // ===== Quạ Cơ Giới Oca (GĐ6c): vật bay thật — bay thẳng qua tường tới điểm thả, lượn vòng trên đầu con mồi gần nhất,
   // cho tầm nhìn 8 đv (lộ tàng hình), mỗi giây thả bom mini. Có máu, BỊ BẮN HẠ được. =====
-  const OCA_R = 10, OCA_LEASH = 60, OCA_HUNT = 26;   // GĐ9: Oca bay rất xa, tự tìm con mồi yếu máu
+  const OCA_R = 10, OCA_LEASH = 1e9, OCA_HUNT = 26;   // GĐ9: tự tìm con mồi yếu máu • GĐ13: không còn dây xích — bay khắp bản đồ tìm mục tiêu
   function ocaBase(u) { return { hp: 120 + 28 * u.level, armor: 12 + u.level, mr: 12 + u.level, ad: 0, as: 0.1, ms: 11, range: 0 }; }
   function makeOca(m, u, pt, life) {
     if (u.ws.oca && u.ws.oca.alive) { u.ws.oca.expired = true; m.kill(u.ws.oca, null); }
@@ -41,7 +41,13 @@
     const prey = m.heroes.filter((h) => h.alive && h.team !== u.team && M.dist(h, o) < OCA_HUNT && h.vis[u.team])
       .sort((a, b) => (a.hpPct - (a.hasKey(OCA) ? 0.1 : 0)) - (b.hpPct - (b.hasKey(OCA) ? 0.1 : 0)) || M.dist2(a, o) - M.dist2(b, o) || a.id - b.id)[0];
     o.prey = prey || null;
-    if (prey) { o.anchor.x += (prey.x - o.anchor.x) * Math.min(1, dt * 2); o.anchor.y += (prey.y - o.anchor.y) * Math.min(1, dt * 2); }
+    if (prey) { o.anchor.x += (prey.x - o.anchor.x) * Math.min(1, dt * 2); o.anchor.y += (prey.y - o.anchor.y) * Math.min(1, dt * 2); o.seek = null; }
+    else if (M.dist(o, o.anchor) < 3.5) {
+      // GĐ13: chưa thấy con mồi — "đánh hơi" tướng địch gần quạ nhất ở bất cứ đâu trên bản đồ và bay tới (lượn lệch một chút cho tự nhiên);
+      // tới gần thì tầm nhìn của quạ làm lộ nó → thành con mồi ở nhịp sau
+      const s = m.heroes.filter((h) => h.alive && h.team !== u.team && !(h.duel && h.x > 800)).sort((a, b) => M.dist2(a, o) - M.dist2(b, o) || a.id - b.id)[0];
+      if (s) { const wob = M.sin(m.time * 0.9 + o.id) * 4; const v = H.dirTo(o, s), d = Math.min(M.dist(o, s), 30); o.anchor.x = o.x + v.x * d - v.y * wob; o.anchor.y = o.y + v.y * d + v.x * wob; o.seek = s; }
+    }
     // không bay quá xa Raven
     const dA = M.dist(o.anchor, u); if (dA > OCA_LEASH) { o.anchor.x = u.x + (o.anchor.x - u.x) / dA * OCA_LEASH; o.anchor.y = u.y + (o.anchor.y - u.y) / dA * OCA_LEASH; }
     o.anchor.x = Math.max(2, Math.min(G.C.MAP - 2, o.anchor.x)); o.anchor.y = Math.max(2, Math.min(G.C.MAP - 2, o.anchor.y));
@@ -173,6 +179,13 @@
       desc: 'Hai băng đạn độc lập (bản Legacy): SÚNG TRƯỜNG 30 viên (mỗi phát 3 viên, nạp 3s) — mục tiêu càng xa đạn càng mạnh (tối đa +25% từ 8 đv) • SÚNG TỈA 5 viên (nạp 6s, mỗi viên ×1.6 sát thương). Thấy kẻ địch ngoài tầm súng trường thì đứng lại NGẮM: tầm +7.5; khi quạ Oca còn sống, tầm gần như vô hạn — bắn bất cứ kẻ nào Oca / Raven nhìn thấy, liên tục tới khi Oca bị hạ. Di chuyển là thôi ngắm. Chỉ nạp khi bắn cạn băng; tốc đánh và Tốc Nạp rút ngắn thời gian nạp.',
       init(m, u) { u.ws.ammo = MAG; u.ws.rl = 0; u.ws.ammoB = MAG_B; u.ws.rlB = 0; },
       update(m, u, dt) {
+        // GĐ13: Raven của người chơi — tự vào SÚNG NGẮM khi Oca còn sống và (đứng yên 0.35s, hoặc đang ra lệnh đánh kẻ địch ngoài tầm súng trường mà Oca/Raven thấy)
+        if (u.ctl && !u.ws.scope && !u.cast && !u.dash) {
+          if (H.moving(u)) u.ws.stillT = m.time;
+          const oca = u.ws.oca && u.ws.oca.alive, t = u.attackTarget, arR = u.base.range + u.r + (t ? t.r : 0);
+          const farT = t && t.alive && t.kind === 'hero' && t.vis[u.team] && M.dist(u, t) > arR && M.dist(u, t) <= scopeR(u) + u.r + t.r;
+          if ((oca && m.time - (u.ws.stillT || 0) > 0.35) || farT) { startScope(m, u); u.goal = null; }
+        }
         // súng ngắm: giữ khi Oca còn sống và Raven đứng yên; di chuyển / Oca chết thì đổi lại súng trường
         if (u.ws.scope) {
           const oca = u.ws.oca;
@@ -307,4 +320,21 @@
       { name: 'Vọng Âm Đêm Tối', desc: 'Trong Màn Đêm, mỗi lần hạ gục tướng kéo dài bóng tối thêm 3s.' },
     ],
   ];
+})();
+
+(function () {
+  const G = globalThis.G;
+  // GĐ13: trạng thái Oca / súng ngắm cho giao diện người chơi
+  G.HEROES.raven.ocaInfo = function (m, u) {
+    const o = u.ws.oca; if (!o || !o.alive) return null;
+    return { left: Math.max(0, o.until - m.time), prey: o.prey || null, seek: o.seek || null, hp: o.hp / o.st.maxHp, scope: !!u.ws.scope };
+  };
+  // GĐ13: PvE — đang SÚNG NGẮM và bật tự ngắm: tự bắn con mồi Oca đang bám (hoặc tướng địch thấy được gần nhất trong tầm ngắm)
+  G.HEROES.raven.pveAutoTarget = function (m, u) {
+    if (!u.ws.scope) return null;
+    const R = u.st.range + u.r, ok = (h) => h && h.alive && h.kind === 'hero' && h.team !== u.team && h.vis[u.team] && G.M.dist(h, u) <= R + h.r;
+    const o = u.ws.oca; if (o && o.alive && ok(o.prey)) return o.prey;
+    let best = null, bd = 1e9; for (const h of m.heroes) if (ok(h)) { const d = G.M.dist(h, u); if (d < bd) { bd = d; best = h; } }
+    return best;
+  };
 })();

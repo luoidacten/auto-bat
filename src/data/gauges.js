@@ -25,6 +25,13 @@
     boran: (m, u) => [bar('❄ Nộ Khí', u.ws.fury, 100, '#9fe0ff', (u.ws.fury || 0) >= 100 ? '100 • Thấu Cốt' : null)],
     caelus: (m, u) => [bar('🧠 Xác Suất', u.ws.prob, 100, '#b0ffd0', (u.ws.prob || 0) >= 100 ? '100 • Quá Tải Phân Tích' : null)],
     bachdiep: (m, u) => [bar('🗡 Kiếm', u.ws.sw, null, '#d0f0ff', String(u.ws.sw || 0))],
+    raven: (m, u) => {
+      const I = G.HEROES.raven.ocaInfo(m, u), out = [];
+      if (I) out.push(bar('🐦 Oca', I.left, 30, '#8aa0c8', `${I.left.toFixed(0)}s • ${I.prey ? 'bám ' + I.prey.hero.name : I.seek ? 'đang tìm…' : 'lượn'} • ${Math.round(I.hp * 100)}% máu`));
+      else out.push(bar('🐦 Oca', 0, null, '#666', 'chưa thả — E'));
+      out.push(bar(u.ws.scope ? '🔭 Súng ngắm' : '🔫 Súng trường', 0, null, u.ws.scope ? '#cfe0ff' : '#ccc', u.ws.scope ? (I ? 'tầm vô hạn qua mắt Oca' : 'tầm +7.5') : (I ? 'đứng yên để ngắm' : 'thả Oca để bắn xa')));
+      return out;
+    },
     wukong: (m, u) => [bar('🐒 Côn Thức', u.ws.kt, 100, '#ffd24a', (u.ws.kt || 0) >= 100 ? '100 • cường hóa tối đa' : (u.ws.kt || 0) >= 50 ? Math.round(u.ws.kt) + ' • chiêu kế cường hóa' : null)],
   };
   G.heroGauges = function (m, u) {

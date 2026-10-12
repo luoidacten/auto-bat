@@ -28,7 +28,7 @@
     pveTarget(u) {
       const P = this.pve, vis = (e) => e && e.alive && e.team !== u.team && (!e.vis || e.vis[u.team] !== false) && !(e.statuses.length && e.has('untarget'));
       const cur = P.lockId != null ? this.units.find((x) => x.id === P.lockId) : null;
-      if (vis(cur) && dist(cur, u) < 11) return cur;
+      if (vis(cur) && dist(cur, u) < Math.max(11, u.st.range + u.r + 2)) return cur;   // GĐ13: tầm đánh rất xa (súng ngắm Raven) vẫn giữ khóa
       let best = null, bd = 9;
       for (const h of this.heroes) if (h !== u && vis(h) && !(h.allyRec && h.allyRec.get && h.allyRec.get(u.id))) { const d = dist(h, u); if (d < bd) { bd = d; best = h; } }
       if (!best) { bd = u.st.range + u.r + 2; this.grid.query(u.x, u.y, bd + 2, (v) => { if ((v.kind === 'monster' || v.kind === 'pet') && vis(v)) { const d = dist(v, u) - v.r; if (d < bd) { bd = d; best = v; } } }); }
@@ -138,8 +138,12 @@
       u.goal = null;
       // chỉ đánh theo LỆNH (nút ⚔ / click / kéo khóa): bám mục tiêu đã ra lệnh tới khi di chuyển, mục tiêu chết, khuất tầm nhìn hoặc xa > 12 đv
       const a = P.atkId != null ? this.units.find((x) => x.id === P.atkId) : null;
-      if (a && a.alive && (!a.vis || a.vis[u.team] !== false) && Math.hypot(a.x - u.x, a.y - u.y) < 12) u.attackTarget = a;
-      else { P.atkId = null; u.attackTarget = null; }
+      if (a && a.alive && (!a.vis || a.vis[u.team] !== false) && Math.hypot(a.x - u.x, a.y - u.y) < Math.max(12, u.st.range + u.r + 3)) u.attackTarget = a;
+      else {
+        P.atkId = null; u.attackTarget = null;
+        // GĐ13: tướng có chế độ tự bắn riêng (Raven đang ngắm qua mắt Oca) — chỉ khi bật tự ngắm và người chơi không ra lệnh gì
+        if (P.autoAim !== false && u.hero.pveAutoTarget) { const at = u.hero.pveAutoTarget(this, u); if (at) u.attackTarget = at; }
+      }
     },
     // ===== CỬA HÀNG THỦ CÔNG (GĐ12 PvE) — mua ở cạnh Thương Nhân (hoặc mọi nơi nếu có mảnh "Cửa Hàng Online") =====
     pveCanShop(u) { return !!(this.atShop(u) || (u.perks && u.perks.has('cua_hang') && this.time - (u.combatT || -99) > 4)); },

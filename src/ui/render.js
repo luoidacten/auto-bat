@@ -1763,6 +1763,14 @@
         g.fillStyle = h.hero.color; g.strokeStyle = TEAM[h.team]; g.lineWidth = 2;
         g.beginPath(); g.arc(h.x * k, h.y * k, Math.max(3.2, S / 44), 0, TAU); g.fill(); g.stroke();
       }
+      // GĐ13: quạ trinh sát (Oca của Raven) — phe mình (PvE) hoặc mọi phe (xem trận); vẽ đường tới con mồi
+      for (const o of m.units) {
+        if (!o.alive || !o.scoutPet || (this.pov != null && o.team !== this.pov && o.vis && o.vis[this.pov] === false)) continue;
+        const ox = o.x * k, oy = o.y * k;
+        if (o.prey && o.prey.alive && (this.pov == null || o.team === this.pov)) { g.strokeStyle = 'rgba(160,190,255,0.7)'; g.setLineDash([2, 2]); g.lineWidth = 1; g.beginPath(); g.moveTo(ox, oy); g.lineTo(o.prey.x * k, o.prey.y * k); g.stroke(); g.setLineDash([]); }
+        g.fillStyle = '#cfe0ff'; g.strokeStyle = '#1a2030'; g.lineWidth = 1;
+        g.beginPath(); g.moveTo(ox, oy - 3.5); g.lineTo(ox + 3.5, oy + 2.5); g.lineTo(ox, oy + 1); g.lineTo(ox - 3.5, oy + 2.5); g.closePath(); g.fill(); g.stroke();
+      }
       // Cổng/Không gian quyết đấu trên minimap
       const dg = m.duelSt && m.duelSt.gate;
       if (dg && dg.state === 'fight') {

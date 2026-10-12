@@ -46,7 +46,7 @@
       const pick = this.last || ids[0];
       $('#setup').innerHTML = `
         <h2>🕹 Sinh Tồn PvE — chọn tướng của bạn</h2>
-        <p class="hint">Bạn điều khiển 1 tướng giữa 9 tướng máy — <b>AI của tướng bạn bị tắt hoàn toàn</b> (không tự đánh, tự dùng chiêu, tự uống bình hay tự liên minh), tầm nhìn như người chơi thường (có chỉ báo âm thanh). <b>PC (kiểu LoL)</b>: <b>chuột phải</b> lên đất = đi tới (giữ để đi theo con trỏ), lên kẻ địch = đánh • WASD cũng đi được • giữ Q/E/R/F/Space để ngắm theo chuột, nhả để tung (chuột phải lúc ngắm = hủy) • U bật/tắt tự ngắm (bật: bấm nhanh chiêu chỉ nhắm kẻ địch TRONG TẦM chiêu; tắt: tung theo hướng mặt) • I bảng chiêu & chỉ số (rê chuột lên nút chiêu để xem nhanh) • Y khóa/thả camera (thả rồi mới kéo mép màn hình) • P cửa hàng • V mở rương • 1–4 ô dùng nhanh (phép bổ trợ / vật phẩm balo, hướng theo con trỏ) • Alt+1/2/3 chọn nhánh cây tiến hóa • Ctrl+Q/E/R/F nâng chiêu • H/G bình • B balo • T đổi mục tiêu.
+        <p class="hint">Bạn điều khiển 1 tướng giữa 9 tướng máy — <b>AI của tướng bạn bị tắt hoàn toàn</b> (không tự đánh, tự dùng chiêu, tự uống bình hay tự liên minh), tầm nhìn như người chơi thường (có chỉ báo âm thanh). <b>PC (kiểu LoL)</b>: <b>chuột phải</b> lên đất = đi tới (giữ để đi theo con trỏ), lên kẻ địch = đánh • WASD cũng đi được • giữ Q/E/R/F/Space để ngắm theo chuột, nhả để tung (chuột phải lúc ngắm = hủy) • U bật/tắt tự ngắm (bật: bấm nhanh chiêu chỉ nhắm kẻ địch TRONG TẦM chiêu; tắt: tung theo hướng mặt) • O camera theo quạ Oca (Raven) • I bảng chiêu & chỉ số (rê chuột lên nút chiêu để xem nhanh) • Y khóa/thả camera (thả rồi mới kéo mép màn hình) • P cửa hàng • V mở rương • 1–4 ô dùng nhanh (phép bổ trợ / vật phẩm balo, hướng theo con trỏ) • Alt+1/2/3 chọn nhánh cây tiến hóa • Ctrl+Q/E/R/F nâng chiêu • H/G bình • B balo • T đổi mục tiêu.
           <b>Điện thoại</b>: chạm nhanh lên bản đồ = đi tới / đánh • chạm nửa trái để hiện cần ảo • chạm nhanh nút chiêu = tung tự động • giữ & kéo = vòng chỉ thị, kéo vào ✕ để hủy • nút ⚔ chạm để đánh, kéo để khóa mục tiêu • giữ 🎒 để mở bánh xe balo.</p>
         <div class="pve-grid">${ids.map((id) => { const H = G.HEROES[id]; return `<button class="pve-hero${id === pick ? ' on' : ''}" data-id="${id}"><span class="dot" style="background:${H.color}"></span>${esc(H.name)}<small>${esc(H.kit || '')}</small></button>`; }).join('')}</div>
         <div class="row btns"><button class="big" id="pvGo">▶ Vào trận</button><button id="pvBack">← Quay lại</button></div>`;
@@ -93,6 +93,7 @@
         <div class="pve-info" id="pvInfo"></div>
         <div class="pve-gauge" id="pvGauge"></div>
         <button class="pve-infobtn" id="pvInfoBtn" title="Bộ chiêu & chỉ số (I)">📖 Chiêu</button>
+        <button class="pve-ocabtn hidden" id="pvOcaBtn" title="Camera theo quạ Oca / về Raven (O)">👁 Mắt Oca</button>
         <button class="pve-aimbtn on" id="pvAimBtn" title="Tự ngắm khi bấm nhanh — chỉ nhắm kẻ địch TRONG TẦM chiêu (U)">🎯 Tự ngắm: BẬT</button>
         <div class="pve-book hidden" id="pvBook"></div>
         <div class="pve-tip hidden" id="pvTip"></div>`;
@@ -127,6 +128,7 @@
       $('#pvQuick').addEventListener('pointerdown', (e) => { const b = e.target.closest('[data-q]'); if (!b) return; e.stopPropagation(); e.preventDefault(); this.quick(+b.dataset.q); });
       $('#pvInfoBtn').onclick = (e) => { e.stopPropagation(); this.toggleBook(); };
       $('#pvAimBtn').onclick = (e) => { e.stopPropagation(); this.toggleAutoAim(); };
+      $('#pvOcaBtn').onclick = (e) => { e.stopPropagation(); this.toggleOcaCam(); };
       $('#pvBook').addEventListener('click', (e) => {
         e.stopPropagation(); if (e.target.closest('[data-close]')) { this.toggleBook(); return; }
         const b = e.target.closest('[data-choice]'); if (!b || b.disabled || !this.app.m.pve) return;
@@ -330,6 +332,7 @@
       else if (k === 'v') this.openChest();
       else if (k === 'i') this.toggleBook();
       else if (k === 'u') this.toggleAutoAim();
+      else if (k === 'o') this.toggleOcaCam();
       else if ((k === '1' || k === '2' || k === '3') && this.treeKey != null && (e.altKey || e.shiftKey)) { e.preventDefault(); this.pickTree(+k - 1); }
       else if (k === '1' || k === '2' || k === '3' || k === '4') this.quick(+k - 1);
       else if (k === 't') this.cycle();
@@ -338,7 +341,7 @@
       else if (k === 'escape') { if (this.aim) { this.aim.cancel = true; this.release(); } else if (this.shopOpen) this.toggleShop(); else if (this.bookOpen) this.toggleBook(); else { this.unmount(); this.app.quitMatch(); } }
     },
     // ---------- khóa camera ----------
-    camLocked() { const r = this.app.r, u = this.unit(); return !!(u && r.cam.follow && r.cam.focusId === u.id); },
+    camLocked() { const r = this.app.r, u = this.unit(); return !!(u && r.cam.follow && (r.cam.focusId === u.id || (u.ws && u.ws.oca && r.cam.focusId === u.ws.oca.id))); },
     toggleCam() {
       const r = this.app.r, u = this.unit(); if (!u) return;
       if (this.camLocked()) { r.cam.follow = false; r.cam.push = null; }          // thả: camera đứng yên, kéo màn hình để nhìn quanh
@@ -369,6 +372,12 @@
       if (key === this.quickKey) return; this.quickKey = key;
       const C = G.CONSUMABLES, m = this.app.m, cd = Math.max(0, (u.bagT || 0) - m.time);
       $('#pvQuick').innerHTML = L.map((id, i) => `<button data-q="${i}" title="${esc(C[id].name + ' — ' + (C[id].desc || ''))}"${cd > 0 ? ' class="cd"' : ''}><b>${i + 1}</b>${C[id].icon || '🎁'}<em>${m.bagCount(u, id)}</em></button>`).join('');
+    },
+    // GĐ13: Raven — camera theo quạ Oca (xem con mồi ở xa) / về lại Raven
+    toggleOcaCam() {
+      const u = this.unit(), r = this.app.r; if (!u || !u.ws.oca || !u.ws.oca.alive) return;
+      if (r.cam.focusId === u.ws.oca.id) { r.cam.follow = true; r.cam.focusId = u.id; }
+      else { r.cam.follow = true; r.cam.focusId = u.ws.oca.id; }
     },
     autoAimOn() { const m = this.app.m; return !(m && m.pve && m.pve.autoAim === false); },
     toggleAutoAim() { const m = this.app.m; if (!m || !m.pve) return; m.pve.queue.push({ autoAim: !this.autoAimOn() }); m.pve.autoAim = !this.autoAimOn(); },
@@ -523,6 +532,8 @@
       const cb = $('#pvCam'), lk = this.camLocked(); cb.classList.toggle('on', lk); cb.textContent = lk ? '🔒 Camera' : '🔓 Camera';
       // điểm chiêu chưa cộng: nút + nhấp nháy trên chiêu nâng được
       this.renderTree(u); this.renderQuick(u);
+      { const ob = $('#pvOcaBtn'), oc = u.ws && u.ws.oca && u.ws.oca.alive ? u.ws.oca : null; ob.classList.toggle('hidden', !oc);
+        if (oc) ob.textContent = r.cam.focusId === oc.id ? '👁 Về Raven (O)' : '👁 Mắt Oca (O)'; else if (r.cam.focusId && r.cam.focusId !== u.id) { r.cam.focusId = u.id; }  }   // Oca chết lúc đang xem → camera về Raven
       { const ab = $('#pvAimBtn'), on = this.autoAimOn(); ab.classList.toggle('on', on); ab.textContent = on ? '🎯 Tự ngắm: BẬT' : '🎯 Tự ngắm: TẮT'; }
       if (performance.now() > (this.gT || 0)) {
         this.gT = performance.now() + 150; this.renderGauge(u);
@@ -558,11 +569,17 @@
     drawOverlay(r, ctx, m, alpha, z) {
       const u = this.unit(); if (!u || !u.alive || m.pve.out) return;
       const q = r.pos ? r.pos(u, alpha) : u, p = r.w2s(q.x, q.y), now = performance.now() / 1000;
-      // sương mù ngoài tầm nhìn
+      // sương mù ngoài tầm nhìn — lớp riêng, khoét lỗ cho tướng mình và vật trinh sát của mình (quạ Oca của Raven)
       const VR = (u.visionR || G.C.VISION.hero) * z;
-      const g = ctx.createRadialGradient(p.x, p.y, VR * 0.75, p.x, p.y, VR * 1.08);
-      g.addColorStop(0, 'rgba(6,8,16,0)'); g.addColorStop(1, 'rgba(6,8,16,0.6)');
-      ctx.save(); ctx.fillStyle = g; ctx.fillRect(0, 0, r.W, r.H);
+      const fc = this.fogC || (this.fogC = document.createElement('canvas'));
+      if (fc.width !== r.W || fc.height !== r.H) { fc.width = r.W; fc.height = r.H; }
+      const fg = fc.getContext('2d');
+      fg.globalCompositeOperation = 'source-over'; fg.clearRect(0, 0, r.W, r.H); fg.fillStyle = 'rgba(6,8,16,0.6)'; fg.fillRect(0, 0, r.W, r.H);
+      fg.globalCompositeOperation = 'destination-out';
+      const hole = (x, y, R) => { const gg = fg.createRadialGradient(x, y, R * 0.75, x, y, R * 1.08); gg.addColorStop(0, 'rgba(0,0,0,1)'); gg.addColorStop(1, 'rgba(0,0,0,0)'); fg.fillStyle = gg; fg.beginPath(); fg.arc(x, y, R * 1.08, 0, TAU); fg.fill(); };
+      hole(p.x, p.y, VR);
+      for (const o of m.units) if (o.alive && o.scoutPet && o.owner === u) { const oq = r.pos ? r.pos(o, alpha) : o, op = r.w2s(oq.x, oq.y); hole(op.x, op.y, (o.visionR || 10) * z); }
+      ctx.save(); ctx.drawImage(fc, 0, 0);
       // vòng khóa mục tiêu
       const lk = m.pve.lockId != null ? m.units.find((v) => v.id === m.pve.lockId && v.alive) : null;
       if (lk) { const lq = r.pos ? r.pos(lk, alpha) : lk, lp = r.w2s(lq.x, lq.y), R = (lk.r + 0.35) * z; ctx.strokeStyle = '#ff3a3a'; ctx.lineWidth = 2.5; ctx.setLineDash([R * 0.5, R * 0.3]); ctx.beginPath(); ctx.arc(lp.x, lp.y, R, now * 2, now * 2 + TAU); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = '#ff3a3a'; ctx.beginPath(); ctx.moveTo(lp.x, lp.y - R - 10); ctx.lineTo(lp.x - 6, lp.y - R - 18); ctx.lineTo(lp.x + 6, lp.y - R - 18); ctx.fill(); }
