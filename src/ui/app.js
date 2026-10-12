@@ -45,6 +45,7 @@
       this.running = false; this.m = null; this.bk = null; this.afterReplay = null;
       if (G.BetUI) G.BetUI.unmountHud();
       if (G.SandboxUI) G.SandboxUI.unmount();
+      if (G.PveUI) G.PveUI.unmount();
       this.show('menu');
       G.Sound.music('menu');
       const sv = G.BetUI && G.BetUI.saved();
@@ -54,6 +55,7 @@
           ${sv ? `<button class="big" id="mResume">▶ Tiếp tục ván cược <small>(${sv.over ? '🕊 đã tự do — chơi tiếp vô tận?' : `${sv.endless ? '♾ vô tận, ' : ''}chặng ${sv.stage + 1}, trận ${sv.idx + 1} • 💰 ${U.fmt(sv.money)} + 🏦 ${U.fmt(sv.sav || 0)}`})</small></button>` : ''}
           <button class="${sv ? '' : 'big'}" id="mRun">🎲 Ván cược mới</button>
           <button id="mWatch">👁 Xem một trận tự do (không cược)</button>
+          <button id="mPve">🕹 Sinh Tồn PvE — tự điều khiển 1 tướng</button>
           <button id="mSolo">⚔ Solo 1v1 • 2 tướng</button>
           <button id="mSim">⏩ Mô phỏng nhanh 1 trận</button>
           <button id="mSbx">🧪 Phòng thử nghiệm (Sandbox)</button>
@@ -70,6 +72,7 @@
       if ($('#mResume')) $('#mResume').onclick = () => G.BetUI.resume();
       $('#mSim').onclick = () => this.quickSim(G.arenaConfig(this.newSeed()));
       $('#mSbx').onclick = () => G.SandboxUI.open(this);
+      $('#mPve').onclick = () => G.PveUI.open(this);
       $('#mMus').onclick = () => { G.Sound.toggleMusic(); this.menu(); };
       $('#mSfx').onclick = () => { G.Sound.toggleSfx(); this.menu(); };
       $('#mFull').onclick = () => goFullscreen();
@@ -177,7 +180,7 @@
       this.r.updateCamera(dt, sp);
       this.r.draw(sp > 0 && !m.over ? Math.min(1, this.acc / G.C.TICK) : 1);
       if (!this.hudT || t > this.hudT) { this.hud.update(); this.r.drawMinimap(this.hud.mini); this.hudT = t + 160; if (this.bk) G.BetUI.notify(); if (m.sbx && G.SandboxUI) G.SandboxUI.update(m); }
-      if (m.over && !this.ended) { this.ended = true; setTimeout(() => (this.bk && this.bk.m === m ? G.BetUI.after(m) : this.result(m)), 2200); G.Sound.play('applause'); }
+      if (m.over && !this.ended) { this.ended = true; if (G.PveUI && this.pveMode) setTimeout(() => G.PveUI.unmount(), 2100); setTimeout(() => (this.bk && this.bk.m === m ? G.BetUI.after(m) : this.result(m)), 2200); G.Sound.play('applause'); }
     },
     // âm thanh theo sự kiện (chỉ những gì gần khung nhìn)
     sound(e) {
@@ -213,7 +216,7 @@
       cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
       cv.addEventListener('wheel', (e) => { e.preventDefault(); this.zoomTo(this.r.cam.zoom * (e.deltaY > 0 ? 0.9 : 1.1)); }, { passive: false });
       window.addEventListener('keydown', (e) => {
-        if (!this.running) return;
+        if (!this.running || this.pveMode) return;   // GĐ12: PvE dùng phím riêng (pve_ui.js)
         if (e.key === ' ') { this.setSpeed(this.speed ? 0 : this.pref.speed || 2); e.preventDefault(); }
         else if (['1', '2', '4', '8'].includes(e.key)) this.setSpeed(+e.key);
         else if (e.key === 'Tab') { this.hud.$('board').classList.toggle('hidden'); e.preventDefault(); }

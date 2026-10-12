@@ -129,7 +129,7 @@
       if (kind === 'rival' || G.HEROES[kind]) {
         const id = kind === 'rival' ? (this.cfg.sandbox && this.cfg.sandbox.rival) || 'ryoma' : kind;
         u = this.spawnHero({ hero: id, team: 1, level: S.hero ? S.hero.level : 9 }, this.heroes.length, p);
-        u.sbRival = true;
+        u.sbRival = true; this.sbWrap(u, 'rcmd');
       } else {
         u = this.spawnHero({ hero: 'dummy_' + kind, def: dummyDef(kind), team: 1, level: 1, ai: dummyAI, items: ['__none'], pers: 'hoabinh', player: { name: DUMMY[kind].icon + ' ' + DUMMY[kind].name, stats: {} } }, this.heroes.length, p);
         u.dummy = kind;
@@ -196,10 +196,11 @@
 
     // ---------------- LỆNH CHO TƯỚNG THỬ ----------------
     // cmd: 'auto' (AI tự đánh) • 'idle' (đứng yên, không làm gì) • 'atk' (chỉ đánh thường) • 's1'|'s2'|'s3'|'s4'|'sub' (CHỈ dùng chiêu đó)
-    sbWrap(u) {
-      const m = this, ai = u.ai, own = ai.think;
+    // GĐ12: key = 'cmd' (tướng thử) hoặc 'rcmd' (lệnh riêng cho các ĐỐI THỦ tướng thật)
+    sbWrap(u, key) {
+      const m = this, ai = u.ai, own = ai.think, K = key || 'cmd';
       ai.think = function () {
-        const S = m.sbx, c = S && S.cmd;
+        const S = m.sbx, c = S && S[K];
         if (!c || c === 'auto') return own.call(this);
         u.goal = null; u.attackTarget = null;
         if (c === 'idle') return;
@@ -219,6 +220,11 @@
       let best = null, bd = 1e9;
       for (const h of this.heroes) if (h.alive && h.team !== u.team) { const d = Math.hypot(h.x - u.x, h.y - u.y); if (d < bd) { bd = d; best = h; } }
       return best;
+    },
+    sbRcmd(c) {
+      const S = this.sbx; S.rcmd = c;
+      for (const r of S.dummies) if (r.sbRival) { r.goal = null; r.attackTarget = null; }
+      this.sbLog('⚔ Lệnh đối thủ: ' + (c === 'auto' ? 'AI tự đánh' : c === 'idle' ? 'Đứng yên' : c === 'atk' ? 'Chỉ đánh thường' : 'Chỉ dùng ' + c.toUpperCase()));
     },
     sbCmd(c) {
       const S = this.sbx; S.cmd = c;

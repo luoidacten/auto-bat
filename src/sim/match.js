@@ -236,7 +236,8 @@
       const H = this.heroes, nH = H.length;
       const revAI = ((this.tick / C.AI_TICK) | 0) & 1;
       // nhịp nghĩ theo tốc độ phản ứng của nhân vật (Phản Xạ, Kỹ Năng): 0.06–0.25 giây
-      for (let i = 0; i < nH; i++) { const h = H[revAI ? nH - 1 - i : i]; if (h.alive && this.tick >= h.ai.nextTick) { h.ai.nextTick = h.ai.scheduleNext(this.tick); this.hook(() => h.ai.think()); } }
+      if (this.pve) { const pu = this.heroById(this.pve.id); if (pu) this.pveStep(pu); }   // GĐ12: người chơi điều khiển
+      for (let i = 0; i < nH; i++) { const h = H[revAI ? nH - 1 - i : i]; if (h.ctl) continue; if (h.alive && this.tick >= h.ai.nextTick) { h.ai.nextTick = h.ai.scheduleNext(this.tick); this.hook(() => h.ai.think()); } }
       const Us = this.units, nU = Us.length;
       for (let i = 0; i < nU; i++) {
         const u = Us[rev ? nU - 1 - i : i];
@@ -872,7 +873,7 @@
       };
     }
   }
-  Object.assign(Match.prototype, G.Combat, G.Neutral, G.BossMix, G.ArenaMix, G.ExtrasMix, G.BagMix, G.PropMix, G.ItemMix, G.TreeMix, G.DecoyMix, G.HouseMix, G.RoamMix, G.SandboxMix);
+  Object.assign(Match.prototype, G.Combat, G.Neutral, G.BossMix, G.ArenaMix, G.ExtrasMix, G.BagMix, G.PropMix, G.ItemMix, G.TreeMix, G.DecoyMix, G.HouseMix, G.RoamMix, G.SandboxMix, G.PveMix);
   G.Match = Match;
   G.DEFAULT_PLAYER = DEFAULT_PLAYER;
 })();

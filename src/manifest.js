@@ -26,6 +26,7 @@
     'sim/talents.js',
     'sim/decoy.js',
     'sim/sandbox.js',
+    'sim/pve.js',
     'data/items.js',
     'data/builds.js',
     'data/personality.js',
@@ -96,6 +97,7 @@
     'ui/bet_ui.js',
     'ui/solo_ui.js',
     'ui/sandbox_ui.js',
+    'ui/pve_ui.js',
     'ui/app.js',
   ];
   // Trình duyệt: chèn thẻ script theo đúng thứ tự (async=false giữ thứ tự thực thi)
