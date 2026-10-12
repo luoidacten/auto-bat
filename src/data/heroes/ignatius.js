@@ -70,7 +70,7 @@
           const ap = 0.8 + 0.2 * Math.min(1, c * 2) + (ctx.v([2, 2.25, 2.25, 2.5, 3]) - 1) * c;
           const dmg = H.amt(u, ctx.v([60, 90, 120, 150, 180]) * (0.6 + 0.4 * c), 0, ap);
           const t = ctx.tgt && ctx.tgt.alive ? ctx.tgt : null;
-          const aim = t && u.ai ? u.ai.lead(t, 16) : ctx.pt;
+          const aim = t && u.ai && !u.ctl ? u.ai.lead(t, 16) : ctx.pt;
           const hit = (mm, p) => {
             mm.hitCircle(u, p.x, p.y, R, (e) => { mm.damage(u, e, dmg * (e.hpPct < 0.3 ? 1.25 : 1), 'magic', { tag: 's2', aoe: true }); burn(mm, u, e, 2); }, { color: '#ff5a1a' });
             mm.zone({ owner: u, x: p.x, y: p.y, r: Math.max(1.8, R * 0.7), life: 4, every: 0.5, kind: 'fire',

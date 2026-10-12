@@ -83,7 +83,7 @@
           u.ws.cloakT = m.time + cloakCd(u);
           m.addStatus(u, 'stealth', 1.5, 1, { key: 'luca_cloak' });
           const e = H.nearestEnemyHero(m, u, 10), v = e ? H.dirTo(e, u) : { x: -u.fx, y: -u.fy };
-          m.blink(u, u.x + v.x * 4, u.y + v.y * 4);
+          if (!u.ctl) m.blink(u, u.x + v.x * 4, u.y + v.y * 4);   // GĐ13: tướng người chơi — chỉ tàng hình, không tự dịch chuyển
           if (H.T(u, '1b')) m.addStatus(u, 'haste', 3, 0.4, { key: 'luca_slip' });
           hype(m, u, 15);
           if (m.fxOn) m.fx({ type: 'callout', id: u.id, text: '🌹 Biến mất!', color: '#ff6a9a' });

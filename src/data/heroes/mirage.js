@@ -67,7 +67,7 @@
           u.ws.vanishT = m.time + (H.T(u, '6b') ? 80 : 120);
           const from = { x: u.x, y: u.y }, a = m.rng.next() * 6.283;
           m.addStatus(u, 'stealth', 2.5, 1, { key: 'mir_vanish' });
-          m.blink(u, u.x + M.cos(a) * 5, u.y + M.sin(a) * 5);
+          if (!u.ctl) m.blink(u, u.x + M.cos(a) * 5, u.y + M.sin(a) * 5);   // GĐ13: người chơi tự chạy (chỉ tàng hình + ảo ảnh)
           for (let i = 0; i < 4; i++) illusion(m, u, from.x, from.y, { life: 3, runTo: { x: from.x + [9, -9, 0, 0][i], y: from.y + [0, 0, 9, -9][i] } });
           if (m.fxOn) m.fx({ type: 'callout', id: u.id, text: '🎩 Ngươi đang nhìn đi đâu thế?', color: '#e0b0ff' });
         }

@@ -46,7 +46,7 @@
       const pick = this.last || ids[0];
       $('#setup').innerHTML = `
         <h2>🕹 Sinh Tồn PvE — chọn tướng của bạn</h2>
-        <p class="hint">Bạn điều khiển 1 tướng giữa 9 tướng máy — <b>AI của tướng bạn bị tắt hoàn toàn</b> (không tự đánh, tự dùng chiêu, tự uống bình hay tự liên minh), tầm nhìn như người chơi thường (có chỉ báo âm thanh). <b>PC (kiểu LoL)</b>: <b>chuột phải</b> lên đất = đi tới (giữ để đi theo con trỏ), lên kẻ địch = đánh • WASD cũng đi được • giữ Q/E/R/F/Space để ngắm theo chuột, nhả để tung (chuột phải lúc ngắm = hủy) • I bảng chiêu & chỉ số (rê chuột lên nút chiêu để xem nhanh) • Y khóa/thả camera (thả rồi mới kéo mép màn hình) • P cửa hàng • V mở rương • 1–4 ô dùng nhanh (phép bổ trợ / vật phẩm balo, hướng theo con trỏ) • Alt+1/2/3 chọn nhánh cây tiến hóa • Ctrl+Q/E/R/F nâng chiêu • H/G bình • B balo • T đổi mục tiêu.
+        <p class="hint">Bạn điều khiển 1 tướng giữa 9 tướng máy — <b>AI của tướng bạn bị tắt hoàn toàn</b> (không tự đánh, tự dùng chiêu, tự uống bình hay tự liên minh), tầm nhìn như người chơi thường (có chỉ báo âm thanh). <b>PC (kiểu LoL)</b>: <b>chuột phải</b> lên đất = đi tới (giữ để đi theo con trỏ), lên kẻ địch = đánh • WASD cũng đi được • giữ Q/E/R/F/Space để ngắm theo chuột, nhả để tung (chuột phải lúc ngắm = hủy) • U bật/tắt tự ngắm (bật: bấm nhanh chiêu chỉ nhắm kẻ địch TRONG TẦM chiêu; tắt: tung theo hướng mặt) • I bảng chiêu & chỉ số (rê chuột lên nút chiêu để xem nhanh) • Y khóa/thả camera (thả rồi mới kéo mép màn hình) • P cửa hàng • V mở rương • 1–4 ô dùng nhanh (phép bổ trợ / vật phẩm balo, hướng theo con trỏ) • Alt+1/2/3 chọn nhánh cây tiến hóa • Ctrl+Q/E/R/F nâng chiêu • H/G bình • B balo • T đổi mục tiêu.
           <b>Điện thoại</b>: chạm nhanh lên bản đồ = đi tới / đánh • chạm nửa trái để hiện cần ảo • chạm nhanh nút chiêu = tung tự động • giữ & kéo = vòng chỉ thị, kéo vào ✕ để hủy • nút ⚔ chạm để đánh, kéo để khóa mục tiêu • giữ 🎒 để mở bánh xe balo.</p>
         <div class="pve-grid">${ids.map((id) => { const H = G.HEROES[id]; return `<button class="pve-hero${id === pick ? ' on' : ''}" data-id="${id}"><span class="dot" style="background:${H.color}"></span>${esc(H.name)}<small>${esc(H.kit || '')}</small></button>`; }).join('')}</div>
         <div class="row btns"><button class="big" id="pvGo">▶ Vào trận</button><button id="pvBack">← Quay lại</button></div>`;
@@ -93,6 +93,7 @@
         <div class="pve-info" id="pvInfo"></div>
         <div class="pve-gauge" id="pvGauge"></div>
         <button class="pve-infobtn" id="pvInfoBtn" title="Bộ chiêu & chỉ số (I)">📖 Chiêu</button>
+        <button class="pve-aimbtn on" id="pvAimBtn" title="Tự ngắm khi bấm nhanh — chỉ nhắm kẻ địch TRONG TẦM chiêu (U)">🎯 Tự ngắm: BẬT</button>
         <div class="pve-book hidden" id="pvBook"></div>
         <div class="pve-tip hidden" id="pvTip"></div>`;
       $('#match').appendChild(el); this.el = el; document.body.classList.add('pve-on');
@@ -125,6 +126,7 @@
       $('#pvCam').onclick = (e) => { e.stopPropagation(); this.toggleCam(); };
       $('#pvQuick').addEventListener('pointerdown', (e) => { const b = e.target.closest('[data-q]'); if (!b) return; e.stopPropagation(); e.preventDefault(); this.quick(+b.dataset.q); });
       $('#pvInfoBtn').onclick = (e) => { e.stopPropagation(); this.toggleBook(); };
+      $('#pvAimBtn').onclick = (e) => { e.stopPropagation(); this.toggleAutoAim(); };
       $('#pvBook').addEventListener('click', (e) => {
         e.stopPropagation(); if (e.target.closest('[data-close]')) { this.toggleBook(); return; }
         const b = e.target.closest('[data-choice]'); if (!b || b.disabled || !this.app.m.pve) return;
@@ -213,7 +215,7 @@
       if (I.type === 'self') { A.pt = { x: u.x, y: u.y }; return; }
       // GĐ13: nam châm nhẹ (chỉ cảm ứng): bắt khi lệch ≤ 7°, giữ tới 12° (trễ) — không còn "khóa góc" khi lia ngón tay qua kẻ địch
       let dir = A.dir, best = null, ba = 0;
-      if (!A.pc) for (const h of m.heroes) {
+      if (!A.pc && this.autoAimOn()) for (const h of m.heroes) {   // tắt tự ngắm = không nam châm
         if (!h.alive || h === u || h.team === u.team || (h.vis && h.vis[u.team] === false)) continue;
         const dx = h.x - u.x, dy = h.y - u.y, d = Math.hypot(dx, dy); if (d > I.R + 1.5 || d < 0.5) continue;
         const ang = Math.acos(Math.max(-1, Math.min(1, (dx * dir.x + dy * dir.y) / d))), lim = h === prev ? 0.2094 : 0.122;
@@ -327,6 +329,7 @@
       else if (k === 'p') this.toggleShop();
       else if (k === 'v') this.openChest();
       else if (k === 'i') this.toggleBook();
+      else if (k === 'u') this.toggleAutoAim();
       else if ((k === '1' || k === '2' || k === '3') && this.treeKey != null && (e.altKey || e.shiftKey)) { e.preventDefault(); this.pickTree(+k - 1); }
       else if (k === '1' || k === '2' || k === '3' || k === '4') this.quick(+k - 1);
       else if (k === 't') this.cycle();
@@ -367,6 +370,8 @@
       const C = G.CONSUMABLES, m = this.app.m, cd = Math.max(0, (u.bagT || 0) - m.time);
       $('#pvQuick').innerHTML = L.map((id, i) => `<button data-q="${i}" title="${esc(C[id].name + ' — ' + (C[id].desc || ''))}"${cd > 0 ? ' class="cd"' : ''}><b>${i + 1}</b>${C[id].icon || '🎁'}<em>${m.bagCount(u, id)}</em></button>`).join('');
     },
+    autoAimOn() { const m = this.app.m; return !(m && m.pve && m.pve.autoAim === false); },
+    toggleAutoAim() { const m = this.app.m; if (!m || !m.pve) return; m.pve.queue.push({ autoAim: !this.autoAimOn() }); m.pve.autoAim = !this.autoAimOn(); },
     // ---------- GĐ13: thông tin chiêu rõ ràng ----------
     skillCard(u, k, full) {
       const m = this.app.m, def = u.hero.skills[k]; if (!def) return '';
@@ -518,6 +523,7 @@
       const cb = $('#pvCam'), lk = this.camLocked(); cb.classList.toggle('on', lk); cb.textContent = lk ? '🔒 Camera' : '🔓 Camera';
       // điểm chiêu chưa cộng: nút + nhấp nháy trên chiêu nâng được
       this.renderTree(u); this.renderQuick(u);
+      { const ab = $('#pvAimBtn'), on = this.autoAimOn(); ab.classList.toggle('on', on); ab.textContent = on ? '🎯 Tự ngắm: BẬT' : '🎯 Tự ngắm: TẮT'; }
       if (performance.now() > (this.gT || 0)) {
         this.gT = performance.now() + 150; this.renderGauge(u);
         if (this.bookOpen && performance.now() > (this.bookT || 0)) { this.bookT = performance.now() + 700; this.renderBook(); }

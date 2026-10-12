@@ -16,7 +16,7 @@
   const PveMix = {
     pveOn(heroId) {
       const u = this.heroes.find((h) => h.heroId === heroId) || this.heroes[0];
-      u.ctl = true; this.pve = { id: u.id, mv: { x: 0, y: 0 }, aim: null, lockId: null, queue: [], out: false, atkId: null };
+      u.ctl = true; this.pve = { id: u.id, mv: { x: 0, y: 0 }, aim: null, lockId: null, queue: [], out: false, atkId: null, autoAim: true };
       // GĐ12: XÓA AI TỰ HÀNH của tướng này — không nghĩ, không tự dùng chiêu / bình / balo, không tự liên minh, không phản xạ / hoảng loạn;
       // điểm chiêu và mua đồ đều do người chơi tự làm (nút + trên chiêu, cửa hàng 🛒)
       if (u.ai) { u.ai.seq = null; u.ai.act = null; u.ai.mode = 'player'; }
@@ -64,6 +64,7 @@
       while (P.queue.length) {
         const c = P.queue.shift();
         if (c.tree != null) { this.pickTree(u, c.tree); continue; }
+        if (c.autoAim != null) { P.autoAim = !!c.autoAim; continue; }
         if (c.move) { const g = { x: c.move.x, y: c.move.y }; MAP.pushOut(g, u.r); P.moveTo = g; P.atkId = null; P.chestId = null; u.attackTarget = null; if (u.cast && u.cast.key === 'chest') u.cast = null; continue; }
         if (c.learn) {
           if (this.canLearn(u, c.learn)) {
@@ -84,14 +85,33 @@
         if (c.atk !== undefined) { P.chestId = null; P.moveTo = null; const tg = c.atk != null ? this.units.find((x) => x.id === c.atk) : null; this.executeBasicAttack(u, tg, c.dir); continue; }
         const def = u.hero.skills[c.k]; if (!def) continue;
         const a = def.ai || {};
-        const ent = c.tgt != null ? this.units.find((x) => x.id === c.tgt) : t;
+        // GĐ13: chỉ "tự ngắm" khi mục tiêu NẰM TRONG TẦM CHIÊU; tắt tự ngắm (P.autoAim = false) thì bấm nhanh = tung theo hướng mặt
+        const R = (a.range || 4) + 0.5, vis = (e) => e && e.alive && e.team !== u.team && (!e.vis || e.vis[u.team] !== false);
+        const inR = (e) => vis(e) && dist(u, e) - (e.r || 0) <= R;
+        let ent = c.tgt != null ? this.units.find((x) => x.id === c.tgt) : null;
+        if (ent && !inR(ent)) ent = null;
         let pt = c.pt;
-        if (!pt) {                                              // bấm nhanh: tự lấy mục tiêu ưu tiên + đón đầu nhẹ 0.25s
+        if (!pt) {                                              // bấm nhanh
           if (a.aim === 'self') pt = { x: u.x, y: u.y };
-          else if (ent && ent.alive) pt = { x: ent.x + (ent.vx || 0) * 0.25, y: ent.y + (ent.vy || 0) * 0.25 };
-          else pt = { x: u.x + u.fx * (a.range || 4), y: u.y + u.fy * (a.range || 4) };
+          else {
+            let tg = null;
+            if (P.autoAim !== false) {
+              if (inR(t)) tg = t;
+              else { let bd = 1e9; for (const h of this.heroes) if (h !== u && inR(h) && !(h.statuses.length && h.has('untarget'))) { const d = dist(u, h); if (d < bd) { bd = d; tg = h; } } }
+            }
+            if (tg) { ent = tg; pt = { x: tg.x + (tg.vx || 0) * 0.25, y: tg.y + (tg.vy || 0) * 0.25 }; }
+            else { const L = a.aim === 'away' ? -(a.range || 4) : (a.range || 4); pt = { x: u.x + u.fx * L, y: u.y + u.fy * L }; }
+          }
+        } else if (!ent && a.aim === 'unit') {                  // chiêu chỉ định mục tiêu mà người chơi ngắm vào một điểm → kẻ địch gần điểm đó nhất (≤ 2.5 đv, trong tầm)
+          let bd = 2.5; for (const v of this.units) { if (v === u || !inR(v) || (v.kind !== 'hero' && v.kind !== 'monster' && v.kind !== 'pet')) continue; const d = dist(v, pt) - v.r; if (d < bd) { bd = d; ent = v; } }
         }
-        if (u.recast[c.k] || this.canCast(u, c.k)) { this.executeSkill(u, c.k, pt, ent && ent.alive ? ent : null); u.stats.pveCasts = (u.stats.pveCasts || 0) + 1; }
+        if (u.recast[c.k] || this.canCast(u, c.k)) {
+          // chiêu đọc ai.target (Đoạt Mệnh, Ấn…) chỉ thấy mục tiêu của LẦN TUNG NÀY — không còn tự bay về mục tiêu khóa ngoài tầm
+          const keep = u.ai ? u.ai.target : null; if (u.ai) u.ai.target = ent && ent.kind === 'hero' ? ent : null;
+          u.aimPt = pt;
+          this.executeSkill(u, c.k, pt, ent && ent.alive ? ent : null); u.stats.pveCasts = (u.stats.pveCasts || 0) + 1;
+          if (u.ai) u.ai.target = keep;
+        }
       }
       const L = Math.hypot(P.mv.x, P.mv.y);
       if (u.cast && u.cast.key === 'chest' && (L > 0.15 || P.moveTo)) u.cast = null;   // di chuyển = bỏ mở rương

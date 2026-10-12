@@ -84,7 +84,7 @@
     onRespawn() { this.mode = 'idle'; this.target = null; this.decT = 0; }
     // thời gian tích chiêu (Ignatius S2, Elara S2)
     chargeTime(max) {
-      const t = this.target, d = t ? dist(this.u, t) : 6;
+      const t = this.target, d = this.u.ctl && this.u.aimPt ? dist(this.u, this.u.aimPt) : t ? dist(this.u, t) : 6;   // GĐ13: người chơi — tích theo điểm ngắm
       const c = d > 6.5 ? max : d > 4 ? max * 0.7 : max * 0.4;
       this.lastCharge = Math.max(0.3, Math.min(max, c));
       return this.lastCharge;

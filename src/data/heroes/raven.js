@@ -226,7 +226,7 @@
           if (H.T(u, '12a')) u.cd.s1 *= 0.5;
           const dmg = H.amt(u, ctx.v([100, 150, 200, 250, 300]), 1.0);
           const t = ctx.tgt && ctx.tgt.alive ? ctx.tgt : null;
-          const aim = t && u.ai ? u.ai.lead(t, H.T(u, '1c') ? 60 : 40) : ctx.pt;
+          const aim = t && u.ai && !u.ctl ? u.ai.lead(t, H.T(u, '1c') ? 60 : 40) : ctx.pt;
           const marked = t && t.hasKey(OCA);
           const p0 = { x: u.x, y: u.y };
           H.shoot(m, u, aim, { speed: H.T(u, '1c') ? 60 : 40, range: 14, r: 0.4, kind: 'bigarrow', passWall: !!marked, onHit: (mm, p, e) => {

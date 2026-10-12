@@ -771,3 +771,7 @@ body.pve-on:not(.pve-dead) #ctrl .spd, body.pve-on:not(.pve-dead) #ctrl .spc, bo
 .pc-o button:disabled { opacity: .45; }
 .pc-o button small { font-size: 11px; opacity: .85; line-height: 1.35; }
 .pb-h .br { color: #ffd24a; }
+
+.pve-aimbtn { position: absolute; left: 12px; top: 154px; pointer-events: auto; padding: 5px 10px; border-radius: 14px; font-size: 12px; background: rgba(40,40,60,.85); border: 2px solid #888; }
+.pve-aimbtn.on { border-color: #ff7a7a; }
+.pve-tree:not(.hidden) ~ .pve-aimbtn { top: auto; bottom: 52px; }

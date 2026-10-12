@@ -88,7 +88,7 @@
         m.addStatus(u, 'buff', 8, 1, { key: 'alice_final', mods: { ap: 40 + 8 * u.level, msPct: 0.3 } });
         if (m.fxOn) m.fx({ type: 'callout', id: u.id, text: '🎭 Sân Khấu Cuối Cùng!', color: '#d070ff' });
         if (H.T(u, '9a')) m.addStatus(u, 'invuln', 1, 1);
-        const e = H.nearestEnemyHero(m, u, 8); if (e) { const v = H.dirTo(e, u); m.dashTo(u, u.x + v.x * 3, u.y + v.y * 3, 18, {}); }
+        const e = u.ctl ? null : H.nearestEnemyHero(m, u, 8); if (e) { const v = H.dirTo(e, u); m.dashTo(u, u.x + v.x * 3, u.y + v.y * 3, 18, {}); }
         illusion(m, u, u.x, u.y, { life: 3, extra: true });
         return true;
       },

@@ -49,7 +49,7 @@
           const c = Math.min(1, (u.ai ? u.ai.lastCharge : 1) / 1.5);
           const dmg = H.amt(u, ctx.v([80, 125, 170, 215, 260]), 0.9) * (0.5 + 0.5 * c);
           const t = ctx.tgt && ctx.tgt.alive ? ctx.tgt : null;
-          const aim = t && u.ai ? u.ai.lead(t, 24) : ctx.pt;
+          const aim = t && u.ai && !u.ctl ? u.ai.lead(t, 24) : ctx.pt;
           const xp = H.T(u, '3b'), hole = H.T(u, '12a') && c >= 0.9;
           H.shoot(m, u, aim, { speed: 24, range: H.T(u, '1b') ? 13.8 : 12, r: 0.45, pierce: true, kind: 'bigarrow', passWall: xp,
             onHit: (mm, p, e) => mm.damage(u, e, e.kind === 'minion' && !xp ? dmg * 0.6 : dmg, 'phys', { tag: 's2' }),

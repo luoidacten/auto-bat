@@ -43,7 +43,7 @@
         if (u.hpPct < 0.5 && m.time >= u.ws.hatT && m.time - (u.lastDmgT || -99) < 1.2) {
           u.ws.hatT = m.time + 90 * (H.T(u, '12b') ? 0.5 : 1);
           const from = { x: u.x, y: u.y }, e = H.nearestEnemyHero(m, u, 10), v = e ? H.dirTo(e, u) : { x: -u.fx, y: -u.fy };
-          HAT(m, from.x, from.y, 1.6); m.blink(u, u.x + v.x * 5.5, u.y + v.y * 5.5);
+          HAT(m, from.x, from.y, 1.6); if (!u.ctl) m.blink(u, u.x + v.x * 5.5, u.y + v.y * 5.5);   // GĐ13: người chơi không bị tự dịch chuyển
           m.later(0.5, (mm) => mm.hitCircle(u, from.x, from.y, 3, (x) => { mm.damage(u, x, H.amt(u, 60 + 12 * u.level, 0, 0.5), 'magic', { tag: 'p', aoe: true }); mm.addStatus(x, 'stun', 1, 1, { src: u }); }, { color: '#c040ff' }));
           if (H.T(u, '3b')) m.shield(u, u, u.st.maxHp * 0.2, 3);
           if (m.fxOn) m.fx({ type: 'callout', id: u.id, text: '🎩 Để xem đêm nay sẽ thú vị như nào!', color: '#c040ff' });
