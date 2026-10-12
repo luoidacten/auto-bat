@@ -117,6 +117,7 @@
   }
   function formAlliance(m, a, b, dur, opt) {
     if (m.sbx) return null;   // GĐ11: phòng thử nghiệm — không liên minh / mua bán
+    if (a.ctl || b.ctl) return null;   // GĐ12 PvE: tướng người chơi điều khiển không bị AI tự kết liên minh / đình chiến
     const t = { a, b, t0: m.time, until: m.time + dur, broken: false, dmg: 0, betray: null, trade: !!(opt && opt.trade) };
     (m.truces || (m.truces = [])).push(t); a.allyRec = t; b.allyRec = t;
     for (const [x, y] of [[a, b], [b, a]]) if (x.ai && x.ai.target === y) { x.ai.target = null; x.ai.mode = 'idle'; x.attackTarget = null; }

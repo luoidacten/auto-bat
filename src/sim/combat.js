@@ -148,8 +148,8 @@
         if (this.sbx) this.sbOnDmg(owner, tgt, info, shAbs);   // GĐ11: bảng đo Sandbox
         // sổ sách
         tgt.lastDmgT = this.time; tgt.lastDmgSrcHero = !!(owner && (owner.kind === 'hero' || owner.owner));
-        if (tgt.ai && tgt.ai.cog && tot > 0) G.Cog.onHit(this, tgt, owner, tot);   // GĐ10: bất ngờ / mù tiêu điểm
-        if (tgt.ai && G.Brain && tot > 0) G.Brain.onHit(this, tgt, owner, info, tot);   // GĐ11: suy luận hướng đòn
+        if (tgt.ai && !tgt.ctl && tgt.ai.cog && tot > 0) G.Cog.onHit(this, tgt, owner, tot);   // GĐ10: bất ngờ / mù tiêu điểm
+        if (tgt.ai && !tgt.ctl && G.Brain && tot > 0) G.Brain.onHit(this, tgt, owner, info, tot);   // GĐ11: suy luận hướng đòn
         // kẻ vừa đánh (mọi loại: tướng, vật triệu hồi, quái) — hộ vệ của chủ dùng để nhắm kẻ đánh chủ
         if (owner && owner !== tgt && tot > 0) {
           tgt.lastAtt = owner; tgt.lastAttT = this.time;

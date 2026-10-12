@@ -13,7 +13,8 @@
 //    GIỮ & KÉO = vòng chỉ thị (Đường thẳng / Hình nón / Vòng rơi), kéo vào ô [✕ HỦY] góc trên phải = hủy • NAM CHÂM NGẮM: dải ngắm
 //    lệch ≤ 12° so với một tướng địch thì tự hút vào điểm đón đầu của nó; kéo mạnh vượt góc thì ngắm tự do • chiêu tầm > 10 đv:
 //    camera trôi theo hướng ngắm (tầm × 0.6) • NÚT ĐÁNH THƯỜNG: chạm = tự chọn (tướng thấp máu nhất trong tầm → tướng gần nhất →
-//    quái đang đánh; không có thì bước ngắn về phía địch), kéo = đường vàng, rê qua mục tiêu nào thì vòng khóa đỏ ghim vào nó •
+//    quái đang đánh; không có thì bước ngắn về phía địch), kéo = đường vàng, rê qua mục tiêu nào thì vòng khóa đỏ ghim vào nó;
+//    lệnh đánh giữ tới khi di chuyển / mục tiêu chết / khuất tầm nhìn — KHÔNG có tự đánh khi đứng yên •
 //    BÁNH XE BALO: giữ 🎒 → bung tối đa 6 ô quanh ngón tay, quẹt về món cần dùng rồi thả.
 //  • Tầm nhìn như người chơi thường (sương mù ngoài tầm nhìn đội mình) + CHỈ BÁO ÂM THANH: ⚔ tiếng giao tranh (30 đv), 💨 tiếng lướt
 //    (18 đv), 👣 tiếng bước chân ngoài bụi (9 đv) của kẻ địch khuất tầm nhìn — vị trí hơi lệch, ngoài màn hình thì thành mũi tên ở mép.
@@ -44,7 +45,7 @@
       const pick = this.last || ids[0];
       $('#setup').innerHTML = `
         <h2>🕹 Sinh Tồn PvE — chọn tướng của bạn</h2>
-        <p class="hint">Bạn điều khiển 1 tướng giữa 9 tướng máy, tầm nhìn như người chơi thường (có chỉ báo âm thanh). <b>PC</b>: WASD đi • giữ Q/E/R/F/Space để ngắm theo chuột, nhả để tung • chuột phải hủy • click trái vào địch để khóa đánh • H/G bình • B balo • T đổi mục tiêu.
+        <p class="hint">Bạn điều khiển 1 tướng giữa 9 tướng máy — <b>AI của tướng bạn bị tắt hoàn toàn</b> (không tự đánh, tự dùng chiêu, tự uống bình hay tự liên minh), tầm nhìn như người chơi thường (có chỉ báo âm thanh). <b>PC</b>: WASD đi • giữ Q/E/R/F/Space để ngắm theo chuột, nhả để tung • chuột phải hủy • click trái vào địch để khóa đánh • H/G bình • B balo • T đổi mục tiêu.
           <b>Điện thoại</b>: chạm nửa trái để hiện cần ảo • chạm nhanh nút chiêu = tung tự động • giữ & kéo = vòng chỉ thị, kéo vào ✕ để hủy • nút ⚔ chạm để đánh, kéo để khóa mục tiêu • giữ 🎒 để mở bánh xe balo.</p>
         <div class="pve-grid">${ids.map((id) => { const H = G.HEROES[id]; return `<button class="pve-hero${id === pick ? ' on' : ''}" data-id="${id}"><span class="dot" style="background:${H.color}"></span>${esc(H.name)}<small>${esc(H.kit || '')}</small></button>`; }).join('')}</div>
         <div class="row btns"><button class="big" id="pvGo">▶ Vào trận</button><button id="pvBack">← Quay lại</button></div>`;

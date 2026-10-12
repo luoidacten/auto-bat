@@ -812,7 +812,7 @@
     castSkill(u, key, tgt, pt) {
       if (!this.canCast(u, key)) return false;
       // GĐ10: hoảng loạn (máu tụt quá nhanh) → bấm nhầm chiêu / lệch góc
-      if (u.ai && u.ai.cog && u.ai.cog.panic > 0.7) { const p = G.Cog.perturb(this, u, key, tgt, pt); if (p && this.canCast(u, p.key)) { key = p.key; tgt = p.tgt; pt = p.pt; } }
+      if (u.ai && !u.ctl && u.ai.cog && u.ai.cog.panic > 0.7) { const p = G.Cog.perturb(this, u, key, tgt, pt); if (p && this.canCast(u, p.key)) { key = p.key; tgt = p.tgt; pt = p.pt; } }
       const def = u.hero.skills[key];
       const rank = this.rankOf(u, key);
       const ctx = { key, rank, tgt: tgt || null, pt: pt || (tgt ? { x: tgt.x, y: tgt.y } : { x: u.x + u.fx * 3, y: u.y + u.fy * 3 }), v: (arr) => (Array.isArray(arr) ? arr[Math.min(arr.length, rank) - 1] : arr) };

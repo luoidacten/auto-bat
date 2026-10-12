@@ -6,7 +6,7 @@
 //   • aim {x,y}  — điểm ngắm trên bản đồ (chuột / hướng cần ảo); null thì tự ngắm theo mục tiêu khóa
 //   • lockId     — mục tiêu đang khóa; tự khóa thông minh: tướng địch gần nhất trong 9 đv, không có thì quái gần nhất trong tầm
 //   • queue      — lệnh chờ: { k: 's1'|'s2'|'s3'|'s4'|'sub' } hoặc { bag: id } (bình / vật phẩm balo, 1 chạm)
-// Đứng yên + có mục tiêu khóa trong tầm → tự đánh thường (như đánh thường giữ nút). Bị loại → pve.out = true, giao diện chuyển
+// Không tự đánh: đánh thường chỉ theo lệnh (nút ⚔ / click / kéo khóa), giữ lệnh tới khi di chuyển hoặc mất mục tiêu. Bị loại → pve.out = true, giao diện chuyển
 // sang góc nhìn trọng tài.
 (function () {
   const G = globalThis.G || (globalThis.G = {});
@@ -16,7 +16,10 @@
   const PveMix = {
     pveOn(heroId) {
       const u = this.heroes.find((h) => h.heroId === heroId) || this.heroes[0];
-      u.ctl = true; this.pve = { id: u.id, mv: { x: 0, y: 0 }, aim: null, lockId: null, queue: [], out: false, autoAtk: true };
+      u.ctl = true; this.pve = { id: u.id, mv: { x: 0, y: 0 }, aim: null, lockId: null, queue: [], out: false, atkId: null };
+      // GĐ12: XÓA AI TỰ HÀNH của tướng này — không nghĩ, không tự dùng chiêu / bình / balo, không tự liên minh, không phản xạ / hoảng loạn;
+      // chỉ còn luật chung của trận (tự cộng điểm chiêu, đứng cạnh Thương Nhân tự mua theo lối build)
+      if (u.ai) { u.ai.seq = null; u.ai.act = null; u.ai.mode = 'player'; }
       u.isPlayer = true;
       return u;
     },
@@ -46,7 +49,7 @@
         t = hs.sort((a, b) => a.hp / a.st.maxHp - b.hp / b.st.maxHp || a.id - b.id)[0] || null;
         if (!t) { let bd = 1e9; this.grid.query(u.x, u.y, u.st.range + 3, (v) => { if ((v.kind === 'monster' || v.kind === 'pet') && ok(v) && inR(v)) { const d = Math.hypot(v.x - u.x, v.y - u.y) - (v.aggro === u ? 5 : 0); if (d < bd) { bd = d; t = v; } } }); }
       }
-      if (t) { if (this.pve) this.pve.lockId = t.id; u.attackTarget = t; u.goal = null; return t; }
+      if (t) { if (this.pve) { this.pve.lockId = t.id; this.pve.atkId = t.id; } u.attackTarget = t; u.goal = null; return t; }
       let e = null, bd = 9; for (const h of this.heroes) if (h !== u && ok(h)) { const d = Math.hypot(h.x - u.x, h.y - u.y); if (d < bd) { bd = d; e = h; } }
       const v = e ? { x: (e.x - u.x) / bd, y: (e.y - u.y) / bd } : dir || { x: u.fx, y: u.fy };
       const g = { x: u.x + v.x * 1.5, y: u.y + v.y * 1.5 }; MAP.pushOut(g, u.r); u.goal = g; u.attackTarget = null;
@@ -56,12 +59,12 @@
     pveStep(u) {
       const P = this.pve; if (!P || !u.alive) { if (P && !u.alive && !this.over && (u.out || this.lastLifeGone(u))) P.out = true; return; }
       const t = this.pveTarget(u);
-      if (u.ai) { u.ai.target = t && t.kind === 'hero' ? t : null; u.ai.mode = t ? 'fight' : 'idle'; }   // chiêu đọc ai.target (Florian S4…)
+      if (u.ai) u.ai.target = t && t.kind === 'hero' ? t : null;   // chỉ là dữ liệu cho chiêu đọc ai.target (Florian S4…), không phải AI quyết định
       // lệnh: chiêu (vị trí ngắm từ chỉ thị), đánh thường (mục tiêu khóa / ưu tiên), vật phẩm balo
       while (P.queue.length) {
         const c = P.queue.shift();
         if (c.bag) { const pt = c.pt || (t ? { x: t.x, y: t.y } : { x: u.x + u.fx * 3, y: u.y + u.fy * 3 }); this.useBag(u, c.bag, t, pt); continue; }
-        if (c.atk !== undefined) { const tg = c.atk != null ? this.units.find((x) => x.id === c.atk) : null; P.manualAtkT = this.time + 1.2; this.executeBasicAttack(u, tg, c.dir); continue; }
+        if (c.atk !== undefined) { const tg = c.atk != null ? this.units.find((x) => x.id === c.atk) : null; this.executeBasicAttack(u, tg, c.dir); continue; }
         const def = u.hero.skills[c.k]; if (!def) continue;
         const a = def.ai || {};
         const ent = c.tgt != null ? this.units.find((x) => x.id === c.tgt) : t;
@@ -77,13 +80,16 @@
       const L = Math.hypot(P.mv.x, P.mv.y);
       if (L > 0.15) {
         const g = { x: u.x + P.mv.x / L * 2.5, y: u.y + P.mv.y / L * 2.5 }; MAP.pushOut(g, u.r);
-        u.attackTarget = null; u.goal = g; u.navP = null;
+        u.attackTarget = null; u.goal = g; u.navP = null; P.atkId = null;   // di chuyển = hủy lệnh đánh
         u.face(g.x, g.y);
         return;
       }
       if (P.stepUntil > this.time) return;                       // đang bước ngắn tới kẻ địch (đánh thường hụt tầm)
       u.goal = null;
-      if ((P.autoAtk || P.manualAtkT > this.time) && t && Math.hypot(t.x - u.x, t.y - u.y) - t.r - u.r <= u.st.range + 0.1) u.attackTarget = t; else u.attackTarget = null;
+      // chỉ đánh theo LỆNH (nút ⚔ / click / kéo khóa): bám mục tiêu đã ra lệnh tới khi di chuyển, mục tiêu chết, khuất tầm nhìn hoặc xa > 12 đv
+      const a = P.atkId != null ? this.units.find((x) => x.id === P.atkId) : null;
+      if (a && a.alive && (!a.vis || a.vis[u.team] !== false) && Math.hypot(a.x - u.x, a.y - u.y) < 12) u.attackTarget = a;
+      else { P.atkId = null; u.attackTarget = null; }
     },
     lastLifeGone(u) { return !!(u.place || u.out); },
   };
