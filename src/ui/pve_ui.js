@@ -46,7 +46,7 @@
       const pick = this.last || ids[0];
       $('#setup').innerHTML = `
         <h2>🕹 Sinh Tồn PvE — chọn tướng của bạn</h2>
-        <p class="hint">Bạn điều khiển 1 tướng giữa 9 tướng máy — <b>AI của tướng bạn bị tắt hoàn toàn</b> (không tự đánh, tự dùng chiêu, tự uống bình hay tự liên minh), tầm nhìn như người chơi thường (có chỉ báo âm thanh). <b>PC (kiểu LoL)</b>: <b>chuột phải</b> lên đất = đi tới (giữ để đi theo con trỏ), lên kẻ địch = đánh • WASD cũng đi được • giữ Q/E/R/F/Space để ngắm theo chuột, nhả để tung (chuột phải lúc ngắm = hủy) • Y khóa/thả camera (thả rồi mới kéo mép màn hình) • P cửa hàng • V mở rương • 1–4 ô dùng nhanh (phép bổ trợ / vật phẩm balo, hướng theo con trỏ) • Alt+1/2/3 chọn nhánh cây tiến hóa • Ctrl+Q/E/R/F nâng chiêu • H/G bình • B balo • T đổi mục tiêu.
+        <p class="hint">Bạn điều khiển 1 tướng giữa 9 tướng máy — <b>AI của tướng bạn bị tắt hoàn toàn</b> (không tự đánh, tự dùng chiêu, tự uống bình hay tự liên minh), tầm nhìn như người chơi thường (có chỉ báo âm thanh). <b>PC (kiểu LoL)</b>: <b>chuột phải</b> lên đất = đi tới (giữ để đi theo con trỏ), lên kẻ địch = đánh • WASD cũng đi được • giữ Q/E/R/F/Space để ngắm theo chuột, nhả để tung (chuột phải lúc ngắm = hủy) • I bảng chiêu & chỉ số (rê chuột lên nút chiêu để xem nhanh) • Y khóa/thả camera (thả rồi mới kéo mép màn hình) • P cửa hàng • V mở rương • 1–4 ô dùng nhanh (phép bổ trợ / vật phẩm balo, hướng theo con trỏ) • Alt+1/2/3 chọn nhánh cây tiến hóa • Ctrl+Q/E/R/F nâng chiêu • H/G bình • B balo • T đổi mục tiêu.
           <b>Điện thoại</b>: chạm nhanh lên bản đồ = đi tới / đánh • chạm nửa trái để hiện cần ảo • chạm nhanh nút chiêu = tung tự động • giữ & kéo = vòng chỉ thị, kéo vào ✕ để hủy • nút ⚔ chạm để đánh, kéo để khóa mục tiêu • giữ 🎒 để mở bánh xe balo.</p>
         <div class="pve-grid">${ids.map((id) => { const H = G.HEROES[id]; return `<button class="pve-hero${id === pick ? ' on' : ''}" data-id="${id}"><span class="dot" style="background:${H.color}"></span>${esc(H.name)}<small>${esc(H.kit || '')}</small></button>`; }).join('')}</div>
         <div class="row btns"><button class="big" id="pvGo">▶ Vào trận</button><button id="pvBack">← Quay lại</button></div>`;
@@ -90,7 +90,11 @@
         <div class="pve-pts hidden" id="pvPts"></div>
         <div class="pve-tree hidden" id="pvTree"></div>
         <div class="pve-shop hidden" id="pvShop"></div>
-        <div class="pve-info" id="pvInfo"></div>`;
+        <div class="pve-info" id="pvInfo"></div>
+        <div class="pve-gauge" id="pvGauge"></div>
+        <button class="pve-infobtn" id="pvInfoBtn" title="Bộ chiêu & chỉ số (I)">📖 Chiêu</button>
+        <div class="pve-book hidden" id="pvBook"></div>
+        <div class="pve-tip hidden" id="pvTip"></div>`;
       $('#match').appendChild(el); this.el = el; document.body.classList.add('pve-on');
       this.keys = {}; this.mouse = null; this.aim = null; this.held = {};
       this.kd = (e) => this.onKey(e, true); this.ku = (e) => this.onKey(e, false);
@@ -120,6 +124,10 @@
       for (const b of el.querySelectorAll('.pve-sm')) if (b.dataset.a !== 'bag') b.onclick = (e) => { e.stopPropagation(); const a = b.dataset.a; if (a === 'lock') this.cycle(); else if (a === 'shop') this.toggleShop(); else this.drink(a); };
       $('#pvCam').onclick = (e) => { e.stopPropagation(); this.toggleCam(); };
       $('#pvQuick').addEventListener('pointerdown', (e) => { const b = e.target.closest('[data-q]'); if (!b) return; e.stopPropagation(); e.preventDefault(); this.quick(+b.dataset.q); });
+      $('#pvInfoBtn').onclick = (e) => { e.stopPropagation(); this.toggleBook(); };
+      $('#pvBook').addEventListener('click', (e) => { e.stopPropagation(); if (e.target.closest('[data-close]')) this.toggleBook(); });
+      // PC: rê chuột lên nút chiêu → thẻ mô tả (không cần mở bảng)
+      for (const b of el.querySelectorAll('.pve-sk')) { b.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') this.showTip(b.dataset.k, b); }); b.addEventListener('pointerleave', () => this.hideTip()); }
       $('#pvChest').onclick = (e) => { e.stopPropagation(); this.openChest(); };
       // nút không giữ focus — tránh phím cách / Enter "bấm lại" nút vừa chạm (vd. nút tốc độ)
       this.blur = (e) => { if (e.target.closest && e.target.closest('button')) setTimeout(() => { const a = document.activeElement; if (a && a.tagName === 'BUTTON') a.blur(); }, 0); };
@@ -195,14 +203,15 @@
     // từ hướng + độ kéo → điểm ngắm; nam châm hút về điểm đón đầu khi lệch ≤ 12°
     solveAim() {
       const A = this.aim, u = this.unit(), m = this.app.m; if (!A || !u) return;
-      const I = A.ind; A.magnet = null;
+      const I = A.ind, prev = A.magnet; A.magnet = null;
       if (I.type === 'self') { A.pt = { x: u.x, y: u.y }; return; }
-      let dir = A.dir, best = null, ba = 0.2094;   // 12°
-      for (const h of m.heroes) {
+      // GĐ13: nam châm nhẹ (chỉ cảm ứng): bắt khi lệch ≤ 7°, giữ tới 12° (trễ) — không còn "khóa góc" khi lia ngón tay qua kẻ địch
+      let dir = A.dir, best = null, ba = 0;
+      if (!A.pc) for (const h of m.heroes) {
         if (!h.alive || h === u || h.team === u.team || (h.vis && h.vis[u.team] === false)) continue;
         const dx = h.x - u.x, dy = h.y - u.y, d = Math.hypot(dx, dy); if (d > I.R + 1.5 || d < 0.5) continue;
-        const ang = Math.acos(Math.max(-1, Math.min(1, (dx * dir.x + dy * dir.y) / d)));
-        if (ang < ba) { ba = ang; best = h; }
+        const ang = Math.acos(Math.max(-1, Math.min(1, (dx * dir.x + dy * dir.y) / d))), lim = h === prev ? 0.2094 : 0.122;
+        if (ang < lim && (!best || ang < ba)) { ba = ang; best = h; }
       }
       if (best && !A.pc) {
         const sp = (A.def.ai && A.def.ai.speed) || 0, tt = Math.min(0.6, (sp ? Math.hypot(best.x - u.x, best.y - u.y) / sp : 0.25) + (A.def.castTime || 0));
@@ -311,12 +320,13 @@
       if (k === 'y') this.toggleCam();
       else if (k === 'p') this.toggleShop();
       else if (k === 'v') this.openChest();
+      else if (k === 'i') this.toggleBook();
       else if ((k === '1' || k === '2' || k === '3') && this.treeKey != null && (e.altKey || e.shiftKey)) { e.preventDefault(); this.pickTree(+k - 1); }
       else if (k === '1' || k === '2' || k === '3' || k === '4') this.quick(+k - 1);
       else if (k === 't') this.cycle();
       else if (k === 'h') this.drink('hp');
       else if (k === 'g') this.drink('mp');
-      else if (k === 'escape') { if (this.aim) { this.aim.cancel = true; this.release(); } else if (this.shopOpen) this.toggleShop(); else { this.unmount(); this.app.quitMatch(); } }
+      else if (k === 'escape') { if (this.aim) { this.aim.cancel = true; this.release(); } else if (this.shopOpen) this.toggleShop(); else if (this.bookOpen) this.toggleBook(); else { this.unmount(); this.app.quitMatch(); } }
     },
     // ---------- khóa camera ----------
     camLocked() { const r = this.app.r, u = this.unit(); return !!(u && r.cam.follow && r.cam.focusId === u.id); },
@@ -350,6 +360,49 @@
       if (key === this.quickKey) return; this.quickKey = key;
       const C = G.CONSUMABLES, m = this.app.m, cd = Math.max(0, (u.bagT || 0) - m.time);
       $('#pvQuick').innerHTML = L.map((id, i) => `<button data-q="${i}" title="${esc(C[id].name + ' — ' + (C[id].desc || ''))}"${cd > 0 ? ' class="cd"' : ''}><b>${i + 1}</b>${C[id].icon || '🎁'}<em>${m.bagCount(u, id)}</em></button>`).join('');
+    },
+    // ---------- GĐ13: thông tin chiêu rõ ràng ----------
+    skillCard(u, k, full) {
+      const m = this.app.m, def = u.hero.skills[k]; if (!def) return '';
+      const rk = k === 'sub' ? m.rankOf(u, 'sub') : u.ranks[k] || 0, max = k === 's4' ? 3 : k === 'sub' ? 5 : 5;
+      const cd = rk > 0 || k === 'sub' ? m.cdOf(u, k) : (Array.isArray(def.cd) ? def.cd[0] : typeof def.cd === 'number' ? def.cd : 0);
+      const cost = rk > 0 ? m.costOf(u, k) : 0, now = u.recast[k] ? 0 : Math.max(0, u.cd[k] || 0);
+      let V = null; try { if (def.variant) V = def.variant(m, u, m.pve && m.pve.lockId != null ? m.units.find((x) => x.id === m.pve.lockId) : null); } catch (e) { V = null; }
+      const KEY = { s1: 'Q', s2: 'E', s3: 'R', s4: 'F', sub: 'Space' }[k];
+      return `<div class="pb-sk${rk > 0 || k === 'sub' ? '' : ' locked'}"><div class="pb-h"><b>[${KEY}] ${esc(def.name)}</b><span>${k === 'sub' ? 'skill phụ' : `cấp ${rk}/${max}`}</span></div>
+        <div class="pb-n">⏱ hồi ${cd ? cd.toFixed(1) + 's' : '—'}${now > 0.05 ? ` <i>(còn ${now.toFixed(1)}s)</i>` : ''}${cost ? ` • 💧 ${Math.round(cost)}` : ''}${def.castTime ? ` • niệm ${def.castTime}s` : ''}${def.ai && def.ai.range ? ` • tầm ~${def.ai.range} đv` : ''}${u.recast[k] ? ' • <b class="re">DÙNG LẠI ĐƯỢC</b>' : ''}</div>
+        ${V ? `<div class="pb-v">▶ Nếu dùng bây giờ: <b>${esc(V.name)}</b> <small>(${esc(V.why)})</small></div>` : ''}
+        ${full || !V ? `<div class="pb-d">${esc(def.desc || '').replace(/ • /g, '<br>• ')}</div>` : ''}${rk === 0 && k !== 'sub' ? `<div class="pb-l">🔒 chưa học — ${k === 's4' ? 'mở ở cấp 4/8/12' : 'cộng điểm chiêu (nút + / Ctrl+phím)'}</div>` : ''}</div>`;
+    },
+    showTip(k, b) {
+      const u = this.unit(); if (!u || this.aim) return;
+      const t = $('#pvTip'), r = b.getBoundingClientRect(), R = this.el.getBoundingClientRect();
+      t.innerHTML = this.skillCard(u, k, true); t.classList.remove('hidden');
+      t.style.right = Math.max(8, R.right - r.left + 8) + 'px'; t.style.bottom = Math.max(8, R.bottom - r.top - 40) + 'px';
+      this.tipK = k;
+    },
+    hideTip() { $('#pvTip').classList.add('hidden'); this.tipK = null; },
+    toggleBook() { this.bookOpen = !this.bookOpen; $('#pvBook').classList.toggle('hidden', !this.bookOpen); this.bookT = 0; if (this.bookOpen) this.renderBook(); },
+    renderBook() {
+      const u = this.unit(), m = this.app.m; if (!u) return;
+      const H = u.hero, S = u.st, f1 = (x) => (Math.round(x * 10) / 10).toString();
+      const tree = (u.tree || []).map((c, i) => (c != null && H.tree && H.tree[i] && H.tree[i][c] ? `<li>cấp ${G.TREE_TIERS[i]}: <b>${esc(H.tree[i][c].name)}</b> — <small>${esc(H.tree[i][c].desc)}</small></li>` : '')).join('');
+      const gs = G.heroGauges ? G.heroGauges(m, u) : [];
+      $('#pvBook').innerHTML = `<div class="ps-head"><b>📖 ${esc(H.name)} — bộ chiêu & chỉ số</b><span>Cấp ${u.level}</span><button data-close="1">✕</button></div>
+        <div class="pb-body">
+          <div class="pb-st">❤ ${Math.round(u.hp)}/${Math.round(S.maxHp)}${S.maxGa ? ` • 🛡 Hộ Giáp ${Math.round(u.ga || 0)}/${Math.round(S.maxGa)}` : ''}${u.resource === 'mana' ? ` • 💧 ${Math.round(u.mp)}/${Math.round(S.maxMp)}` : ''}<br>
+          ⚔ SMVL ${Math.round(S.ad)} • ✨ SMPT ${Math.round(S.ap)} • 🛡 Giáp ${Math.round(S.armor)} • 🔮 Kháng phép ${Math.round(S.mr)}<br>
+          ⚡ Tốc đánh ${f1(S.as)} • 👟 Tốc chạy ${f1(S.ms)} • 🎯 Tầm đánh ${f1(S.range)} ${u.ranged ? '(xa)' : '(cận chiến)'} • 💥 Chí mạng ${Math.round(S.crit * 100)}% • ⏱ Giảm hồi chiêu ${Math.round(S.cdr * 100)}%${S.lifesteal ? ` • 🩸 Hút máu ${Math.round(S.lifesteal * 100)}%` : ''}<br>
+          ⚔ Hệ số đánh tướng hiện tại ×${f1(m.pvpPow ? m.pvpPow(u) * G.C.PVP_DMG * 0.95 : 1)} <small>(tăng theo cấp + đồ hoàn chỉnh + Ý Niệm)</small></div>
+          ${gs.length ? `<div class="pb-g">${gs.map((g) => `<span>${g.k}: <b>${g.txt || Math.round(g.v) + (g.max ? '/' + g.max : '')}</b></span>`).join(' • ')}</div>` : ''}
+          <div class="pb-sk"><div class="pb-h"><b>Nội tại — ${esc(H.passive.name || '')}</b></div><div class="pb-d">${esc(H.passive.desc || '').replace(/ • /g, '<br>• ')}</div></div>
+          ${['s1', 's2', 's3', 's4', 'sub'].map((k) => this.skillCard(u, k, true)).join('')}
+          ${tree ? `<div class="pb-sk"><div class="pb-h"><b>🌳 Nhánh tiến hóa đã chọn</b></div><ul>${tree}</ul></div>` : ''}
+        </div>`;
+    },
+    renderGauge(u) {
+      const gs = G.heroGauges ? G.heroGauges(this.app.m, u) : [], el = $('#pvGauge');
+      el.innerHTML = gs.map((g) => `<div class="pg"><span>${g.k}</span>${g.max ? `<i><b style="width:${Math.min(100, g.v / g.max * 100)}%;background:${g.col}"></b></i>` : ''}<em>${g.txt || Math.round(g.v) + (g.max ? '/' + g.max : '')}</em></div>`).join('');
     },
     openChest() { const m = this.app.m, u = this.unit(); if (m && u && m.pveChest(u, 2.5)) m.pve.queue.push({ chest: 1 }); },
     // ---------- điểm chiêu thủ công ----------
@@ -430,16 +483,27 @@
         if (!this.outShown) { this.outShown = true; this.app.hud.banner(`💀 Bạn bị loại — hạng ${u.place || '?'} • chuyển sang góc nhìn trọng tài`, 'red'); r.cam.focusId = null; r.pov = null; r.cam.push = null; this.app.setSpeed(this.app.pref.speed || 2); this.el.classList.add('pve-dead'); document.body.classList.add('pve-dead'); this.app.hud.refreshCtrl(); }
         return;
       }
-      // camera: chiêu tầm xa đang ngắm → trôi theo hướng ngắm; PC: con trỏ sát mép → trôi tối đa 8 đv
+      // GĐ13: ngắm cập nhật MỖI KHUNG HÌNH (tướng đang chạy thì vòng chỉ thị vẫn bám đúng con trỏ / hướng kéo, không đứng hình)
       const A = this.aim;
-      if (A && A.kind === 'skill' && A.ind.R > 10 && A.dirS) { const k = A.ind.R * 0.6 * Math.max(0.4, A.mag); r.cam.push = { x: A.dirS.x * k, y: A.dirS.y * k }; }
+      if (A && A.kind === 'skill') {
+        if (A.pc) this.aimFromMouse(); else this.solveAim();
+        const d = A.dirS || A.dir; if (d) { const o = A.dirD || d, k = 0.45; let x = o.x + (d.x - o.x) * k, y = o.y + (d.y - o.y) * k; const L = Math.hypot(x, y) || 1; A.dirD = { x: x / L, y: y / L }; }   // làm mượt hướng vẽ
+      }
+      // camera: chiêu tầm xa đang ngắm → trôi theo hướng ngắm; PC: con trỏ sát mép → trôi tối đa 8 đv
+      if (A && A.kind === 'skill' && !A.pc && A.ind.R > 10 && A.dirS) {   // chỉ cảm ứng: PC mà đẩy camera thì điểm ngắm theo chuột bị trôi vòng (giật)
+        const k = A.ind.R * 0.6 * Math.max(0.4, A.mag); r.cam.push = { x: A.dirS.x * k, y: A.dirS.y * k }; }
       else if (this.mouse && performance.now() - this.mouse.t < 4000 && !this.camLocked()) {   // LoL: kéo mép màn hình chỉ khi đã thả camera
         const ex = this.mouse.x < this.mouse.W * 0.05 ? -1 : this.mouse.x > this.mouse.W * 0.95 ? 1 : 0, ey = this.mouse.y < this.mouse.H * 0.05 ? -1 : this.mouse.y > this.mouse.H * 0.95 ? 1 : 0;
         r.cam.push = ex || ey ? { x: ex * 8, y: ey * 8 } : null;
-      } else if (!A) r.cam.push = null;
+      } else r.cam.push = null;
       const cb = $('#pvCam'), lk = this.camLocked(); cb.classList.toggle('on', lk); cb.textContent = lk ? '🔒 Camera' : '🔓 Camera';
       // điểm chiêu chưa cộng: nút + nhấp nháy trên chiêu nâng được
       this.renderTree(u); this.renderQuick(u);
+      if (performance.now() > (this.gT || 0)) {
+        this.gT = performance.now() + 150; this.renderGauge(u);
+        if (this.bookOpen && performance.now() > (this.bookT || 0)) { this.bookT = performance.now() + 700; this.renderBook(); }
+        if (this.tipK) { const b = this.el.querySelector(`.pve-sk[data-k="${this.tipK}"]`); if (b) this.showTip(this.tipK, b); }
+      }
       const chN = m.pveChest(u, 2.5), cb2 = $('#pvChest'), opening = u.cast && u.cast.key === 'chest';
       cb2.classList.toggle('hidden', !chN && !opening); cb2.textContent = opening ? `🎁 Đang mở… ${Math.max(0, u.cast.t).toFixed(1)}s` : '🎁 Mở rương (V)'; cb2.disabled = opening;
       const pts = $('#pvPts'); pts.classList.toggle('hidden', !(u.points > 0) || !!this.shopOpen);   // bảng cửa hàng mở → báo điểm ngay trong bảng if (u.points > 0) pts.textContent = `⬆ ${u.points} điểm chiêu — chạm + trên chiêu (Ctrl+Q/E/R/F)`;
@@ -447,17 +511,21 @@
       for (const b of this.el.querySelectorAll('.pve-rk')) { const k = b.parentNode.dataset.k; b.textContent = k ? '•'.repeat(u.ranks[k] || 0) : ''; }
       const sb = $('#pvShopBtn'); sb.classList.toggle('hot', m.pveCanShop(u));
       if (this.shopOpen && performance.now() > (this.shopT || 0)) { this.shopT = performance.now() + 600; this.renderShop(); }
+      const t0 = m.pve.lockId != null ? m.units.find((v) => v.id === m.pve.lockId) : null;
       for (const b of this.el.querySelectorAll('.pve-sk')) {
         const k = b.dataset.k, def = u.hero.skills[k];
         if (!def || (k !== 'sub' && !(u.ranks[k] > 0))) { b.classList.add('off'); b.querySelector('em').textContent = def ? '🔒' : ''; continue; }
         const cd = u.recast[k] ? 0 : Math.max(0, u.cd[k] || 0), ready = !!u.recast[k] || m.canCast(u, k);
         b.classList.toggle('off', !ready); b.classList.toggle('re', !!u.recast[k]);
-        b.querySelector('span').textContent = def.name.split(/[\s/]/)[0];
+        // GĐ13: chiêu có nhiều biến thể (vd S4 Alice) → nút ghi biến thể SẼ RA nếu bấm ngay
+        let vn = null; if (def.variant && (this.vT || 0) < performance.now()) { try { vn = def.variant(m, u, t0); } catch (e) { vn = null; } b.dataset.var = vn ? vn.name : ''; }
+        b.querySelector('span').textContent = b.dataset.var || def.name.split(/[\s/]/)[0];
+        b.classList.toggle('var', !!b.dataset.var);
         b.querySelector('em').textContent = cd > 0.05 ? cd.toFixed(cd < 3 ? 1 : 0) : '';
       }
       const pots = u.pots || {}; const em = this.el.querySelectorAll('.pve-sm em'); if (em[0]) em[0].textContent = pots.hp || 0; if (em[1]) em[1].textContent = (pots.mp || 0) + (pots.ga || 0);
       const t = m.pve.lockId != null ? m.units.find((v) => v.id === m.pve.lockId) : null;
-      $('#pvInfo').innerHTML = `❤ ${Math.round(u.hp)}/${Math.round(u.st.maxHp)}${u.resource === 'mana' ? ` • 💧 ${Math.round(u.mp)}` : ''} • Cấp ${u.level}${u.heroId === 'thanhphong' && u.ws.wind != null ? ` • 🌬 Gió ${Math.round(u.ws.wind)} (${{ thuan: 'Thuận', bao: 'Bão Hòa', nghich: 'Nghịch' }[G.HEROES.thanhphong.windState(u)]})` : ''} • 💰 ${Math.round(u.gold)} • 👥 ${m.aliveCount ? m.aliveCount() : ''}${t && t.alive ? ` • 🎯 ${esc(t.hero ? t.hero.name : t.name || 'quái')}` : ''}`;
+      $('#pvInfo').innerHTML = `❤ ${Math.round(u.hp)}/${Math.round(u.st.maxHp)}${u.resource === 'mana' ? ` • 💧 ${Math.round(u.mp)}` : ''} • Cấp ${u.level} • 💰 ${Math.round(u.gold)} • 👥 ${m.aliveCount ? m.aliveCount() : ''}${t && t.alive ? ` • 🎯 ${esc(t.hero ? t.hero.name : t.name || 'quái')}` : ''}`;
     },
     // ---------- vẽ trên bản đồ: sương mù, vòng khóa, vòng chỉ thị, chỉ báo âm thanh ----------
     drawOverlay(r, ctx, m, alpha, z) {
@@ -484,7 +552,7 @@
       // vòng chỉ thị
       const A = this.aim;
       if (A && A.kind === 'skill') {
-        const I = A.ind, bad = A.cancel, col = bad ? 'rgba(150,40,40,' : A.magnet ? 'rgba(255,90,90,' : 'rgba(90,170,255,', d = A.dirS || A.dir;
+        const I = A.ind, bad = A.cancel, col = bad ? 'rgba(150,40,40,' : A.magnet ? 'rgba(255,90,90,' : 'rgba(90,170,255,', d = A.dirD || A.dirS || A.dir;
         ctx.strokeStyle = col + '0.5)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(p.x, p.y, I.R * z, 0, TAU); ctx.stroke();   // tầm tối đa
         ctx.fillStyle = col + '0.28)'; ctx.strokeStyle = col + '0.9)'; ctx.lineWidth = 2;
         if (I.type === 'line') { const w = I.w * z, L = I.R * z, a = Math.atan2(d.y, d.x); ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(a); ctx.fillRect(0, -w / 2, L, w); ctx.strokeRect(0, -w / 2, L, w); ctx.beginPath(); ctx.moveTo(L + 10, 0); ctx.lineTo(L - 4, -w); ctx.lineTo(L - 4, w); ctx.closePath(); ctx.fill(); ctx.restore(); }

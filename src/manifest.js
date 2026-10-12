@@ -78,6 +78,7 @@
     'data/heroes/bachdiep.js',
     'data/heroes/tsukiyo.js',
     'data/curves.js',
+    'data/gauges.js',
     'sim/ai/utility.js',
     'sim/ai/skill_ai.js',
     'sim/ai/persona.js',

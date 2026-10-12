@@ -735,3 +735,28 @@ body.pve-on:not(.pve-dead) #ctrl .spd, body.pve-on:not(.pve-dead) #ctrl .spc, bo
 .pve-quick button.cd { opacity: .45; }
 .pve-quick b { position: absolute; left: 3px; top: 1px; font-size: 10px; color: #ffe08a; }
 .pve-quick em { position: absolute; right: 3px; bottom: 1px; font-size: 11px; font-style: normal; color: #fff; }
+
+/* GĐ13: thanh tài nguyên riêng + bảng chiêu */
+.pve-gauge { position: absolute; left: 50%; top: 96px; transform: translateX(-50%); display: flex; gap: 8px; pointer-events: none; }
+.pve-gauge .pg { display: flex; align-items: center; gap: 5px; background: rgba(10,10,20,.72); padding: 3px 8px; border-radius: 10px; font-size: 12px; }
+.pve-gauge .pg i { display: block; width: 90px; height: 8px; background: rgba(255,255,255,.15); border-radius: 4px; overflow: hidden; }
+.pve-gauge .pg i b { display: block; height: 100%; transition: width .15s; }
+.pve-gauge .pg em { font-style: normal; font-weight: 700; }
+.pve-infobtn { position: absolute; left: 12px; top: 112px; pointer-events: auto; padding: 5px 10px; border-radius: 14px; font-size: 13px; background: rgba(40,40,60,.85); border: 2px solid #88a; }
+.pve-tree:not(.hidden) ~ .pve-infobtn { top: auto; bottom: 12px; }
+.pve-book { position: absolute; left: 50%; top: 6%; transform: translateX(-50%); width: min(640px, 96vw); max-height: 86vh; display: flex; flex-direction: column; pointer-events: auto; background: rgba(16,16,26,.97); border: 2px solid #7ab0ff; border-radius: 12px; z-index: 55; }
+.pve-book .pb-body { overflow-y: auto; padding: 6px 10px 10px; }
+.pb-st { font-size: 12.5px; line-height: 1.6; background: rgba(255,255,255,.05); border-radius: 8px; padding: 6px 8px; }
+.pb-g { margin-top: 6px; font-size: 12.5px; color: #ffe9b0; }
+.pb-sk { margin-top: 8px; padding: 6px 8px; border-radius: 8px; background: rgba(255,255,255,.04); border-left: 3px solid #7ab0ff; }
+.pb-sk.locked { opacity: .6; border-left-color: #666; }
+.pb-h { display: flex; justify-content: space-between; gap: 8px; font-size: 13.5px; }
+.pb-h span { font-size: 11.5px; opacity: .8; }
+.pb-n { font-size: 11.5px; opacity: .85; margin-top: 2px; }
+.pb-n .re { color: #8fff9f; }
+.pb-v { margin-top: 3px; font-size: 12.5px; color: #ffd24a; }
+.pb-d { margin-top: 3px; font-size: 12px; line-height: 1.45; }
+.pb-l { margin-top: 3px; font-size: 11.5px; color: #ffb0b0; }
+.pb-sk ul { margin: 4px 0 0 16px; padding: 0; font-size: 12px; }
+.pve-tip { position: absolute; width: 320px; pointer-events: none; background: rgba(16,16,26,.96); border: 2px solid #7ab0ff; border-radius: 10px; padding: 2px 6px 6px; z-index: 56; }
+.pve-sk.var span { color: #ffd24a; font-weight: 700; }

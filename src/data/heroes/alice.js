@@ -173,21 +173,29 @@
       s4: {
         name: 'Rực Rỡ, Cùng Vui Nào!', desc: 'Tự chọn 1 trong 3 biến thể theo tình huống: Chương Trình Thoát Hiểm (máu thấp: 10 ảo ảnh chạy toán loạn, Alice tàng hình 5s, +50% tốc chạy, tăng mạnh Công Phép) • Mạo Hiểm (bị áp sát hoặc đứng trong vùng cảnh báo: phi dao đánh dấu rồi tự nhốt vào Hộp Ảo Thuật 1.5s — bị đánh thì đổi chỗ với kẻ đánh, trả lại ×2 sát thương, đẩy văng và choáng; không bị đánh thì xuất hiện sau lưng kẻ bị đánh dấu, choáng 3s) • Vạn Biến (chiêu đang hồi: Náo Nhiệt tràn tới 200, làm mới mọi hồi chiêu, tăng mạnh Công Phép; mọi ảo ảnh nổ mạnh hơn, nổ gây choáng và tự sao chép Phi Dao, Lướt Đâm trong 5/7/10s).',
         cd: [110, 90, 70], cost: [100, 100, 100], castTime: 0.1,
-        use(m, u, ctx) {
-          const t = ctx.tgt && ctx.tgt.kind === 'hero' && ctx.tgt.alive && M.dist(u, ctx.tgt) < 6.5 ? ctx.tgt : null;
+        // GĐ13: biến thể được chọn theo tình huống — tách thành hàm để giao diện báo trước biến thể sẽ ra (và vì sao)
+        variant(m, u, tgt) {
+          const t = tgt && tgt.kind === 'hero' && tgt.alive && M.dist(u, tgt) < 6.5 ? tgt : null;
           const near = m.enemiesIn(u.team, u.x, u.y, 6, { heroesOnly: true });
           const melee = near.find((e) => !e.ranged && M.dist(e, u) < 3.2) || (m.dangers && m.dangers.some((g) => g.team !== u.team && M.dist(g, u) < (g.r || 2) + 0.5) ? near[0] : null);
+          if (u.hpPct < 0.4 && near.length && !(melee && melee.hpPct < 0.25)) return { k: 'escape', name: 'Thoát Hiểm', why: 'máu < 40% và có địch trong 6 đv', t, melee };
+          const victim = melee || t, down = ['s1', 's2', 's3'].filter((k) => (u.cd[k] || 0) > 2).length;
+          if (victim && (melee || !(down >= 2 && victim.hpPct > 0.5))) return { k: 'box', name: 'Mạo Hiểm', why: melee ? 'bị cận chiến áp sát / đứng trong vùng cảnh báo' : 'có mục tiêu trong 6.5 đv', t, melee, victim };
+          return { k: 'wild', name: 'Vạn Biến', why: victim ? '≥ 2 chiêu đang hồi, mục tiêu còn > 50% máu' : 'không có mục tiêu gần', t, melee };
+        },
+        use(m, u, ctx) {
+          const V = G.HEROES.alice.skills.s4.variant(m, u, ctx.tgt), t = V.t, near = m.enemiesIn(u.team, u.x, u.y, 6, { heroesOnly: true }), melee = V.melee;
           // Chương Trình Thoát Hiểm: 5 ảo ảnh chạy toán loạn, Alice tàng hình 3s về chỗ an toàn
-          if (u.hpPct < 0.4 && near.length && !(melee && melee.hpPct < 0.25)) {
+          if (V.k === 'escape') {
             m.addStatus(u, 'stealth', 5, 1, { key: 'alice_ult' }); m.addStatus(u, 'haste', 5, 0.5, { key: 'alice_ult' });
             m.addStatus(u, 'buff', 5, 1, { key: 'alice_ult', mods: { ap: 50 + 10 * u.level } });
             for (let i = 0; i < 10; i++) { const a = i * 0.6283 + m.rng.next() * 0.4; const d = illusion(m, u, u.x, u.y, { life: 4, extra: true, runTo: { x: u.x + M.cos(a) * 9, y: u.y + M.sin(a) * 9 } }); d.box = true; }
             return;
           }
           // Mạo Hiểm: bị cận chiến áp sát (hoặc có mồi ngon) → Hộp Ảo Thuật
-          const victim = melee || t;
-          const down = ['s1', 's2', 's3'].filter((k) => (u.cd[k] || 0) > 2).length;
-          if (victim && (melee || !(down >= 2 && victim.hpPct > 0.5))) { magicBox(m, u, victim, H.amt(u, ctx.v([150, 250, 350]), 0, 0.7)); return; }
+          const victim = V.victim;
+          void near;
+          if (V.k === 'box') { magicBox(m, u, victim, H.amt(u, ctx.v([150, 250, 350]), 0, 0.7)); return; }
           // Vạn Biến: Náo Nhiệt tràn tới 150, làm mới mọi hồi chiêu
           u.ws.bigCap = true; u.ws.wildT = m.time + ctx.v([5, 7, 10]);
           u.cd.s1 = 0; u.cd.s2 = 0; u.cd.s3 = 0; u.cd.sub = 0; u.ws.nn = 200;
