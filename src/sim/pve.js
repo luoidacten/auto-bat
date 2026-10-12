@@ -68,7 +68,11 @@
         if (c.learn) { if (this.canLearn(u, c.learn)) { u.ranks[c.learn]++; u.points--; if (this.fxOn) this.fx({ type: 'lvl', x: u.x, y: u.y, team: u.team }); } continue; }
         if (c.shop) { this.pveShop(u, c.shop); continue; }
         if (c.chest) { const ch = this.pveChest(u, 2.5); if (ch) { u.attackTarget = null; P.atkId = null; P.chestId = ch.id; } continue; }
-        if (c.bag) { const pt = c.pt || (t ? { x: t.x, y: t.y } : { x: u.x + u.fx * 3, y: u.y + u.fy * 3 }); this.useBag(u, c.bag, t, pt); continue; }
+        if (c.bag) {
+          const D = G.CONSUMABLES[c.bag];
+          if (D && D.pot) { if (this.drink(u, D.pot, true)) { P.moveTo = null; P.atkId = null; } continue; }   // bình: uống có thời gian (đường riêng, không qua USE của balo)
+          const pt = c.pt || (t ? { x: t.x, y: t.y } : { x: u.x + u.fx * 3, y: u.y + u.fy * 3 }); this.useBag(u, c.bag, t, pt); continue;
+        }
         if (c.atk !== undefined) { P.chestId = null; P.moveTo = null; const tg = c.atk != null ? this.units.find((x) => x.id === c.atk) : null; this.executeBasicAttack(u, tg, c.dir); continue; }
         const def = u.hero.skills[c.k]; if (!def) continue;
         const a = def.ai || {};

@@ -46,7 +46,7 @@
       const pick = this.last || ids[0];
       $('#setup').innerHTML = `
         <h2>🕹 Sinh Tồn PvE — chọn tướng của bạn</h2>
-        <p class="hint">Bạn điều khiển 1 tướng giữa 9 tướng máy — <b>AI của tướng bạn bị tắt hoàn toàn</b> (không tự đánh, tự dùng chiêu, tự uống bình hay tự liên minh), tầm nhìn như người chơi thường (có chỉ báo âm thanh). <b>PC (kiểu LoL)</b>: <b>chuột phải</b> lên đất = đi tới (giữ để đi theo con trỏ), lên kẻ địch = đánh • WASD cũng đi được • giữ Q/E/R/F/Space để ngắm theo chuột, nhả để tung (chuột phải lúc ngắm = hủy) • Y khóa/thả camera (thả rồi mới kéo mép màn hình) • P cửa hàng • V mở rương • 1/2/3 chọn nhánh cây tiến hóa • Ctrl+Q/E/R/F nâng chiêu • H/G bình • B balo • T đổi mục tiêu.
+        <p class="hint">Bạn điều khiển 1 tướng giữa 9 tướng máy — <b>AI của tướng bạn bị tắt hoàn toàn</b> (không tự đánh, tự dùng chiêu, tự uống bình hay tự liên minh), tầm nhìn như người chơi thường (có chỉ báo âm thanh). <b>PC (kiểu LoL)</b>: <b>chuột phải</b> lên đất = đi tới (giữ để đi theo con trỏ), lên kẻ địch = đánh • WASD cũng đi được • giữ Q/E/R/F/Space để ngắm theo chuột, nhả để tung (chuột phải lúc ngắm = hủy) • Y khóa/thả camera (thả rồi mới kéo mép màn hình) • P cửa hàng • V mở rương • 1–4 ô dùng nhanh (phép bổ trợ / vật phẩm balo, hướng theo con trỏ) • Alt+1/2/3 chọn nhánh cây tiến hóa • Ctrl+Q/E/R/F nâng chiêu • H/G bình • B balo • T đổi mục tiêu.
           <b>Điện thoại</b>: chạm nhanh lên bản đồ = đi tới / đánh • chạm nửa trái để hiện cần ảo • chạm nhanh nút chiêu = tung tự động • giữ & kéo = vòng chỉ thị, kéo vào ✕ để hủy • nút ⚔ chạm để đánh, kéo để khóa mục tiêu • giữ 🎒 để mở bánh xe balo.</p>
         <div class="pve-grid">${ids.map((id) => { const H = G.HEROES[id]; return `<button class="pve-hero${id === pick ? ' on' : ''}" data-id="${id}"><span class="dot" style="background:${H.color}"></span>${esc(H.name)}<small>${esc(H.kit || '')}</small></button>`; }).join('')}</div>
         <div class="row btns"><button class="big" id="pvGo">▶ Vào trận</button><button id="pvBack">← Quay lại</button></div>`;
@@ -84,6 +84,7 @@
           <button class="pve-sm" data-a="shop" id="pvShopBtn" title="Cửa hàng (P)">🛒</button>
         </div>
         <button class="pve-chest hidden" id="pvChest" title="Mở rương (V)">🎁 Mở rương</button>
+        <div class="pve-quick" id="pvQuick"></div>
         <div class="pve-wheel hidden" id="pvWheel"></div>
         <button class="pve-cam on" id="pvCam" title="Khóa / thả camera (Y)">🔒 Camera</button>
         <div class="pve-pts hidden" id="pvPts"></div>
@@ -118,6 +119,7 @@
       this.bindStick(); this.bindSkills(); this.bindAtk(); this.bindBag();
       for (const b of el.querySelectorAll('.pve-sm')) if (b.dataset.a !== 'bag') b.onclick = (e) => { e.stopPropagation(); const a = b.dataset.a; if (a === 'lock') this.cycle(); else if (a === 'shop') this.toggleShop(); else this.drink(a); };
       $('#pvCam').onclick = (e) => { e.stopPropagation(); this.toggleCam(); };
+      $('#pvQuick').addEventListener('pointerdown', (e) => { const b = e.target.closest('[data-q]'); if (!b) return; e.stopPropagation(); e.preventDefault(); this.quick(+b.dataset.q); });
       $('#pvChest').onclick = (e) => { e.stopPropagation(); this.openChest(); };
       // nút không giữ focus — tránh phím cách / Enter "bấm lại" nút vừa chạm (vd. nút tốc độ)
       this.blur = (e) => { if (e.target.closest && e.target.closest('button')) setTimeout(() => { const a = document.activeElement; if (a && a.tagName === 'BUTTON') a.blur(); }, 0); };
@@ -309,7 +311,8 @@
       if (k === 'y') this.toggleCam();
       else if (k === 'p') this.toggleShop();
       else if (k === 'v') this.openChest();
-      else if ((k === '1' || k === '2' || k === '3') && this.treeKey != null) this.pickTree(+k - 1);
+      else if ((k === '1' || k === '2' || k === '3') && this.treeKey != null && (e.altKey || e.shiftKey)) { e.preventDefault(); this.pickTree(+k - 1); }
+      else if (k === '1' || k === '2' || k === '3' || k === '4') this.quick(+k - 1);
       else if (k === 't') this.cycle();
       else if (k === 'h') this.drink('hp');
       else if (k === 'g') this.drink('mp');
@@ -330,8 +333,23 @@
       if (key === this.treeKey) return; this.treeKey = key;
       el.classList.toggle('hidden', i == null); if (i == null) return;
       const opts = (u.hero.tree && u.hero.tree[i]) || [];
-      el.innerHTML = `<div class="pt-h">🌳 Cây tiến hóa — mốc cấp ${G.TREE_TIERS[i]}: chọn 1 nhánh <small>(phím 1/2/3)</small></div>` +
+      el.innerHTML = `<div class="pt-h">🌳 Cây tiến hóa — mốc cấp ${G.TREE_TIERS[i]}: chọn 1 nhánh <small>(chạm hoặc Alt+1/2/3)</small></div>` +
         opts.map((b, j) => `<button data-tree="${j}"><b>${j + 1}. ${esc(b.name)}</b><small>${esc(b.desc || '')}</small></button>`).join('');
+    },
+    // ---------- ô dùng nhanh 1–4: vật phẩm balo không phải bình (phép bổ trợ cũ, dây móc, bẫy, phù…) ----------
+    quickItems(u) { const C = G.CONSUMABLES, seen = new Set(), L = []; for (const sl of (u.bag ? u.bag.slots : [])) { const d = C[sl.id]; if (!d || d.pot || sl.n <= 0 || seen.has(sl.id)) continue; seen.add(sl.id); L.push(sl.id); } return L.slice(0, 4); },
+    quick(i) {
+      const m = this.app.m, u = this.unit(); if (!m || !u) return;
+      const id = this.quickItems(u)[i]; if (!id) return;
+      let pt = null;
+      if (this.mouse && performance.now() - this.mouse.t < 5000) pt = this.s2w(this.mouse.x, this.mouse.y);   // PC: hướng / điểm theo con trỏ (vd Tốc Biến)
+      m.pve.queue.push(pt ? { bag: id, pt } : { bag: id });
+    },
+    renderQuick(u) {
+      const L = this.quickItems(u), key = L.map((id) => id + ':' + this.app.m.bagCount(u, id)).join(',') + '|' + Math.ceil(Math.max(0, (u.bagT || 0) - this.app.m.time));
+      if (key === this.quickKey) return; this.quickKey = key;
+      const C = G.CONSUMABLES, m = this.app.m, cd = Math.max(0, (u.bagT || 0) - m.time);
+      $('#pvQuick').innerHTML = L.map((id, i) => `<button data-q="${i}" title="${esc(C[id].name + ' — ' + (C[id].desc || ''))}"${cd > 0 ? ' class="cd"' : ''}><b>${i + 1}</b>${C[id].icon || '🎁'}<em>${m.bagCount(u, id)}</em></button>`).join('');
     },
     openChest() { const m = this.app.m, u = this.unit(); if (m && u && m.pveChest(u, 2.5)) m.pve.queue.push({ chest: 1 }); },
     // ---------- điểm chiêu thủ công ----------
@@ -421,7 +439,7 @@
       } else if (!A) r.cam.push = null;
       const cb = $('#pvCam'), lk = this.camLocked(); cb.classList.toggle('on', lk); cb.textContent = lk ? '🔒 Camera' : '🔓 Camera';
       // điểm chiêu chưa cộng: nút + nhấp nháy trên chiêu nâng được
-      this.renderTree(u);
+      this.renderTree(u); this.renderQuick(u);
       const chN = m.pveChest(u, 2.5), cb2 = $('#pvChest'), opening = u.cast && u.cast.key === 'chest';
       cb2.classList.toggle('hidden', !chN && !opening); cb2.textContent = opening ? `🎁 Đang mở… ${Math.max(0, u.cast.t).toFixed(1)}s` : '🎁 Mở rương (V)'; cb2.disabled = opening;
       const pts = $('#pvPts'); pts.classList.toggle('hidden', !(u.points > 0) || !!this.shopOpen);   // bảng cửa hàng mở → báo điểm ngay trong bảng if (u.points > 0) pts.textContent = `⬆ ${u.points} điểm chiêu — chạm + trên chiêu (Ctrl+Q/E/R/F)`;

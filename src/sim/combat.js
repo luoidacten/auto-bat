@@ -80,7 +80,7 @@
         }
         if (owner && owner.hi && !tgt.hi && (owner.kind === 'hero' || owner.kind === 'pet')) a *= 1 + C.HIGH.dmg;                    // GĐ7: đánh từ trên cao xuống
         if (owner && owner.ultRageT > this.time && !info.auto) a *= 2;                                                 // GĐ7b: Tuyệt Kỹ Nộ (mảnh hồn Đỏ)
-        if (owner && owner.kind === 'hero' && tgt.kind === 'hero') a *= 0.95 * C.PVP_DMG * (this.time < C.PVP_EARLY.full ? C.PVP_EARLY.k0 + (1 - C.PVP_EARLY.k0) * this.time / C.PVP_EARLY.full : 1);   // giảm nhẹ sát thương PvP để trận căng hơn và khó đoán hơn
+        if (owner && owner.kind === 'hero' && tgt.kind === 'hero') a *= 0.95 * C.PVP_DMG * this.pvpPow(owner);   // GĐ13: nhịp giao tranh theo độ mạnh người đánh — đầu trận dài, đủ đồ/chiêu thì nhanh & gọn
         if (owner && owner.mastMul && tgt.kind === 'hero') a *= owner.mastMul;
         if (owner && owner.kind === 'hero' && G.heroCurve) a *= 1 + G.heroCurve(owner);                                 // GĐ5c: giai đoạn mạnh của tướng
         if (tgt.kind === 'monster' && owner && owner.bonus && owner.bonus.monsterAmp) a *= 1 + owner.bonus.monsterAmp;
@@ -205,6 +205,17 @@
       if (src && src.fxl && src.fxl.onAllyCare && src !== tgt && src.team === tgt.team && !quiet) this.heroHook(src, 'onAllyCare', tgt);
       if (!quiet && this.fxOn && h >= 5) this.fx({ type: 'heal', x: tgt.x, y: tgt.y, v: h });
       return h;
+    },
+    // GĐ13: hệ số sát thương tướng ↔ tướng theo ĐỘ MẠNH của người đánh: p = 45% cấp (1→18) + 45% số món hoàn chỉnh (0→6) + 10% Ý Niệm (0→5);
+    // hệ số = k0 × base^p (đầu trận ~k0, đủ đồ + cấp cao ~k0 × base) → 2 máu giấy: đầu trận đánh lâu, giữa trận 5–10s, cuối trận dồn chết trong ~1s
+    pvpPow(u) {
+      const P = C.PVP_POW; if (!P) return 1;
+      if (u.powT !== this.tick) {
+        let full = 0; for (const id of u.items || []) { const it = G.ITEMS[id]; if (it && !it.isComp && !it.starter) full++; }
+        const p = 0.45 * Math.min(1, ((u.level || 1) - 1) / 17) + 0.45 * Math.min(1, full / 6) + 0.1 * Math.min(1, (u.yNiem || 0) / 5);
+        u.powK = P.k0 * Math.pow(P.base, p); u.powT = this.tick;
+      }
+      return u.powK;
     },
     shield(src, tgt, amt, dur) {
       if (!isUnit(tgt) || !tgt.alive) return null;

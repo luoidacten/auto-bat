@@ -58,7 +58,8 @@
     HERO_HP_MULT: 2.4,                           // đánh đơn: tướng trâu gấp 2.4 bản MOBA → giao tranh dài 20–120s, đủ thời gian tung hết chiêu
     ALLIN_HP: 1.15,                              // tướng kiểu "Lì đòn" (đã đánh là không chạy): +15% máu tối đa
     PVP_DMG: 0.60,                               // giảm nhẹ sát thương tướng lên tướng để giao tranh căng hơn, khó đoán hơn
-    PVP_EARLY: { k0: 0.8, full: 600 },           // GĐ8: 10 phút đầu sát thương tướng ↔ tướng tăng dần từ 80% → 100% (đầu trận bớt chết vì đụng độ lúc farm)
+    PVP_EARLY: { k0: 0.8, full: 600 },           // (GĐ13: thay bằng PVP_POW — không còn dùng)
+    PVP_POW: { k0: 1.6, base: 6 },               // GĐ13: hệ số PvP = k0 × base^độ_mạnh (0..1) — xem Combat.pvpPow           // GĐ8: 10 phút đầu sát thương tướng ↔ tướng tăng dần từ 80% → 100% (đầu trận bớt chết vì đụng độ lúc farm)
     MANA_COST: 0.6, MANA_REGEN: 1.6,             // chiêu tốn 60% mana, hồi mana ×1.6 → giao tranh dài vẫn còn mana tung chiêu
     CATCHUP_XP: 0.2,                             // KN quái +20% mỗi cấp thấp hơn trung bình (tối đa ×1.6)
 

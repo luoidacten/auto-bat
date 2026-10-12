@@ -729,3 +729,9 @@ body.pve-on:not(.pve-dead) #ctrl .spd, body.pve-on:not(.pve-dead) #ctrl .spc, bo
 .pve-tree button { text-align: left; padding: 6px 8px; border-radius: 8px; background: #22301c; border: 1px solid #4a6a3a; color: #eef; display: flex; flex-direction: column; gap: 2px; }
 .pve-tree button:hover { background: #33502a; }
 .pve-tree button small { font-size: 11px; opacity: .85; }
+
+.pve-quick { position: absolute; right: 18px; bottom: 250px; display: flex; gap: 6px; pointer-events: auto; }
+.pve-quick button { position: relative; width: 46px; height: 46px; border-radius: 10px; background: rgba(30,30,48,.9); border: 2px solid #8a7ad0; font-size: 22px; padding: 0; }
+.pve-quick button.cd { opacity: .45; }
+.pve-quick b { position: absolute; left: 3px; top: 1px; font-size: 10px; color: #ffe08a; }
+.pve-quick em { position: absolute; right: 3px; bottom: 1px; font-size: 11px; font-style: normal; color: #fff; }
