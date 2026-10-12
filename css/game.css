@@ -760,3 +760,14 @@ body.pve-on:not(.pve-dead) #ctrl .spd, body.pve-on:not(.pve-dead) #ctrl .spc, bo
 .pb-sk ul { margin: 4px 0 0 16px; padding: 0; font-size: 12px; }
 .pve-tip { position: absolute; width: 320px; pointer-events: none; background: rgba(16,16,26,.96); border: 2px solid #7ab0ff; border-radius: 10px; padding: 2px 6px 6px; z-index: 56; }
 .pve-sk.var span { color: #ffd24a; font-weight: 700; }
+
+.pb-ch { margin-top: 8px; padding: 6px 8px; border-radius: 8px; background: rgba(255,210,74,.07); border-left: 3px solid #ffd24a; }
+.pc-g { margin-top: 6px; }
+.pc-t { font-size: 12.5px; font-weight: 700; }
+.pc-t i { font-weight: 400; color: #9fe8b0; } .pc-t .up { color: #8fff9f; font-size: 11.5px; } .pc-t small { font-weight: 400; opacity: .7; }
+.pc-o { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 5px; margin-top: 4px; }
+.pc-o button { text-align: left; padding: 5px 7px; border-radius: 8px; background: #1e2236; border: 1px solid #4a5080; color: #eef; display: flex; flex-direction: column; gap: 2px; }
+.pc-o button.on { border-color: #ffd24a; background: #3a3218; }
+.pc-o button:disabled { opacity: .45; }
+.pc-o button small { font-size: 11px; opacity: .85; line-height: 1.35; }
+.pb-h .br { color: #ffd24a; }

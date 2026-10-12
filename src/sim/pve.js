@@ -65,7 +65,15 @@
         const c = P.queue.shift();
         if (c.tree != null) { this.pickTree(u, c.tree); continue; }
         if (c.move) { const g = { x: c.move.x, y: c.move.y }; MAP.pushOut(g, u.r); P.moveTo = g; P.atkId = null; P.chestId = null; u.attackTarget = null; if (u.cast && u.cast.key === 'chest') u.cast = null; continue; }
-        if (c.learn) { if (this.canLearn(u, c.learn)) { u.ranks[c.learn]++; u.points--; if (this.fxOn) this.fx({ type: 'lvl', x: u.x, y: u.y, team: u.team }); } continue; }
+        if (c.learn) {
+          if (this.canLearn(u, c.learn)) {
+            u.ranks[c.learn]++; u.points--; if (this.fxOn) this.fx({ type: 'lvl', x: u.x, y: u.y, team: u.team });
+            if (u.hero.onLearn) u.hero.onLearn(this, u, c.learn);
+            if (c.choice && u.hero.setChoice) u.hero.setChoice(this, u, c.choice.id, c.choice.v);   // nâng chiêu + chọn hướng (Tsukiyo)
+          }
+          continue;
+        }
+        if (c.choice) { if (u.hero.setChoice) u.hero.setChoice(this, u, c.choice.id, c.choice.v); continue; }   // GĐ13: lựa chọn riêng của tướng (bảng 📖)
         if (c.shop) { this.pveShop(u, c.shop); continue; }
         if (c.chest) { const ch = this.pveChest(u, 2.5); if (ch) { u.attackTarget = null; P.atkId = null; P.chestId = ch.id; } continue; }
         if (c.bag) {

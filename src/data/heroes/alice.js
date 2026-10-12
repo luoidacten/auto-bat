@@ -178,6 +178,11 @@
           const t = tgt && tgt.kind === 'hero' && tgt.alive && M.dist(u, tgt) < 6.5 ? tgt : null;
           const near = m.enemiesIn(u.team, u.x, u.y, 6, { heroesOnly: true });
           const melee = near.find((e) => !e.ranged && M.dist(e, u) < 3.2) || (m.dangers && m.dangers.some((g) => g.team !== u.team && M.dist(g, u) < (g.r || 2) + 0.5) ? near[0] : null);
+          // GĐ13: người chơi chọn trước biến thể (bảng 📖) — Mạo Hiểm cần có mục tiêu, không có thì về tự chọn
+          const F = u.ws.s4force;
+          if (F === 'escape') return { k: 'escape', name: 'Thoát Hiểm', why: 'đã chọn trước', t, melee };
+          if (F === 'wild') return { k: 'wild', name: 'Vạn Biến', why: 'đã chọn trước', t, melee };
+          if (F === 'box' && (melee || t)) return { k: 'box', name: 'Mạo Hiểm', why: 'đã chọn trước', t, melee, victim: melee || t };
           if (u.hpPct < 0.4 && near.length && !(melee && melee.hpPct < 0.25)) return { k: 'escape', name: 'Thoát Hiểm', why: 'máu < 40% và có địch trong 6 đv', t, melee };
           const victim = melee || t, down = ['s1', 's2', 's3'].filter((k) => (u.cd[k] || 0) > 2).length;
           if (victim && (melee || !(down >= 2 && victim.hpPct > 0.5))) return { k: 'box', name: 'Mạo Hiểm', why: melee ? 'bị cận chiến áp sát / đứng trong vùng cảnh báo' : 'có mục tiêu trong 6.5 đv', t, melee, victim };
@@ -205,6 +210,16 @@
         ai: { use: 'ult', aim: 'unit', range: 6, cond: (m, u, t) => u.hpPct < 0.4 || !!(t && t.kind === 'hero' && t.hpPct < 0.65) },
       },
     },
+    // GĐ13: lựa chọn của người chơi — chọn trước biến thể Rực Rỡ, Cùng Vui Nào!
+    choices(m, u) {
+      return [{ id: 's4mode', title: '[F] Rực Rỡ, Cùng Vui Nào! — biến thể', cur: u.ws.s4force || 'auto', opts: [
+        { v: 'auto', name: '🎲 Tự chọn theo tình huống', desc: 'máu < 40% có địch gần → Thoát Hiểm; bị áp sát / có mục tiêu ≤ 6.5 đv → Mạo Hiểm; còn lại → Vạn Biến' },
+        { v: 'escape', name: '🎭 Thoát Hiểm', desc: '10 ảo ảnh chạy toán loạn, tàng hình 5s, +50% tốc chạy, tăng mạnh Công Phép' },
+        { v: 'box', name: '🎁 Mạo Hiểm', desc: 'phi dao đánh dấu mục tiêu rồi vào Hộp Ảo Thuật 1.5s (cần mục tiêu trong 6.5 đv — không có thì tự chọn)' },
+        { v: 'wild', name: '✨ Vạn Biến', desc: 'Náo Nhiệt 200, làm mới mọi hồi chiêu, ảo ảnh nổ choáng & sao chép chiêu' },
+      ] }];
+    },
+    setChoice(m, u, id, v) { if (id !== 's4mode' || !['auto', 'escape', 'box', 'wild'].includes(v)) return false; u.ws.s4force = v === 'auto' ? null : v; return true; },
     ai: { order: ['s1', 's3', 's2'], engageRange: 6, role: 'mage', guard: (m, u) => (u.ws.boxOn ? { t: 1, punish: true } : null) },
     tags: ['stealth'],
   });

@@ -125,7 +125,13 @@
       $('#pvCam').onclick = (e) => { e.stopPropagation(); this.toggleCam(); };
       $('#pvQuick').addEventListener('pointerdown', (e) => { const b = e.target.closest('[data-q]'); if (!b) return; e.stopPropagation(); e.preventDefault(); this.quick(+b.dataset.q); });
       $('#pvInfoBtn').onclick = (e) => { e.stopPropagation(); this.toggleBook(); };
-      $('#pvBook').addEventListener('click', (e) => { e.stopPropagation(); if (e.target.closest('[data-close]')) this.toggleBook(); });
+      $('#pvBook').addEventListener('click', (e) => {
+        e.stopPropagation(); if (e.target.closest('[data-close]')) { this.toggleBook(); return; }
+        const b = e.target.closest('[data-choice]'); if (!b || b.disabled || !this.app.m.pve) return;
+        const choice = { id: b.dataset.choice, v: b.dataset.v };
+        this.app.m.pve.queue.push(b.dataset.learn ? { learn: b.dataset.learn, choice } : { choice });
+        setTimeout(() => this.renderBook(), 80);
+      });
       // PC: rê chuột lên nút chiêu → thẻ mô tả (không cần mở bảng)
       for (const b of el.querySelectorAll('.pve-sk')) { b.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') this.showTip(b.dataset.k, b); }); b.addEventListener('pointerleave', () => this.hideTip()); }
       $('#pvChest').onclick = (e) => { e.stopPropagation(); this.openChest(); };
@@ -369,7 +375,8 @@
       const cost = rk > 0 ? m.costOf(u, k) : 0, now = u.recast[k] ? 0 : Math.max(0, u.cd[k] || 0);
       let V = null; try { if (def.variant) V = def.variant(m, u, m.pve && m.pve.lockId != null ? m.units.find((x) => x.id === m.pve.lockId) : null); } catch (e) { V = null; }
       const KEY = { s1: 'Q', s2: 'E', s3: 'R', s4: 'F', sub: 'Space' }[k];
-      return `<div class="pb-sk${rk > 0 || k === 'sub' ? '' : ' locked'}"><div class="pb-h"><b>[${KEY}] ${esc(def.name)}</b><span>${k === 'sub' ? 'skill phụ' : `cấp ${rk}/${max}`}</span></div>
+      const bn = u.hero.branchName && k !== 'sub' ? u.hero.branchName(u, k) : '';
+      return `<div class="pb-sk${rk > 0 || k === 'sub' ? '' : ' locked'}"><div class="pb-h"><b>[${KEY}] ${esc(def.name)}${bn ? ` — <span class="br">${esc(bn)}</span>` : ''}</b><span>${k === 'sub' ? 'skill phụ' : `cấp ${rk}/${max}`}</span></div>
         <div class="pb-n">⏱ hồi ${cd ? cd.toFixed(1) + 's' : '—'}${now > 0.05 ? ` <i>(còn ${now.toFixed(1)}s)</i>` : ''}${cost ? ` • 💧 ${Math.round(cost)}` : ''}${def.castTime ? ` • niệm ${def.castTime}s` : ''}${def.ai && def.ai.range ? ` • tầm ~${def.ai.range} đv` : ''}${u.recast[k] ? ' • <b class="re">DÙNG LẠI ĐƯỢC</b>' : ''}</div>
         ${V ? `<div class="pb-v">▶ Nếu dùng bây giờ: <b>${esc(V.name)}</b> <small>(${esc(V.why)})</small></div>` : ''}
         ${full || !V ? `<div class="pb-d">${esc(def.desc || '').replace(/ • /g, '<br>• ')}</div>` : ''}${rk === 0 && k !== 'sub' ? `<div class="pb-l">🔒 chưa học — ${k === 's4' ? 'mở ở cấp 4/8/12' : 'cộng điểm chiêu (nút + / Ctrl+phím)'}</div>` : ''}</div>`;
@@ -395,10 +402,22 @@
           ⚡ Tốc đánh ${f1(S.as)} • 👟 Tốc chạy ${f1(S.ms)} • 🎯 Tầm đánh ${f1(S.range)} ${u.ranged ? '(xa)' : '(cận chiến)'} • 💥 Chí mạng ${Math.round(S.crit * 100)}% • ⏱ Giảm hồi chiêu ${Math.round(S.cdr * 100)}%${S.lifesteal ? ` • 🩸 Hút máu ${Math.round(S.lifesteal * 100)}%` : ''}<br>
           ⚔ Hệ số đánh tướng hiện tại ×${f1(m.pvpPow ? m.pvpPow(u) * G.C.PVP_DMG * 0.95 : 1)} <small>(tăng theo cấp + đồ hoàn chỉnh + Ý Niệm)</small></div>
           ${gs.length ? `<div class="pb-g">${gs.map((g) => `<span>${g.k}: <b>${g.txt || Math.round(g.v) + (g.max ? '/' + g.max : '')}</b></span>`).join(' • ')}</div>` : ''}
+          ${this.choicesHtml(u)}
           <div class="pb-sk"><div class="pb-h"><b>Nội tại — ${esc(H.passive.name || '')}</b></div><div class="pb-d">${esc(H.passive.desc || '').replace(/ • /g, '<br>• ')}</div></div>
           ${['s1', 's2', 's3', 's4', 'sub'].map((k) => this.skillCard(u, k, true)).join('')}
           ${tree ? `<div class="pb-sk"><div class="pb-h"><b>🌳 Nhánh tiến hóa đã chọn</b></div><ul>${tree}</ul></div>` : ''}
         </div>`;
+    },
+    // GĐ13: lựa chọn riêng của tướng (nhánh chiêu Tsukiyo, biến thể S4 Alice…) — hero.choices / hero.setChoice
+    choicesHtml(u) {
+      const m = this.app.m; if (!u.hero.choices) return '';
+      let L = []; try { L = u.hero.choices(m, u) || []; } catch (e) { L = []; }
+      if (!L.length) return '';
+      return `<div class="pb-ch"><div class="pb-h"><b>⚙ Lựa chọn của tướng</b><small>bấm để chọn — áp dụng ngay</small></div>` + L.map((c) => {
+        const k = c.id.startsWith('br_') ? c.id.slice(3) : null, up = c.learnable && k;
+        return `<div class="pc-g"><div class="pc-t">${esc(c.title)}${c.openLeft ? ` <i>(còn ${c.openLeft.toFixed(0)}s để đổi hướng)</i>` : ''}${up ? ' <b class="up">⬆ có thể nâng — chọn hướng để nâng luôn</b>' : ''}${c.lock && !up ? ` <small>🔒 ${esc(c.lock)}</small>` : ''}</div>
+          <div class="pc-o">${c.opts.map((o) => `<button data-choice="${c.id}" data-v="${o.v}"${up ? ` data-learn="${k}"` : ''} class="${o.v === c.cur ? 'on' : ''}"${c.lock && !up && o.v !== c.cur ? ' disabled' : ''}><b>${esc(o.name)}${o.v === c.cur ? ' ✔' : ''}</b><small>${esc(o.desc || '')}</small></button>`).join('')}</div></div>`;
+      }).join('') + '</div>';
     },
     renderGauge(u) {
       const gs = G.heroGauges ? G.heroGauges(this.app.m, u) : [], el = $('#pvGauge');
@@ -506,7 +525,8 @@
       }
       const chN = m.pveChest(u, 2.5), cb2 = $('#pvChest'), opening = u.cast && u.cast.key === 'chest';
       cb2.classList.toggle('hidden', !chN && !opening); cb2.textContent = opening ? `🎁 Đang mở… ${Math.max(0, u.cast.t).toFixed(1)}s` : '🎁 Mở rương (V)'; cb2.disabled = opening;
-      const pts = $('#pvPts'); pts.classList.toggle('hidden', !(u.points > 0) || !!this.shopOpen);   // bảng cửa hàng mở → báo điểm ngay trong bảng if (u.points > 0) pts.textContent = `⬆ ${u.points} điểm chiêu — chạm + trên chiêu (Ctrl+Q/E/R/F)`;
+      const pts = $('#pvPts'); pts.classList.toggle('hidden', !(u.points > 0) || !!this.shopOpen);   // bảng cửa hàng mở → báo điểm ngay trong bảng
+      if (u.points > 0) pts.textContent = `⬆ ${u.points} điểm chiêu — chạm + trên chiêu (Ctrl+Q/E/R/F)${u.hero.choices && u.hero.branchName ? ' • chọn hướng nâng trong 📖 (I)' : ''}`;
       for (const b of this.el.querySelectorAll('.pve-up')) b.classList.toggle('hidden', !m.canLearn(u, b.dataset.up));
       for (const b of this.el.querySelectorAll('.pve-rk')) { const k = b.parentNode.dataset.k; b.textContent = k ? '•'.repeat(u.ranks[k] || 0) : ''; }
       const sb = $('#pvShopBtn'); sb.classList.toggle('hot', m.pveCanShop(u));
@@ -519,7 +539,8 @@
         b.classList.toggle('off', !ready); b.classList.toggle('re', !!u.recast[k]);
         // GĐ13: chiêu có nhiều biến thể (vd S4 Alice) → nút ghi biến thể SẼ RA nếu bấm ngay
         let vn = null; if (def.variant && (this.vT || 0) < performance.now()) { try { vn = def.variant(m, u, t0); } catch (e) { vn = null; } b.dataset.var = vn ? vn.name : ''; }
-        b.querySelector('span').textContent = b.dataset.var || def.name.split(/[\s/]/)[0];
+        const bnm = u.hero.branchName && k !== 'sub' ? u.hero.branchName(u, k) : '';
+        b.querySelector('span').textContent = b.dataset.var || (bnm ? bnm.split(' ')[1] : '') || def.name.split(/[\s/]/)[0];
         b.classList.toggle('var', !!b.dataset.var);
         b.querySelector('em').textContent = cd > 0.05 ? cd.toFixed(cd < 3 ? 1 : 0) : '';
       }

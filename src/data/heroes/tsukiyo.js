@@ -217,6 +217,25 @@
     ai: { order: ['s1', 's2', 's3'], engageRange: 5, role: 'assassin' },
     tags: ['stealth'],
     branchName: (u, k) => BR[br(u, k)],
+    // GĐ13: người chơi chọn nhánh từng chiêu — đổi được khi chiêu chưa học, trong 20s đầu trận, hoặc trong 15s sau mỗi lần nâng chiêu đó
+    choices(m, u) {
+      const KEY = { s1: 'Q', s2: 'E', s3: 'R', s4: 'F' };
+      return ['s1', 's2', 's3', 's4'].map((k) => {
+        const d = u.hero.skills[k], parts = {}; for (const [code, ic] of [['ap', '🔮'], ['ad', '⚔'], ['sp', '🌪']]) { const mm = (d.desc || '').split(ic)[1]; parts[code] = mm ? mm.split(/ [🔮⚔🌪]/u)[0].trim() : ''; }
+        const open = (u.ranks[k] || 0) === 0 || m.time < 20 || (u.ws.brOpen && u.ws.brOpen[k] > m.time);
+        return { id: 'br_' + k, title: `[${KEY[k]}] ${d.name}`, cur: br(u, k), lock: open ? null : 'chỉ đổi được khi nâng chiêu này (15s sau khi bấm +), hoặc lúc chưa học',
+          openLeft: u.ws.brOpen && u.ws.brOpen[k] > m.time ? u.ws.brOpen[k] - m.time : 0, learnable: m.canLearn(u, k),
+          opts: ['ap', 'ad', 'sp'].map((v) => ({ v, name: BR[v], desc: parts[v] })) };
+      });
+    },
+    setChoice(m, u, id, v) {
+      const k = id.slice(3); if (!/^s[1-4]$/.test(k) || !BR[v]) return false;
+      const c = u.hero.choices(m, u).find((x) => x.id === id); if (!c || c.lock) return false;
+      u.ws.br[k] = v; if (u.ws.brOpen) u.ws.brOpen[k] = 0;
+      if (k === 's1' && v === 'sp') u.ws.dash = Math.min(u.ws.dash || 0, maxDash(u));
+      return true;
+    },
+    onLearn(m, u, k) { (u.ws.brOpen || (u.ws.brOpen = {}))[k] = m.time + 15; },
   });
   G.HEROES.tsukiyo.tree = [
     [
