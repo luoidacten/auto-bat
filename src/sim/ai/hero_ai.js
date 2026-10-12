@@ -730,6 +730,7 @@
       // GĐ11: chống thả diều (lướt chéo áp sát rồi khống chế) • ép bo (khóa chân ngoài bão, đẩy văng ra ngoài bo)
       if (G.Brain && (G.Brain.arrival(this, t) || G.Brain.antiKite(this, t, enemies) || G.Brain.zoneFight(this, t, enemies))) return;
       // GĐ12: tử thủ (khống chế cứng → dồn sát thương) • pháp sư sát thủ (FSM cấu → lao → dồn → rút)
+      if (u.hero.ai.fight && this.hook2(() => u.hero.ai.fight(this, t, enemies, allies))) return;   // GĐ13: bộ não giao tranh riêng của tướng (Thước Gió Thanh Phong…)
       if (G.T12 && (G.T12.berserkSkills(this, t) || G.T12.backstab(this, t) || G.T12.assassin(this, t, enemies, allies))) return;
       // 4) chiêu — GĐ7b: đang/đủ điều kiện "múa" thì đi theo chuỗi combo, không thì chiêu lẻ như cũ
       if (this.comboStep(t, enemies)) return;

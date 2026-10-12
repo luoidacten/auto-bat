@@ -84,6 +84,7 @@
     'sim/ai/cognition.js',
     'sim/ai/combat_brain.js',
     'sim/ai/tactics12.js',
+    'sim/ai/tp_ai.js',
     'sim/ai/hero_ai.js',
   ];
   G.FILES_UI = [

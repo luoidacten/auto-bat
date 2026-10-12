@@ -34,6 +34,8 @@
       let changed = false;
       while (u.treeOn < TIERS.length && u.level >= TIERS[u.treeOn]) {
         const i = u.treeOn;
+        // GĐ13: tướng người chơi (PvE) tự chọn nhánh — mốc mở mà chưa chọn thì chờ (u.treePend), không để AI chọn hộ
+        if (u.tree[i] == null && (u.ctl || (this.cfg && this.cfg.pve && u.heroId === this.cfg.pve)) && (tree[i] || []).length) { u.treePend = i; break; }
         if (u.tree[i] == null) u.tree[i] = G.TreeAI ? G.TreeAI.pick(this, u, i) : (this.treeRng || (this.treeRng = new G.Rng(this.seed + ':tree'))).int(0, Math.max(0, (tree[i] || []).length - 1));
         const b = tree[i] && tree[i][u.tree[i]];
         u.treeOn++;
@@ -68,6 +70,11 @@
         }
       }
       if (changed) this.recalcItems(u);
+    },
+    // GĐ13: người chơi chọn nhánh j cho mốc đang chờ
+    pickTree(u, j) {
+      const i = u.treePend, tree = u.hero.tree; if (i == null || !tree || !tree[i] || !tree[i][j]) return false;
+      u.tree[i] = j; u.treePend = null; this.unlockTree(u); return true;
     },
     // danh sách mã nhánh đang có (báo cáo)
     treeCodes(u) { return u.tree ? u.tree.map((c, i) => (c == null ? null : code(i, c))).filter(Boolean).concat((u.treeX || []).map((x) => x.code)) : []; },

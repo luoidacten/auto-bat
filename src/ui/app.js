@@ -212,7 +212,9 @@
         const p = ptrs.get(e.pointerId); if (!p) return;
         if (ptrs.size === 1) {
           const dx = e.clientX - p.x, dy = e.clientY - p.y;
-          if (Math.abs(dx) + Math.abs(dy) > 2) { this.r.cam.follow = false; this.r.cam.x -= dx / this.r.cam.zoom; this.r.cam.y -= dy / this.r.cam.zoom; this.r.clampCam(); this.hud.refreshCtrl(); }
+          // GĐ13: PvE — chuột không kéo camera (chuột trái/phải là lệnh đánh/đi); cảm ứng chỉ kéo được khi đã thả khóa camera
+          const pveNoPan = this.pveMode && G.PveUI && (e.pointerType === 'mouse' || G.PveUI.camLocked());
+          if (!pveNoPan && Math.abs(dx) + Math.abs(dy) > 2) { this.r.cam.follow = false; this.r.cam.x -= dx / this.r.cam.zoom; this.r.cam.y -= dy / this.r.cam.zoom; this.r.clampCam(); this.hud.refreshCtrl(); }
         }
         p.x = e.clientX; p.y = e.clientY;
         if (ptrs.size === 2 && pinch0) { const [a, b] = [...ptrs.values()]; this.zoomTo(zoom0 * Math.hypot(a.x - b.x, a.y - b.y) / pinch0); }

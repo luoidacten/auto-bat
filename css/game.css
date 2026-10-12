@@ -723,3 +723,9 @@ body.pve-on:not(.pve-dead) #ctrl .spd, body.pve-on:not(.pve-dead) #ctrl .spc, bo
 .ps-search { display: flex; gap: 6px; margin: 6px 10px 0; }
 .ps-search input { flex: 1; padding: 6px 10px; border-radius: 8px; border: 1px solid #6a5aa8; background: #0e0c18; color: #fff; font-size: 14px; }
 .ps-search button { padding: 4px 10px; }
+
+.pve-tree { position: absolute; left: 12px; top: 112px; width: min(330px, 46vw); pointer-events: auto; background: rgba(18,22,16,.95); border: 2px solid #8fd06a; border-radius: 12px; padding: 6px; display: flex; flex-direction: column; gap: 5px; z-index: 40; box-shadow: 0 0 14px rgba(140,220,100,.4); }
+.pve-tree .pt-h { font-weight: 700; font-size: 13px; color: #c8f0a8; }
+.pve-tree button { text-align: left; padding: 6px 8px; border-radius: 8px; background: #22301c; border: 1px solid #4a6a3a; color: #eef; display: flex; flex-direction: column; gap: 2px; }
+.pve-tree button:hover { background: #33502a; }
+.pve-tree button small { font-size: 11px; opacity: .85; }

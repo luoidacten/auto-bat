@@ -63,11 +63,13 @@
       // lệnh: chiêu (vị trí ngắm từ chỉ thị), đánh thường (mục tiêu khóa / ưu tiên), vật phẩm balo
       while (P.queue.length) {
         const c = P.queue.shift();
+        if (c.tree != null) { this.pickTree(u, c.tree); continue; }
+        if (c.move) { const g = { x: c.move.x, y: c.move.y }; MAP.pushOut(g, u.r); P.moveTo = g; P.atkId = null; P.chestId = null; u.attackTarget = null; if (u.cast && u.cast.key === 'chest') u.cast = null; continue; }
         if (c.learn) { if (this.canLearn(u, c.learn)) { u.ranks[c.learn]++; u.points--; if (this.fxOn) this.fx({ type: 'lvl', x: u.x, y: u.y, team: u.team }); } continue; }
         if (c.shop) { this.pveShop(u, c.shop); continue; }
         if (c.chest) { const ch = this.pveChest(u, 2.5); if (ch) { u.attackTarget = null; P.atkId = null; P.chestId = ch.id; } continue; }
         if (c.bag) { const pt = c.pt || (t ? { x: t.x, y: t.y } : { x: u.x + u.fx * 3, y: u.y + u.fy * 3 }); this.useBag(u, c.bag, t, pt); continue; }
-        if (c.atk !== undefined) { P.chestId = null; const tg = c.atk != null ? this.units.find((x) => x.id === c.atk) : null; this.executeBasicAttack(u, tg, c.dir); continue; }
+        if (c.atk !== undefined) { P.chestId = null; P.moveTo = null; const tg = c.atk != null ? this.units.find((x) => x.id === c.atk) : null; this.executeBasicAttack(u, tg, c.dir); continue; }
         const def = u.hero.skills[c.k]; if (!def) continue;
         const a = def.ai || {};
         const ent = c.tgt != null ? this.units.find((x) => x.id === c.tgt) : t;
@@ -80,11 +82,11 @@
         if (u.recast[c.k] || this.canCast(u, c.k)) { this.executeSkill(u, c.k, pt, ent && ent.alive ? ent : null); u.stats.pveCasts = (u.stats.pveCasts || 0) + 1; }
       }
       const L = Math.hypot(P.mv.x, P.mv.y);
-      if (u.cast && u.cast.key === 'chest' && L > 0.15) u.cast = null;   // di chuyển = bỏ mở rương
+      if (u.cast && u.cast.key === 'chest' && (L > 0.15 || P.moveTo)) u.cast = null;   // di chuyển = bỏ mở rương
       if (u.cast || u.dash || u.disabled) return;
       if (L > 0.15) {
         const g = { x: u.x + P.mv.x / L * 2.5, y: u.y + P.mv.y / L * 2.5 }; MAP.pushOut(g, u.r);
-        u.attackTarget = null; u.goal = g; u.navP = null; P.atkId = null; P.chestId = null;   // di chuyển = hủy lệnh đánh / mở rương
+        u.attackTarget = null; u.goal = g; u.navP = null; P.atkId = null; P.chestId = null; P.moveTo = null;   // di chuyển = hủy lệnh đánh / mở rương / điểm đến
         u.face(g.x, g.y);
         return;
       }
@@ -94,6 +96,11 @@
         if (!ch) P.chestId = null;
         else if (dist(u, ch) <= G.C.CHEST.r + u.r - 0.1) { P.chestId = null; u.goal = null; this.openChest(u, ch); return; }
         else { u.goal = { x: ch.x, y: ch.y }; u.attackTarget = null; return; }
+      }
+      // LoL: chuột phải / chạm bản đồ → đi tới điểm (tìm đường), tới nơi thì dừng
+      if (P.moveTo) {
+        if (dist(u, P.moveTo) < 0.35) P.moveTo = null;
+        else { u.goal = P.moveTo; u.attackTarget = null; return; }
       }
       if (P.stepUntil > this.time) return;                       // đang bước ngắn tới kẻ địch (đánh thường hụt tầm)
       u.goal = null;

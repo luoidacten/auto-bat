@@ -46,8 +46,8 @@
       const pick = this.last || ids[0];
       $('#setup').innerHTML = `
         <h2>🕹 Sinh Tồn PvE — chọn tướng của bạn</h2>
-        <p class="hint">Bạn điều khiển 1 tướng giữa 9 tướng máy — <b>AI của tướng bạn bị tắt hoàn toàn</b> (không tự đánh, tự dùng chiêu, tự uống bình hay tự liên minh), tầm nhìn như người chơi thường (có chỉ báo âm thanh). <b>PC</b>: WASD đi • giữ Q/E/R/F/Space để ngắm theo chuột, nhả để tung • chuột phải hủy • click trái vào địch để khóa đánh • H/G bình • B balo • T đổi mục tiêu.
-          <b>Điện thoại</b>: chạm nửa trái để hiện cần ảo • chạm nhanh nút chiêu = tung tự động • giữ & kéo = vòng chỉ thị, kéo vào ✕ để hủy • nút ⚔ chạm để đánh, kéo để khóa mục tiêu • giữ 🎒 để mở bánh xe balo.</p>
+        <p class="hint">Bạn điều khiển 1 tướng giữa 9 tướng máy — <b>AI của tướng bạn bị tắt hoàn toàn</b> (không tự đánh, tự dùng chiêu, tự uống bình hay tự liên minh), tầm nhìn như người chơi thường (có chỉ báo âm thanh). <b>PC (kiểu LoL)</b>: <b>chuột phải</b> lên đất = đi tới (giữ để đi theo con trỏ), lên kẻ địch = đánh • WASD cũng đi được • giữ Q/E/R/F/Space để ngắm theo chuột, nhả để tung (chuột phải lúc ngắm = hủy) • Y khóa/thả camera (thả rồi mới kéo mép màn hình) • P cửa hàng • V mở rương • 1/2/3 chọn nhánh cây tiến hóa • Ctrl+Q/E/R/F nâng chiêu • H/G bình • B balo • T đổi mục tiêu.
+          <b>Điện thoại</b>: chạm nhanh lên bản đồ = đi tới / đánh • chạm nửa trái để hiện cần ảo • chạm nhanh nút chiêu = tung tự động • giữ & kéo = vòng chỉ thị, kéo vào ✕ để hủy • nút ⚔ chạm để đánh, kéo để khóa mục tiêu • giữ 🎒 để mở bánh xe balo.</p>
         <div class="pve-grid">${ids.map((id) => { const H = G.HEROES[id]; return `<button class="pve-hero${id === pick ? ' on' : ''}" data-id="${id}"><span class="dot" style="background:${H.color}"></span>${esc(H.name)}<small>${esc(H.kit || '')}</small></button>`; }).join('')}</div>
         <div class="row btns"><button class="big" id="pvGo">▶ Vào trận</button><button id="pvBack">← Quay lại</button></div>`;
       let sel = pick;
@@ -87,6 +87,7 @@
         <div class="pve-wheel hidden" id="pvWheel"></div>
         <button class="pve-cam on" id="pvCam" title="Khóa / thả camera (Y)">🔒 Camera</button>
         <div class="pve-pts hidden" id="pvPts"></div>
+        <div class="pve-tree hidden" id="pvTree"></div>
         <div class="pve-shop hidden" id="pvShop"></div>
         <div class="pve-info" id="pvInfo"></div>`;
       $('#match').appendChild(el); this.el = el; document.body.classList.add('pve-on');
@@ -94,10 +95,26 @@
       this.kd = (e) => this.onKey(e, true); this.ku = (e) => this.onKey(e, false);
       window.addEventListener('keydown', this.kd); window.addEventListener('keyup', this.ku);
       const cv = this.app.cv;
-      this.mm = (e) => { const r = cv.getBoundingClientRect(); this.mouse = { x: e.clientX - r.left, y: e.clientY - r.top, W: r.width, H: r.height, t: performance.now() }; if (this.aim && this.aim.pc) this.aimFromMouse(); };
-      this.md = (e) => { if (e.pointerType !== 'mouse') return; if (e.button === 2 && this.aim) { this.aim.cancel = true; this.release(); e.preventDefault(); return; } if (e.button === 0 && !this.aim) this.clickAttack(e); };
+      this.mm = (e) => {
+        const r = cv.getBoundingClientRect(); this.mouse = { x: e.clientX - r.left, y: e.clientY - r.top, W: r.width, H: r.height, t: performance.now() };
+        if (this.aim && this.aim.pc) this.aimFromMouse();
+        if (this.rHeld && e.pointerType === 'mouse' && (e.buttons & 2) && performance.now() - this.rT > 120) { this.rT = performance.now(); this.order(e, false); }   // giữ chuột phải: đi theo con trỏ
+        else if (this.rHeld && !(e.buttons & 2)) this.rHeld = false;
+      };
+      // LoL: chuột PHẢI = đi tới / đánh kẻ địch dưới con trỏ (giữ chuột phải để đi theo con trỏ) • chuột trái vào địch = đánh
+      // • điện thoại: chạm nhanh lên bản đồ = đi tới / đánh (không kéo camera khi camera đang khóa)
+      this.md = (e) => {
+        if (e.pointerType !== 'mouse') { this.tap0 = { x: e.clientX, y: e.clientY, t: performance.now(), id: e.pointerId }; return; }
+        if (e.button === 2) { e.preventDefault(); if (this.aim) { this.aim.cancel = true; this.release(); return; } this.rHeld = true; this.rT = performance.now(); this.order(e, true); return; }
+        if (e.button === 0 && !this.aim) this.clickAttack(e);
+      };
+      this.mu = (e) => {
+        if (e.pointerType === 'mouse') { if (e.button === 2) this.rHeld = false; return; }
+        const t = this.tap0; this.tap0 = null;
+        if (t && t.id === e.pointerId && performance.now() - t.t < 350 && Math.hypot(e.clientX - t.x, e.clientY - t.y) < 14) this.order(e, true);
+      };
       this.cm = (e) => e.preventDefault();
-      cv.addEventListener('pointermove', this.mm); cv.addEventListener('pointerdown', this.md); cv.addEventListener('contextmenu', this.cm);
+      cv.addEventListener('pointermove', this.mm); cv.addEventListener('pointerdown', this.md); cv.addEventListener('pointerup', this.mu); cv.addEventListener('contextmenu', this.cm);
       this.bindStick(); this.bindSkills(); this.bindAtk(); this.bindBag();
       for (const b of el.querySelectorAll('.pve-sm')) if (b.dataset.a !== 'bag') b.onclick = (e) => { e.stopPropagation(); const a = b.dataset.a; if (a === 'lock') this.cycle(); else if (a === 'shop') this.toggleShop(); else this.drink(a); };
       $('#pvCam').onclick = (e) => { e.stopPropagation(); this.toggleCam(); };
@@ -107,6 +124,8 @@
       document.addEventListener('click', this.blur, true);
       if (document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
       $('#pvShop').addEventListener('click', (e) => this.shopClick(e));
+      $('#pvTree').addEventListener('click', (e) => { e.stopPropagation(); const b = e.target.closest('[data-tree]'); if (b) this.pickTree(+b.dataset.tree); });
+      this.treeKey = null;
       this.raf = requestAnimationFrame(() => this.tick());
     },
     // keep = dọn giao diện cũ để dựng lại (giữ cờ pveMode + góc nhìn người chơi r.pov — trước đây bị xóa nhầm khiến phím cách = tạm dừng, minimap thấy hết tướng)
@@ -115,8 +134,8 @@
       if (this.blur) document.removeEventListener('click', this.blur, true); this.blur = null;
       if (this.el) this.el.remove(); this.el = null;
       if (this.kd) { window.removeEventListener('keydown', this.kd); window.removeEventListener('keyup', this.ku); }
-      if (this.mm && this.app) { const cv = this.app.cv; cv.removeEventListener('pointermove', this.mm); cv.removeEventListener('pointerdown', this.md); cv.removeEventListener('contextmenu', this.cm); }
-      this.kd = this.ku = this.mm = this.md = null;
+      if (this.mm && this.app) { const cv = this.app.cv; cv.removeEventListener('pointermove', this.mm); cv.removeEventListener('pointerdown', this.md); cv.removeEventListener('pointerup', this.mu); cv.removeEventListener('contextmenu', this.cm); }
+      this.kd = this.ku = this.mm = this.md = this.mu = null;
       if (this.raf) cancelAnimationFrame(this.raf); this.raf = 0;
       if (this.app && !keep) { this.app.pveMode = false; if (this.app.r) { this.app.r.pov = null; this.app.r.cam.push = null; } }
     },
@@ -225,6 +244,16 @@
       b.addEventListener('pointerup', (e) => { const A = this.aim; if (A && A.kind === 'atk' && A.pid === e.pointerId) { if (A.lock && this.app.m.pve) this.app.m.pve.lockId = A.lock.id; this.release(); } });
       b.addEventListener('pointercancel', () => { this.aim = null; });
     },
+    // lệnh kiểu LoL tại vị trí con trỏ / ngón tay: có kẻ địch nhìn thấy dưới đó → khóa & đánh; không thì đi tới điểm đó
+    order(e, mark) {
+      const u = this.unit(), m = this.app.m; if (!u || !m.pve || m.pve.out) return;
+      const r = this.app.cv.getBoundingClientRect(), w = this.s2w(e.clientX - r.left, e.clientY - r.top);
+      let best = null, bd = 1.2;
+      for (const v of m.units) { if (!v.alive || v.team === u.team || !v.targetable || (v.kind !== 'hero' && v.kind !== 'monster' && v.kind !== 'pet') || (v.vis && v.vis[u.team] === false)) continue; const d = Math.hypot(v.x - w.x, v.y - w.y) - v.r; if (d < bd) { bd = d; best = v; } }
+      if (best) { m.pve.lockId = best.id; m.pve.queue.push({ atk: best.id }); if (mark) this.mark = { x: best.x, y: best.y, t: performance.now(), atk: true }; return; }
+      m.pve.queue.push({ move: { x: w.x, y: w.y } });
+      if (mark) this.mark = { x: w.x, y: w.y, t: performance.now(), atk: false };
+    },
     clickAttack(e) {
       const u = this.unit(), m = this.app.m; if (!u || !m.pve) return;
       const r = this.app.cv.getBoundingClientRect(), w = this.s2w(e.clientX - r.left, e.clientY - r.top);
@@ -280,6 +309,7 @@
       if (k === 'y') this.toggleCam();
       else if (k === 'p') this.toggleShop();
       else if (k === 'v') this.openChest();
+      else if ((k === '1' || k === '2' || k === '3') && this.treeKey != null) this.pickTree(+k - 1);
       else if (k === 't') this.cycle();
       else if (k === 'h') this.drink('hp');
       else if (k === 'g') this.drink('mp');
@@ -292,6 +322,16 @@
       if (this.camLocked()) { r.cam.follow = false; r.cam.push = null; }          // thả: camera đứng yên, kéo màn hình để nhìn quanh
       else { r.cam.follow = true; r.cam.focusId = u.id; r.cam.x = u.x; r.cam.y = u.y; }   // khóa: bám theo tướng của bạn
       if (this.app.hud.refreshCtrl) this.app.hud.refreshCtrl();
+    },
+    // ---------- cây tiến hóa: người chơi tự chọn nhánh khi mở mốc (cấp 1/3/6/9/12) ----------
+    pickTree(j) { const m = this.app.m, u = this.unit(); if (!m || !u || u.treePend == null) return; m.pve.queue.push({ tree: j }); },
+    renderTree(u) {
+      const el = $('#pvTree'), i = u.treePend, key = i == null ? null : u.id + ':' + i;
+      if (key === this.treeKey) return; this.treeKey = key;
+      el.classList.toggle('hidden', i == null); if (i == null) return;
+      const opts = (u.hero.tree && u.hero.tree[i]) || [];
+      el.innerHTML = `<div class="pt-h">🌳 Cây tiến hóa — mốc cấp ${G.TREE_TIERS[i]}: chọn 1 nhánh <small>(phím 1/2/3)</small></div>` +
+        opts.map((b, j) => `<button data-tree="${j}"><b>${j + 1}. ${esc(b.name)}</b><small>${esc(b.desc || '')}</small></button>`).join('');
     },
     openChest() { const m = this.app.m, u = this.unit(); if (m && u && m.pveChest(u, 2.5)) m.pve.queue.push({ chest: 1 }); },
     // ---------- điểm chiêu thủ công ----------
@@ -375,12 +415,13 @@
       // camera: chiêu tầm xa đang ngắm → trôi theo hướng ngắm; PC: con trỏ sát mép → trôi tối đa 8 đv
       const A = this.aim;
       if (A && A.kind === 'skill' && A.ind.R > 10 && A.dirS) { const k = A.ind.R * 0.6 * Math.max(0.4, A.mag); r.cam.push = { x: A.dirS.x * k, y: A.dirS.y * k }; }
-      else if (this.mouse && performance.now() - this.mouse.t < 4000) {
+      else if (this.mouse && performance.now() - this.mouse.t < 4000 && !this.camLocked()) {   // LoL: kéo mép màn hình chỉ khi đã thả camera
         const ex = this.mouse.x < this.mouse.W * 0.05 ? -1 : this.mouse.x > this.mouse.W * 0.95 ? 1 : 0, ey = this.mouse.y < this.mouse.H * 0.05 ? -1 : this.mouse.y > this.mouse.H * 0.95 ? 1 : 0;
         r.cam.push = ex || ey ? { x: ex * 8, y: ey * 8 } : null;
       } else if (!A) r.cam.push = null;
       const cb = $('#pvCam'), lk = this.camLocked(); cb.classList.toggle('on', lk); cb.textContent = lk ? '🔒 Camera' : '🔓 Camera';
       // điểm chiêu chưa cộng: nút + nhấp nháy trên chiêu nâng được
+      this.renderTree(u);
       const chN = m.pveChest(u, 2.5), cb2 = $('#pvChest'), opening = u.cast && u.cast.key === 'chest';
       cb2.classList.toggle('hidden', !chN && !opening); cb2.textContent = opening ? `🎁 Đang mở… ${Math.max(0, u.cast.t).toFixed(1)}s` : '🎁 Mở rương (V)'; cb2.disabled = opening;
       const pts = $('#pvPts'); pts.classList.toggle('hidden', !(u.points > 0) || !!this.shopOpen);   // bảng cửa hàng mở → báo điểm ngay trong bảng if (u.points > 0) pts.textContent = `⬆ ${u.points} điểm chiêu — chạm + trên chiêu (Ctrl+Q/E/R/F)`;
@@ -398,7 +439,7 @@
       }
       const pots = u.pots || {}; const em = this.el.querySelectorAll('.pve-sm em'); if (em[0]) em[0].textContent = pots.hp || 0; if (em[1]) em[1].textContent = (pots.mp || 0) + (pots.ga || 0);
       const t = m.pve.lockId != null ? m.units.find((v) => v.id === m.pve.lockId) : null;
-      $('#pvInfo').innerHTML = `❤ ${Math.round(u.hp)}/${Math.round(u.st.maxHp)}${u.resource === 'mana' ? ` • 💧 ${Math.round(u.mp)}` : ''} • Cấp ${u.level} • 💰 ${Math.round(u.gold)} • 👥 ${m.aliveCount ? m.aliveCount() : ''}${t && t.alive ? ` • 🎯 ${esc(t.hero ? t.hero.name : t.name || 'quái')}` : ''}`;
+      $('#pvInfo').innerHTML = `❤ ${Math.round(u.hp)}/${Math.round(u.st.maxHp)}${u.resource === 'mana' ? ` • 💧 ${Math.round(u.mp)}` : ''} • Cấp ${u.level}${u.heroId === 'thanhphong' && u.ws.wind != null ? ` • 🌬 Gió ${Math.round(u.ws.wind)} (${{ thuan: 'Thuận', bao: 'Bão Hòa', nghich: 'Nghịch' }[G.HEROES.thanhphong.windState(u)]})` : ''} • 💰 ${Math.round(u.gold)} • 👥 ${m.aliveCount ? m.aliveCount() : ''}${t && t.alive ? ` • 🎯 ${esc(t.hero ? t.hero.name : t.name || 'quái')}` : ''}`;
     },
     // ---------- vẽ trên bản đồ: sương mù, vòng khóa, vòng chỉ thị, chỉ báo âm thanh ----------
     drawOverlay(r, ctx, m, alpha, z) {
@@ -412,6 +453,16 @@
       // vòng khóa mục tiêu
       const lk = m.pve.lockId != null ? m.units.find((v) => v.id === m.pve.lockId && v.alive) : null;
       if (lk) { const lq = r.pos ? r.pos(lk, alpha) : lk, lp = r.w2s(lq.x, lq.y), R = (lk.r + 0.35) * z; ctx.strokeStyle = '#ff3a3a'; ctx.lineWidth = 2.5; ctx.setLineDash([R * 0.5, R * 0.3]); ctx.beginPath(); ctx.arc(lp.x, lp.y, R, now * 2, now * 2 + TAU); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = '#ff3a3a'; ctx.beginPath(); ctx.moveTo(lp.x, lp.y - R - 10); ctx.lineTo(lp.x - 6, lp.y - R - 18); ctx.lineTo(lp.x + 6, lp.y - R - 18); ctx.fill(); }
+      // dấu lệnh kiểu LoL: điểm đến (xanh) / mục tiêu đánh (đỏ), mờ dần 0.6s; đường đi tới điểm đến
+      const mk = this.mark, P = m.pve;
+      if (P.moveTo) { const t = r.w2s(P.moveTo.x, P.moveTo.y); ctx.strokeStyle = 'rgba(90,255,140,0.35)'; ctx.setLineDash([4, 6]); ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(t.x, t.y); ctx.stroke(); ctx.setLineDash([]); }
+      if (mk) {
+        const k = (performance.now() - mk.t) / 600;
+        if (k >= 1) this.mark = null;
+        else { const q2 = r.w2s(mk.x, mk.y), R = (0.9 - 0.5 * k) * z; ctx.strokeStyle = mk.atk ? `rgba(255,70,70,${1 - k})` : `rgba(90,255,140,${1 - k})`; ctx.lineWidth = 2.5;
+          for (let a = 0; a < 4; a++) { const an = a * Math.PI / 2 + Math.PI / 4; ctx.beginPath(); ctx.moveTo(q2.x + Math.cos(an) * R * 1.4, q2.y + Math.sin(an) * R * 1.4); ctx.lineTo(q2.x + Math.cos(an) * R * 0.5, q2.y + Math.sin(an) * R * 0.5); ctx.stroke(); }
+          ctx.beginPath(); ctx.ellipse(q2.x, q2.y, R, R * 0.6, 0, 0, TAU); ctx.stroke(); }
+      }
       // vòng chỉ thị
       const A = this.aim;
       if (A && A.kind === 'skill') {
