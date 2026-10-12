@@ -240,20 +240,25 @@
       if (!A || A.cancel) return;
       const m = this.app.m; if (!m || !m.pve) return;
       const quick = !A.pc && (!A.dragged || performance.now() - A.t0 < 150 && Math.hypot(A.cur.x - A.origin.x, A.cur.y - A.origin.y) < 14);
-      if (A.kind === 'atk') { m.pve.queue.push({ atk: A.lock ? A.lock.id : null, dir: A.dir }); return; }
+      if (A.kind === 'atk') { m.pve.queue.push({ atk: A.dragged && A.lock ? A.lock.id : null, dir: A.dragged ? A.dir : null }); return; }
       if (quick) { m.pve.queue.push({ k: A.k }); return; }                      // bấm nhanh: mục tiêu ưu tiên + đón đầu nhẹ
       m.pve.queue.push({ k: A.k, pt: A.pt, tgt: A.magnet ? A.magnet.id : (A.ind.unit && m.pve.lockId != null ? m.pve.lockId : undefined) });
     },
     // ---------- nút đánh thường: chạm / kéo khóa ----------
     bindAtk() {
+      // GĐ13: CHẠM ⚔ = đánh (đang đánh thì giữ nguyên mục tiêu) • GIỮ ≥ 0.25s VÀ KÉO ≥ 30px mới hiện thanh khóa mục tiêu;
+      // đã khóa được ai thì "dính" vào người đó — chỉ đổi khi hướng kéo lệch khỏi người đó > 25° (kẻ đi ngang không cướp khóa)
       const b = $('#pvAtk');
-      b.addEventListener('pointerdown', (e) => { e.stopPropagation(); e.preventDefault(); cap(b, e.pointerId); const r = b.getBoundingClientRect(); const u = this.unit(); this.aim = { kind: 'atk', t0: performance.now(), origin: { x: r.left + r.width / 2, y: r.top + r.height / 2 }, cur: null, dir: u ? { x: u.fx, y: u.fy } : { x: 1, y: 0 }, mag: 0, pid: e.pointerId, lock: null }; this.aim.cur = this.aim.origin; });
+      b.addEventListener('pointerdown', (e) => { e.stopPropagation(); e.preventDefault(); cap(b, e.pointerId); const r = b.getBoundingClientRect(); const u = this.unit(); this.aim = { kind: 'atk', t0: performance.now(), origin: { x: r.left + r.width / 2, y: r.top + r.height / 2 }, cur: null, dir: u ? { x: u.fx, y: u.fy } : { x: 1, y: 0 }, mag: 0, pid: e.pointerId, lock: null, dragged: false }; this.aim.cur = this.aim.origin; });
       b.addEventListener('pointermove', (e) => {
         const A = this.aim; if (!A || A.kind !== 'atk' || A.pid !== e.pointerId) return;
         const dx = e.clientX - A.origin.x, dy = e.clientY - A.origin.y, L = Math.hypot(dx, dy); A.cur = { x: e.clientX, y: e.clientY };
-        if (L < 10) return; A.dir = { x: dx / L, y: dy / L }; A.dragged = true;
+        if (!A.dragged && (L < 30 || performance.now() - A.t0 < 250)) return;   // chạm / rung tay nhẹ: không phải kéo khóa
+        A.dir = { x: dx / L, y: dy / L }; A.dragged = true;
         const u = this.unit(), m = this.app.m; if (!u) return;
-        const len = u.st.range + u.r + 5; let best = null, bs = 1.6;
+        const len = u.st.range + u.r + 5, ang = (v) => { const px = v.x - u.x, py = v.y - u.y, d = Math.hypot(px, py) || 1; return Math.acos(Math.max(-1, Math.min(1, (px * A.dir.x + py * A.dir.y) / d))); };
+        if (A.lock && A.lock.alive && ang(A.lock) < 0.436) return;          // đang khóa ai thì giữ (lệch ≤ 25°)
+        let best = null, bs = 1.6;
         for (const v of m.units) {
           if (!v.alive || v.team === u.team || (v.kind !== 'hero' && v.kind !== 'monster' && v.kind !== 'pet') || (v.vis && v.vis[u.team] === false)) continue;
           const px = v.x - u.x, py = v.y - u.y, along = px * A.dir.x + py * A.dir.y; if (along < 0 || along > len) continue;
@@ -264,16 +269,6 @@
       });
       b.addEventListener('pointerup', (e) => { const A = this.aim; if (A && A.kind === 'atk' && A.pid === e.pointerId) { if (A.lock && this.app.m.pve) this.app.m.pve.lockId = A.lock.id; this.release(); } });
       b.addEventListener('pointercancel', () => { this.aim = null; });
-    },
-    // lệnh kiểu LoL tại vị trí con trỏ / ngón tay: có kẻ địch nhìn thấy dưới đó → khóa & đánh; không thì đi tới điểm đó
-    order(e, mark) {
-      const u = this.unit(), m = this.app.m; if (!u || !m.pve || m.pve.out) return;
-      const r = this.app.cv.getBoundingClientRect(), w = this.s2w(e.clientX - r.left, e.clientY - r.top);
-      let best = null, bd = 1.2;
-      for (const v of m.units) { if (!v.alive || v.team === u.team || !v.targetable || (v.kind !== 'hero' && v.kind !== 'monster' && v.kind !== 'pet') || (v.vis && v.vis[u.team] === false)) continue; const d = Math.hypot(v.x - w.x, v.y - w.y) - v.r; if (d < bd) { bd = d; best = v; } }
-      if (best) { m.pve.lockId = best.id; m.pve.queue.push({ atk: best.id }); if (mark) this.mark = { x: best.x, y: best.y, t: performance.now(), atk: true }; return; }
-      m.pve.queue.push({ move: { x: w.x, y: w.y } });
-      if (mark) this.mark = { x: w.x, y: w.y, t: performance.now(), atk: false };
     },
     clickAttack(e) {
       const u = this.unit(), m = this.app.m; if (!u || !m.pve) return;

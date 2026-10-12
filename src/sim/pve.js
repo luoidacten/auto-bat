@@ -44,6 +44,8 @@
       const inR = (e) => Math.hypot(e.x - u.x, e.y - u.y) - e.r - u.r <= u.st.range + 0.15;
       const ok = (e) => e && e.alive && e.team !== u.team && (!e.vis || e.vis[u.team] !== false) && !(e.statuses.length && e.has('untarget'));
       let t = ok(target) ? target : null;
+      // GĐ13: đang đánh một mục tiêu còn hợp lệ trong tầm (+3 đv) → bấm ⚔ lại KHÔNG đổi mục tiêu
+      if (!t && this.pve && this.pve.atkId != null) { const cur = this.units.find((x) => x.id === this.pve.atkId); if (ok(cur) && Math.hypot(cur.x - u.x, cur.y - u.y) - cur.r - u.r <= u.st.range + 3) t = cur; }
       if (!t) {
         const hs = this.heroes.filter((h) => h !== u && ok(h) && inR(h));
         t = hs.sort((a, b) => a.hp / a.st.maxHp - b.hp / b.st.maxHp || a.id - b.id)[0] || null;
@@ -140,7 +142,13 @@
       const a = P.atkId != null ? this.units.find((x) => x.id === P.atkId) : null;
       if (a && a.alive && (!a.vis || a.vis[u.team] !== false) && Math.hypot(a.x - u.x, a.y - u.y) < Math.max(12, u.st.range + u.r + 3)) u.attackTarget = a;
       else {
-        P.atkId = null; u.attackTarget = null;
+        const was = P.atkId; P.atkId = null; u.attackTarget = null;
+        // GĐ13: mục tiêu đang đánh vừa gục / mất dấu → bật tự ngắm thì tự chuyển sang tướng địch gần nhất trong tầm đánh (1 lệnh ⚔ = đánh liên tục)
+        if (was != null && P.autoAim !== false) {
+          let nb = null, bd = u.st.range + u.r + 1;
+          for (const h of this.heroes) { if (h === u || !h.alive || h.team === u.team || (h.vis && h.vis[u.team] === false) || (h.statuses.length && h.has('untarget'))) continue; const d = Math.hypot(h.x - u.x, h.y - u.y) - h.r; if (d < bd) { bd = d; nb = h; } }
+          if (nb) { P.atkId = nb.id; P.lockId = nb.id; u.attackTarget = nb; }
+        }
         // GĐ13: tướng có chế độ tự bắn riêng (Raven đang ngắm qua mắt Oca) — chỉ khi bật tự ngắm và người chơi không ra lệnh gì
         if (P.autoAim !== false && u.hero.pveAutoTarget) { const at = u.hero.pveAutoTarget(this, u); if (at) u.attackTarget = at; }
       }
