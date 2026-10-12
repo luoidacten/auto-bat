@@ -698,3 +698,19 @@ body.pve-on .pve-cancel { right: auto; left: 50%; top: 74px; transform: translat
 body.pve-on .pve-cancel.hot { transform: translateX(-50%) scale(1.12); }
 body.pve-on .pve-info { bottom: auto; top: 70px; }
 body.pve-on .pve-cancel.on ~ .pve-info { display: none; }
+/* PvE: khóa camera, điểm chiêu, cửa hàng */
+.pve-cam { position: absolute; left: 12px; top: 70px; pointer-events: auto; padding: 6px 12px; border-radius: 18px; font-size: 13px; background: rgba(40,40,60,.85); border: 2px solid #888; }
+.pve-cam.on { border-color: #ffd24a; background: rgba(80,60,10,.85); }
+.pve-pts { position: absolute; right: 18px; bottom: 210px; pointer-events: none; background: rgba(60,120,40,.9); padding: 4px 10px; border-radius: 10px; font-size: 12px; animation: pvblink 1s infinite; }
+@keyframes pvblink { 50% { opacity: .55; } }
+.pve-up { position: absolute; top: -6px; right: -6px; width: 24px; height: 24px; border-radius: 50%; background: #3ac060; color: #fff; font-style: normal; font-weight: bold; font-size: 18px; line-height: 22px; box-shadow: 0 0 8px #7aff9a; animation: pvblink 0.8s infinite; }
+.pve-rk { position: absolute; bottom: 2px; left: 0; right: 0; text-align: center; font-size: 9px; color: #ffd24a; letter-spacing: 1px; }
+.pve-sm.hot { border-color: #ffd24a; box-shadow: 0 0 10px #ffd24a; }
+.pve-shop { position: absolute; left: 50%; top: 8%; transform: translateX(-50%); width: min(560px, 94vw); max-height: 80vh; display: flex; flex-direction: column; pointer-events: auto; background: rgba(18,16,28,.96); border: 2px solid #a080ff; border-radius: 12px; z-index: 50; }
+.ps-head { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid #444; } .ps-head span { margin-left: auto; color: #ffd24a; font-weight: bold; }
+.ps-st { padding: 5px 12px; font-size: 12px; } .ps-st.ok { color: #7aff9a; } .ps-st.no { color: #ffb08a; }
+.ps-tabs { display: flex; gap: 4px; padding: 0 8px 6px; } .ps-tabs button { flex: 1; font-size: 12px; padding: 5px; } .ps-tabs button.on { background: #4a3a8a; border-color: #ffd24a; }
+.ps-body { overflow-y: auto; padding: 4px 10px 10px; } .ps-body h4 { margin: 8px 0 4px; font-size: 13px; color: #c8b0ff; }
+.ps-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #2a2840; font-size: 13px; } .ps-row > div { flex: 1; } .ps-row small { opacity: .75; }
+.ps-row button { white-space: nowrap; font-size: 12px; padding: 5px 8px; } .ps-row button:disabled { opacity: .4; } .ps-row.own b { color: #7aff9a; }
+.ps-hint { font-size: 12px; opacity: .8; }

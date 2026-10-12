@@ -196,14 +196,17 @@
       if (u.level >= C.MAX_LVL) u.xp = 0;
     }
     // cộng điểm chiêu theo thứ tự ưu tiên của tướng
+    // luật học chiêu: S1–S3 tối đa 5 cấp, không vượt ceil(cấp tướng / 2); chiêu cuối 3 cấp, mở ở cấp 4 / 8 / 12
+    canLearn(u, k) {
+      const r = u.ranks[k]; if (r == null || u.points <= 0) return false;
+      if (k === 's4') return r < 3 && u.level >= 4 + r * 4;
+      return r < 5 && r < Math.ceil(u.level / 2);
+    }
     autoSkill(u) {
+      if (u.ctl && this.pve) return;                       // GĐ12 PvE: người chơi tự cộng điểm chiêu
       const order = (u.hero.ai && u.hero.ai.order) || ['s1', 's2', 's3'];
       while (u.points > 0) {
-        const can = (k) => {
-          const r = u.ranks[k];
-          if (k === 's4') return r < 3 && u.level >= 4 + r * 4;
-          return r < 5 && r < Math.ceil(u.level / 2);
-        };
+        const can = (k) => this.canLearn(u, k);
         let k = null;
         if (can('s4')) k = 's4';
         else if (u.level <= 3) { k = ['s1', 's2', 's3'].find((x) => u.ranks[x] === 0 && can(x)) || null; }
@@ -674,7 +677,8 @@
           if (h.mp < h.st.maxMp) h.mp = Math.min(h.st.maxMp, h.mp + h.st.maxMp * C.OOC_MP * dt);
         }
         // mua đồ khi đứng cạnh Thương Nhân
-        if ((this.tick + h.slot * 2) % 20 === 0 && this.merchantNear(h)) this.shopAI(h);
+        if (h.ctl) { /* GĐ12 PvE: người chơi tự mua ở cửa hàng */ }
+        else if ((this.tick + h.slot * 2) % 20 === 0 && this.merchantNear(h)) this.shopAI(h);
         // GĐ7b: mảnh hồn Đỏ "Cửa Hàng Online" — mua ở bất cứ đâu (khi không đang giao tranh)
         else if ((this.tick + h.slot * 2) % 100 === 0 && h.perks && h.perks.has('cua_hang') && this.time - (h.combatT || -99) > 4) this.shopAI(h);
         if (this.time >= C.GOLD_PASSIVE_START) this.gainGold(h, (C.GOLD_PER_SEC + (h.hasKey('buff_gold') ? C.BUFF.gold.perSec : 0)) * dt);

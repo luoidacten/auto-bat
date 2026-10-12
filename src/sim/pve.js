@@ -18,7 +18,7 @@
       const u = this.heroes.find((h) => h.heroId === heroId) || this.heroes[0];
       u.ctl = true; this.pve = { id: u.id, mv: { x: 0, y: 0 }, aim: null, lockId: null, queue: [], out: false, atkId: null };
       // GĐ12: XÓA AI TỰ HÀNH của tướng này — không nghĩ, không tự dùng chiêu / bình / balo, không tự liên minh, không phản xạ / hoảng loạn;
-      // chỉ còn luật chung của trận (tự cộng điểm chiêu, đứng cạnh Thương Nhân tự mua theo lối build)
+      // điểm chiêu và mua đồ đều do người chơi tự làm (nút + trên chiêu, cửa hàng 🛒)
       if (u.ai) { u.ai.seq = null; u.ai.act = null; u.ai.mode = 'player'; }
       u.isPlayer = true;
       return u;
@@ -63,6 +63,8 @@
       // lệnh: chiêu (vị trí ngắm từ chỉ thị), đánh thường (mục tiêu khóa / ưu tiên), vật phẩm balo
       while (P.queue.length) {
         const c = P.queue.shift();
+        if (c.learn) { if (this.canLearn(u, c.learn)) { u.ranks[c.learn]++; u.points--; if (this.fxOn) this.fx({ type: 'lvl', x: u.x, y: u.y, team: u.team }); } continue; }
+        if (c.shop) { this.pveShop(u, c.shop); continue; }
         if (c.bag) { const pt = c.pt || (t ? { x: t.x, y: t.y } : { x: u.x + u.fx * 3, y: u.y + u.fy * 3 }); this.useBag(u, c.bag, t, pt); continue; }
         if (c.atk !== undefined) { const tg = c.atk != null ? this.units.find((x) => x.id === c.atk) : null; this.executeBasicAttack(u, tg, c.dir); continue; }
         const def = u.hero.skills[c.k]; if (!def) continue;
@@ -90,6 +92,23 @@
       const a = P.atkId != null ? this.units.find((x) => x.id === P.atkId) : null;
       if (a && a.alive && (!a.vis || a.vis[u.team] !== false) && Math.hypot(a.x - u.x, a.y - u.y) < 12) u.attackTarget = a;
       else { P.atkId = null; u.attackTarget = null; }
+    },
+    // ===== CỬA HÀNG THỦ CÔNG (GĐ12 PvE) — mua ở cạnh Thương Nhân (hoặc mọi nơi nếu có mảnh "Cửa Hàng Online") =====
+    pveCanShop(u) { return !!(this.atShop(u) || (u.perks && u.perks.has('cua_hang') && this.time - (u.combatT || -99) > 4)); },
+    pveShop(u, o) {
+      if (!this.pveCanShop(u)) return false;
+      if (o.buy) {
+        const it = G.ITEMS[o.buy]; if (!it) return false;
+        if (this.canBuy(u, o.buy)) return this.buy(u, o.buy);
+        // đã đủ 6 ô: bán món khởi điểm để lấy chỗ (nếu có)
+        const si = u.items.findIndex((x) => G.ITEMS[x].starter); if (si >= 0 && !(it.comp && u.items.includes(it.comp))) { this.sell(u, si); return this.canBuy(u, o.buy) && this.buy(u, o.buy); }
+        return false;
+      }
+      if (o.sell != null) return this.sell(u, o.sell);
+      if (o.bagBuy) { const d = G.CONSUMABLES[o.bagBuy]; if (!d || d.noBuy || u.gold < d.cost || this.bagRoom(u, o.bagBuy) <= 0) return false; u.gold -= d.cost; this.bagAdd(u, o.bagBuy, 1); return true; }
+      if (o.bagUp) { const B = G.BAG; if (!u.bag || u.bag.lv >= 5 || u.gold < B.upgrade[u.bag.lv]) return false; u.gold -= B.upgrade[u.bag.lv]; this.upgradeBag(u); return true; }
+      if (o.forge) return this.forgeYNiem ? this.forgeYNiem(u, 0) : false;
+      return false;
     },
     lastLifeGone(u) { return !!(u.place || u.out); },
   };
