@@ -14,6 +14,17 @@
   const cloakCd = (u) => (H.T(u, '6c') ? 90 : 120);
   const stageR = (u) => (H.T(u, '6a') ? 8.5 : 6);
   const inStage = (m, u) => !!(u.ws.stage && u.ws.stage.until > m.time && M.dist(u, u.ws.stage) <= stageR(u) + 0.3);
+  // GĐ13: sân khấu còn hiệu lực (kể cả đang ở ngoài vòng trong 2s ân hạn) → S1 là Bước Nhảy Ngàn Hoa
+  const stageOn = (m, u) => !!(u.ws.stage && !u.ws.stage.closed && u.ws.stage.until > m.time);
+  // Hạ màn: hết giờ hoặc Luca rời vòng quá 2s → sân khấu đóng, nổ sát thương phép + làm chậm kẻ địch trong vòng, S1 BẮT ĐẦU hồi chiêu
+  function closeStage(m, u) {
+    const st = u.ws.stage; if (!st || st.closed) return;
+    st.closed = true; st.until = m.time; if (st.z) st.z.age = st.z.life;
+    const R = stageR(u), dmg = H.amt(u, 60 + 15 * u.level, 0, 0.5);
+    if (u.alive) m.hitCircle(u, st.x, st.y, R, (e) => { m.damage(u, e, dmg, 'magic', { tag: 's1', aoe: true }); m.addStatus(e, 'slow', 1.5, 0.4, { src: u, key: 'luca_curtain' }); }, { color: '#ff4a7a', fx: 'boom' });
+    u.cd.s1 = Math.max(u.cd.s1 || 0, m.cdOf(u, 's1'));
+    if (m.fxOn) { m.fx({ type: 'petals', x: st.x, y: st.y, r: R, color: '#ff4a7a' }); m.fx({ type: 'callout', id: u.id, text: '🌹 Hạ màn!', color: '#ff6a9a' }); }
+  }
   // ----- Cải Trang: bộ chiêu sao chép -----
   const disguised = (m, u) => !!(u.ws.copy && u.ws.copyUntil > m.time);
   const copyDef = (u, k) => { const h = u.ws.copy && G.HEROES[u.ws.copy]; return h && h.skills[k]; };
@@ -73,6 +84,8 @@
       },
       update(m, u) {
         if (m.tick % 10 !== 0) return;
+        // GĐ13: theo dõi sân khấu — rời vòng 2s liên tục / hết giờ / gục → hạ màn
+        { const st = u.ws.stage; if (st && !st.closed) { if (!u.alive || m.time >= st.until) closeStage(m, u); else { st.out = M.dist(u, st) > stageR(u) + 0.3 ? (st.out || 0) + 0.5 : 0; if (st.out >= 2) closeStage(m, u); } } }
         if (!H.T(u, '9c') && m.time - u.ws.hypeT > 6 && u.ws.hype > 0) u.ws.hype = Math.max(0, u.ws.hype - 5 * 10 * G.C.TICK);   // GĐ11: ngoài giao tranh > 6s tụt 5 điểm/giây
         const k = Math.floor(u.ws.hype / 10);
         const s = u.hasKey(KEY);
@@ -108,11 +121,11 @@
     },
     skills: {
       s1: {
-        name: 'Sân Khấu Mở Ra / Bước Nhảy Ngàn Hoa', desc: 'Mở Vùng Sân Khấu bán kính 6 đv trong 6s: trong vùng +20% tốc chạy, +15% hút máu phép. Trong sân khấu, S1 thành Bước Nhảy Ngàn Hoa: hồi chỉ 0.6s, tốn 25 mana, lướt 2.5 đv phóng cánh hoa hồng thép gây sát thương phép kẻ địch lướt qua, chạm đất NỔ HOA bán kính 1.8 (50% sát thương).',
+        name: 'Sân Khấu Mở Ra / Bước Nhảy Ngàn Hoa', desc: 'Mở Vùng Sân Khấu bán kính 6 đv trong 6s: trong vùng +20% tốc chạy, +15% hút máu phép. Khi sân khấu còn hiệu lực, S1 thành Bước Nhảy Ngàn Hoa: hồi chỉ 0.6s, tốn 25 mana, lướt 2.5 đv phóng cánh hoa hồng thép gây sát thương phép kẻ địch lướt qua, chạm đất NỔ HOA bán kính 1.8 (50% sát thương). Hết giờ hoặc Luca rời vòng quá 2s: HẠ MÀN — sân khấu đóng, nổ 60 (+15/cấp, +50% SMPT) sát thương phép và làm chậm 40% 1.5s mọi kẻ địch trong vòng; lúc đó S1 mới bắt đầu tính hồi chiêu.',
         cd: [10, 9, 8, 7, 7], cost: [55, 55, 55, 55, 55], manualCd: true,
         use: wrap('s1', (m, u, ctx) => {
           const dmg = H.amt(u, ctx.v([75, 110, 145, 180, 215]), 0, 0.6);
-          if (inStage(m, u)) {
+          if (stageOn(m, u)) {
             u.mp += m.costOf(u, 's1') - (H.T(u, '12b') ? 0 : 25 * G.C.MANA_COST);
             u.cd.s1 = 0.6;                                                    // GĐ12: trong sân khấu hồi chiêu S1 giảm mạnh
             u.ws.waltz = m.time - (u.ws.waltzT || -9) < 2.5 ? Math.min(3, u.ws.waltz + 1) : 0; u.ws.waltzT = m.time;
@@ -126,10 +139,10 @@
             if (H.T(u, '12b')) m.addStatus(u, 'buff', 1.3, 1, { key: 'luca_noslow', mods: { tenacity: 0.6 } });
             return;
           }
-          u.cd.s1 = m.cdOf(u, 's1');
-          u.ws.stage = { x: u.x, y: u.y, until: m.time + 6 };
+          u.cd.s1 = 0.6;                                                      // GĐ13: hồi chiêu thật chỉ tính từ lúc HẠ MÀN
+          u.ws.stage = { x: u.x, y: u.y, until: m.time + 6, out: 0, closed: false };
           const R = stageR(u);
-          m.zone({ owner: u, x: u.x, y: u.y, r: R, life: 6, every: 0.5, kind: 'stage', tick: (mm, z) => {
+          u.ws.stage.z = m.zone({ owner: u, x: u.x, y: u.y, r: R, life: 6, every: 0.5, kind: 'stage', tick: (mm, z) => {
             if (u.alive && M.dist(u, z) <= R) { mm.addStatus(u, 'haste', 0.6, 0.2, { key: 'luca_stage' }); mm.addStatus(u, 'buff', 0.6, 1, { key: 'luca_stage', mods: { lifesteal: 0.15 } }); }
           } });
           if (m.fxOn) m.fx({ type: 'callout', id: u.id, text: '🌹 Sân khấu mở màn!', color: '#ff6a9a' });
