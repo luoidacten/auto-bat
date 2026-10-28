@@ -51,6 +51,31 @@ test("standalone export contains all local runtime assets and preserves existing
     await t.test("rebuild is reproducible", () => {
       assert.deepEqual(build({ out, assetsRoot }).files, first.files);
     });
+    await t.test("source deployment resolves its entry points, manifest and shared offline media", () => {
+      const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+      for (const match of html.matchAll(/(?:src|href)="([^"?#]+)"/g))
+        assert.ok(fs.statSync(path.resolve(ROOT, match[1])).isFile(), match[1]);
+      const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, "manifest.webmanifest"), "utf8"));
+      for (const icon of manifest.icons)
+        assert.ok(fs.statSync(path.resolve(ROOT, icon.src)).isFile(), icon.src);
+      const paths = JSON.parse(fs.readFileSync(path.join(ROOT, "precache.json"), "utf8"));
+      for (const file of paths)
+        assert.ok(fs.statSync(path.resolve(ROOT, file)).isFile(), file);
+      assert.ok(paths.includes("engine/runtime.mjs"));
+      assert.ok(paths.includes("client/render.mjs"));
+      assert.ok(paths.includes("client/host-worker.mjs"));
+      assert.ok(paths.includes("../img/icon.svg"));
+      const worker = fs.readFileSync(path.join(ROOT, "sw.js"), "utf8");
+      assert.doesNotMatch(worker, /__CACHE_VERSION__/);
+      const previous = [JSON.stringify(paths), worker];
+      build({ out, assetsRoot });
+      assert.deepEqual([
+        JSON.stringify(JSON.parse(fs.readFileSync(path.join(ROOT, "precache.json"), "utf8"))),
+        fs.readFileSync(path.join(ROOT, "sw.js"), "utf8"),
+      ], previous);
+      const standaloneManifest = JSON.parse(fs.readFileSync(path.join(out, "manifest.webmanifest"), "utf8"));
+      assert.equal(standaloneManifest.icons[0].src, "img/icon.svg");
+    });
     await t.test("missing media leaves the last good build intact", () => {
       const before = fs.readFileSync(path.join(out, MARKER), "utf8");
       assert.throws(() => build({ out, assetsRoot: temp }), /ENOENT/);

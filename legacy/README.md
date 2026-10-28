@@ -16,6 +16,8 @@ Máy cá nhân có thể dùng `npm ci` với cache mặc định. `npm run dev`
 
 Chọn tướng → **Tạo phòng** hoặc nhập mã sáu ký tự → cả hai **Sẵn sàng**. Mỗi máy đo hiệu năng, sau đó tự chọn máy host và thiết lập WebRTC. Nhãn trong trận cho biết máy nào làm host. Thiếu người thì chờ; không có bot lấp chỗ online.
 
+GitHub Pages có thể phục vụ trực tiếp `/auto-bat/legacy/index.html` từ repo, không cần chạy build trên máy chủ để mở game/offline. Vì vậy `engine/runtime.mjs`, `client/render.mjs`, `precache.json` và `sw.js` được sinh sẵn và đưa vào Git. Chạy `npm run build` rồi commit các file sinh lại khi sửa nguồn engine, renderer hoặc tài nguyên. Icon và media của bản này dùng đường dẫn `../img/`, `../sound/`; bản `dist/` vẫn tự chứa. Phòng online cần dịch vụ signaling riêng; GitHub Pages chỉ phục vụ file tĩnh.
+
 ## Ưu tiên máy mượt hơn làm host
 
 Mỗi lần ready, một Web Worker chạy warmup và đo **512 tick mô phỏng** đại diện cho trận đấu. So sánh 80% thời gian tick p95 và 20% trung bình; máy có điểm thấp hơn được ưu tiên. Chênh lệch trong 5% giữ máy tạo phòng để giảm nhiễu. Người vào phòng sau có thể làm host; rematch đo lại.
@@ -72,17 +74,20 @@ tools/        Compile/build, audit roster, browser checks và TURN fixture
 dist/         Runtime build tự chứa, được Git bỏ qua
 ```
 
-`engine/runtime.mjs` và `client/render.mjs` được sinh lại khi build, không đưa vào Git. Engine dùng chung cho host worker và offline; client P2P nhận snapshot hiển thị. Snapshot không chứa callback hoặc quyền thực thi mã. Kênh state chia gói tối đa 12 KiB và bỏ snapshot cũ khi thất lạc mảnh; input/kết quả dùng kênh control tin cậy.
+`engine/runtime.mjs` và `client/render.mjs` được sinh lại khi build và đưa vào Git để bản GitHub Pages chạy được. Sửa các file nguồn thay vì sửa trực tiếp module sinh ra. Engine dùng chung cho host worker và offline; client P2P nhận snapshot hiển thị. Snapshot không chứa callback hoặc quyền thực thi mã. Kênh state chia gói tối đa 12 KiB và bỏ snapshot cũ khi thất lạc mảnh; input/kết quả dùng kênh control tin cậy.
 
 ## Kiểm tra
 
 ```sh
 npm test
 npm run check:roster
+npm run test:static
 python3 tools/browser-smoke.py
 ```
 
 Browser check cần dịch vụ đang chạy với ICE phù hợp, Python Playwright và Chromium. Có thể đặt `CHROMIUM_PATH` và truyền base URL làm đối số đầu.
+
+`test:static` tự phục vụ **chỉ những file đã được Git theo dõi** ở đúng đường dẫn `/auto-bat/legacy/index.html`. Kiểm tra module/icon không 404, đủ 40 tướng, worker chọn host và reload offline với ảnh dùng chung. Không chạy compile trước bước này để phát hiện file sinh ra bị thiếu trong bản đưa lên Git.
 
 Môi trường cloud hiện quản lý Chromium để chặn UDP trực tiếp. Có thể kiểm tra đúng chính sách bằng coturn TCP cục bộ:
 

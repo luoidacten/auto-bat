@@ -12,7 +12,8 @@
     "start": "node tools/build.cjs && node server/main.mjs",
     "test": "node tools/compile.cjs && node --test tests/*.test.mjs tools/build.test.cjs",
     "check:roster": "node tools/compare-roster.cjs",
-    "test:browser": "node tools/build.cjs && node tools/rtc-test.cjs"
+    "test:browser": "node tools/build.cjs && node tools/rtc-test.cjs",
+    "test:static": "python3 tools/static-smoke.py"
   },
   "dependencies": {
     "ws": "8.22.0"

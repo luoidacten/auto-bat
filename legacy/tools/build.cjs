@@ -92,12 +92,15 @@ function build({ out, assetsRoot }) {
   checkExisting(out);
 
   const output = new Map(Object.entries(compile()));
+  const localMedia = (text) =>
+    text
+      .replace(/\.\.\/(img|sound)\//g, "$1/")
+      .replace(/\.\.\/favicon\.ico/g, "favicon.ico");
   const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
-  output.set("index.html", Buffer.from(html));
+  output.set("index.html", Buffer.from(localMedia(html)));
   output.set("coach.html", fs.readFileSync(path.join(ROOT, "coach.html")));
   const resources = [
     "manifest.webmanifest",
-    "sw.js",
     ...[
       "css",
       "js",
@@ -129,7 +132,7 @@ function build({ out, assetsRoot }) {
       ))
         media.add("sound/" + match[1]);
     }
-    content = content.replace(/\.\.\/(img|sound)\//g, "$1/");
+    content = localMedia(content);
     output.set(file, Buffer.from(content));
   }
   // Favicon requests are made automatically by browsers, even without a link element.
@@ -146,17 +149,16 @@ function build({ out, assetsRoot }) {
       "Legacy Arena\nServe locally: python3 -m http.server 8001 --bind 127.0.0.1\nOffline mode uses the local engine. Online rooms require the included project server, not a static host alone.\nOld coach mode: coach.html\nAudio attribution: sound/NGUON.txt\n",
     ),
   );
-  const contentVersion = hash(Buffer.concat([...output.values()]));
+  const workerTemplate = fs.readFileSync(
+    path.join(ROOT, "tools/service-worker.js"), "utf8",
+  );
+  const contentVersion = hash(
+    Buffer.concat([...output.values(), Buffer.from(workerTemplate)]),
+  );
   output.set(
     "sw.js",
     Buffer.from(
-      output
-        .get("sw.js")
-        .toString()
-        .replace(
-          "legacy-arena-development",
-          "legacy-arena-" + contentVersion.slice(0, 16),
-        ),
+      workerTemplate.replace("__CACHE_VERSION__", contentVersion.slice(0, 16)),
     ),
   );
   const precache = [...output.keys()].filter(
@@ -196,6 +198,30 @@ function build({ out, assetsRoot }) {
     if (fs.existsSync(backup)) fs.rmSync(backup, { recursive: true });
   } finally {
     if (fs.existsSync(staging)) fs.rmSync(staging, { recursive: true });
+  }
+  // GitHub Pages serves tracked source files directly, without running Node.
+  // Ship the generated modules and a source-specific offline cache alongside it.
+  // Media stays shared in ../img and ../sound instead of duplicating it in Git.
+  // An external --assets-root only supplies the standalone export; it cannot
+  // populate the ../img paths of a source deployment.
+  if (assetsRoot === fs.realpathSync(repo)) {
+    const sourcePaths = precache
+      .filter((file) => file !== "README.txt")
+      .map((file) => media.has(file) ? "../" + file : file)
+      .sort();
+    const sourceVersion = hash(Buffer.from(JSON.stringify([
+      hash(workerTemplate),
+      ...sourcePaths.map((file) => [
+        file, hash(fs.readFileSync(path.resolve(ROOT, file))),
+      ]),
+    ])));
+    fs.writeFileSync(
+      path.join(ROOT, "precache.json"), JSON.stringify(sourcePaths, null, 2) + "\n",
+    );
+    fs.writeFileSync(
+      path.join(ROOT, "sw.js"),
+      workerTemplate.replace("__CACHE_VERSION__", sourceVersion.slice(0, 16)),
+    );
   }
   const bytes = [...output.values()].reduce(
     (sum, data) => sum + data.length,

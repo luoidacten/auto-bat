@@ -4,7 +4,7 @@ Ngày 28/10/2026. Online đã chuyển sang WebRTC và chọn host theo hiệu n
 
 ## Đã thực hiện
 
-- Tách core, dữ liệu/vũ khí, Fighter, Match và bot ra `engine/`, `content/`, `controllers/`; tách Canvas/sprite/HUD ra client. Module `engine/runtime.mjs` sinh từ nguồn dùng chung, import được trong Node mà không giả lập window, DOM hay Canvas.
+- Tách core, dữ liệu/vũ khí, Fighter, Match và bot ra `engine/`, `content/`, `controllers/`; tách Canvas/sprite/HUD ra client. Module `engine/runtime.mjs` sinh từ nguồn dùng chung, import được trong Node mà không giả lập window, DOM hay Canvas. Module runtime/renderer và manifest offline được đưa vào Git để GitHub Pages phục vụ trực tiếp `legacy/index.html`, không phụ thuộc build trên máy chủ. Bản nguồn dùng chung media qua `../img/`; `dist/` vẫn tự chứa.
 - Dùng fixed step 60Hz và RNG riêng từng session. Host Web Worker, offline và replay dùng cùng engine. Client còn lại dựng hình từ snapshot nhận qua WebRTC.
 - Human slot không tạo Brain. Điều khiển WASD/chuột, A/B/C/D/Nộ/né, joystick và nút cảm ứng, hướng ngắm, giữ/thả tụ lực và biến thể nhấn giữ. Offline có bot; online luôn hai người thật. Vật triệu hồi là cơ chế kỹ năng, không là bot thay người chơi.
 - Offline chạy lại sau khi ngắt mạng nhờ cache riêng, lưu bằng seed/input mỗi hai giây, có tiếp tục và xuất/nhập. Save HLV cũ được giữ nguyên.
@@ -40,7 +40,7 @@ Các bộ chiêu là chuyển thể cho Legacy. Không giữ nguyên toàn bộ 
 
 ## Kiểm tra đã chạy
 
-`npm test`: **129 kiểm tra đạt, 0 thất bại, 0 bỏ qua**; engine, input, determinism giữa session xen kẽ, replay offline, ring-out, charge/hold, ma trận 40 tướng, từng cơ chế mới, Luca sao chép 39 tướng, 14 bot offline, signaling hai kết nối, chọn host, RTC framing, phục hồi host, reconnect và build độc lập. Không có test bị skip hoặc vô hiệu hóa.
+`npm test`: **130 kiểm tra đạt, 0 thất bại, 0 bỏ qua**; engine, input, determinism giữa session xen kẽ, replay offline, ring-out, charge/hold, ma trận 40 tướng, từng cơ chế mới, Luca sao chép 39 tướng, 14 bot offline, signaling hai kết nối, chọn host, RTC framing, phục hồi host, reconnect và build độc lập. Không có test bị skip hoặc vô hiệu hóa.
 
 `python3 tools/browser-smoke.py`: năm nhóm chức năng:
 
@@ -51,6 +51,8 @@ Các bộ chiêu là chuyển thể cho Legacy. Không giữ nguyên toàn bộ 
 5. Mở chế độ HLV cũ và chạy đấu thử AI với roster lịch sử 26 tướng.
 
 `npm run check:roster`: Battleground 40, Legacy 40, chung 40, thiếu 0.
+
+`npm run test:static`: phục vụ chỉ file Git theo dõi ở `/auto-bat/legacy/index.html`; module, icon, worker và đủ 40 tướng chạy không 404. Ngắt mạng/reload và tiếp tục trận offline vẫn tải được ảnh dùng chung ngoài thư mục Legacy.
 
 Build kiểm tra tài nguyên cục bộ, manifest SHA-256, tính lặp lại và không ghi đè output bị sửa. Môi trường cloud quản lý Chromium với `WebRtcIPHandling=disable_non_proxied_udp`. Kiểm tra browser đã chạy bằng coturn TCP trên loopback, giữ nguyên chính sách; chưa thử hai mạng Internet khác NAT.
 
