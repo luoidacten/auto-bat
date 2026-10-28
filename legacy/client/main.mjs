@@ -14,6 +14,7 @@ import { PROTOCOL_VERSION } from "../protocol/version.mjs";
 import { presentNetwork } from "./presentation.mjs";
 import { PeerSession, measureHost } from "./p2p-session.mjs";
 import { createRoomSocket } from "./room-transport.mjs";
+import { drawAimGuide, skillGuide } from "./aiming.mjs";
 
 const $ = (selector) => document.querySelector(selector);
 const canvas = $("#arena"),
@@ -50,16 +51,26 @@ function storageGet(storage, key) {
     return null;
   }
 }
-const input = new PlayerInput(canvas, (x, y) => {
-  const match = state.match,
-    fighter = match?.lead(state.team);
-  if (!fighter || !match.zoom) return state.team ? Math.PI : 0;
-  const offsetY = innerHeight / 2 - 40 * 0.27 + (innerHeight < 520 ? 10 : 0);
-  return Math.atan2(
-    (y - offsetY) / match.zoom - fighter.y,
-    (x - innerWidth / 2) / match.zoom - fighter.x,
-  );
-});
+const input = new PlayerInput(
+  canvas,
+  (x, y) => {
+    const match = state.match,
+      fighter = match?.lead(state.team);
+    if (!fighter || !match.zoom) return state.team ? Math.PI : 0;
+    const offsetY = innerHeight / 2 - 40 * 0.27 + (innerHeight < 520 ? 10 : 0);
+    return Math.atan2(
+      (y - offsetY) / match.zoom - fighter.y,
+      (x - innerWidth / 2) / match.zoom - fighter.x,
+    );
+  },
+  () => ({
+    match: state.match,
+    team: state.team,
+    width: innerWidth,
+    height: innerHeight,
+  }),
+);
+$("#target-lock").onclick = () => input.toggleTarget();
 
 function resize() {
   const scale = Math.min(2, devicePixelRatio || 1);
@@ -476,7 +487,11 @@ function connect(firstMessage) {
     if (state.socket !== socket) return;
     state.socket = null;
     if (!state.peer?.opened) input.clear();
-    if (socket.closedByPeer || state.peer?.finished) return;
+    if (
+      socket.closedByPeer ||
+      (socket.transport === "peer" && state.peer?.finished)
+    )
+      return;
     const saved = storageGet(sessionStorage, "legacy_arena_session");
     if (saved && state.room) {
       toast(
@@ -582,6 +597,32 @@ function hud() {
   if (!state.match) return;
   const own = state.match.lead(state.team),
     enemy = state.match.lead(1 - state.team);
+  const target = state.match.fighters.find((f) => f.id === input.targetId);
+  $("#target-lock").setAttribute("aria-pressed", String(input.targetAssist));
+  $("#target-lock").textContent = input.manualAim
+    ? "Ngắm: Theo tay"
+    : !input.targetAssist
+      ? "Ngắm: Tự do"
+      : target
+        ? "Ngắm: " + target.name
+        : "Ngắm: Tìm mục tiêu";
+  const hint = $("#aim-hint"),
+    gesture = input.gesture;
+  hint.hidden = !gesture || !input.touchMode;
+  if (gesture && input.touchMode) {
+    const guide = skillGuide(own, gesture.key);
+    hint.dataset.shape = guide.shape;
+    hint.dataset.angle = String(input.aim);
+    hint.dataset.cancelled = String(gesture.cancelled);
+    hint.textContent = gesture.cancelled
+      ? "Thả để hủy chiêu"
+      : (own.weapon.skills[gesture.key]?.name || gesture.key) +
+        " · " +
+        (guide.estimated ? "Tầm ngắm tham khảo · " : "") +
+        (gesture.button.dataset.control === "channel"
+          ? "Giữ để duy trì · thả để dừng"
+          : "Thả để tung · kéo vào Hủy để bỏ");
+  }
   for (const [selector, fighter] of [
     ["#player-score", own],
     ["#opponent-score", enemy],
@@ -622,6 +663,7 @@ function frame(now) {
   const dt = Math.min(0.1, (now - (state.last || now)) / 1000);
   state.last = now;
   try {
+    input.updateAim();
     if (state.local && !state.paused && !state.result) {
       state.accumulator += dt;
       let count = 0;
@@ -658,6 +700,14 @@ function frame(now) {
           : null;
       try {
         state.match.draw(context, innerWidth, innerHeight);
+        drawAimGuide(
+          context,
+          state.match,
+          state.team,
+          input,
+          innerWidth,
+          innerHeight,
+        );
       } finally {
         restore?.();
       }

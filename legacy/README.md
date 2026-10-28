@@ -54,6 +54,14 @@ Mỗi mục có `urls`; mục TURN cần `username` và `credential` do nhà cun
 
 Chuột trái trên sàn: A; chuột phải: C. Tụ lực và biến thể nhấn giữ tính theo tick host; thả để tung, kéo vào Hủy để bỏ chiêu. Roxie giữ A dựng ụ pháo, giữ D gọi T-Zero tự vận hành, bấm D để lái. Không có pause/tua nhanh toàn trận online.
 
+### Ngắm trên điện thoại
+
+- **Giữ nút chiêu** để xem vùng ngắm: đường thẳng, hình quạt, vòng tròn, vùng đặt chiêu hoặc hướng lướt. Chiêu thường chưa được tung khi mới giữ; thả để dùng. Chiêu giữ khiên/channel vẫn bắt đầu khi nhấn theo cơ chế riêng.
+- **Kéo khỏi tâm nút** để ngắm tay. Hướng tay được ưu tiên hơn khóa mục tiêu; có thể dùng cần trái đồng thời bằng ngón khác. Kéo vào vòng **Hủy** rồi thả để bỏ chiêu; mất cảm ứng/đổi ứng dụng cũng hủy.
+- **Chạm đối thủ** để khóa hướng nhìn, hoặc dùng nút **Ngắm** để bật/tắt. Có vòng đánh dấu mục tiêu; nhân vật quay theo đối thủ nhưng không tự di chuyển hay tự dùng chiêu. Khi đối thủ KO, rơi đài hoặc không thể nhắm, bỏ khóa cũ và tìm mục tiêu hợp lệ.
+
+Dữ liệu vùng ngắm cho 40 tướng được tạo lúc build từ các lần dùng chiêu cơ bản trong engine, không chạy mô phỏng phụ trên điện thoại. Các kỹ năng phụ thuộc trạng thái/recast chưa thu được hình học đầy đủ có nét đứt và nhãn **Tầm ngắm tham khảo**; vùng ngắm không dự đoán mọi vật cản, chiêu phản ứng hoặc mục tiêu đang di chuyển. Chức năng dùng cùng input/renderer cho offline và online, không thêm Brain cho người chơi.
+
 ## Offline, save và reconnect
 
 Service worker riêng tải trước mã/hình sau lần truy cập thành công. Chờ **Đã sẵn sàng chơi offline** trước khi ngắt mạng. Sau đó có thể reload, chọn tướng và tiếp tục trận đã lưu mà không cần mạng. Nhạc không được tải trước; giao diện điều khiển mới mặc định không phát nhạc nền.
@@ -94,6 +102,8 @@ python3 tools/browser-smoke.py
 Browser check cần dịch vụ đang chạy với ICE phù hợp, Python Playwright và Chromium. Có thể đặt `CHROMIUM_PATH` và truyền base URL làm đối số đầu.
 
 `test:static` tự phục vụ **chỉ những file đã được Git theo dõi** ở đúng đường dẫn `/auto-bat/legacy/index.html`. Kiểm tra module/icon không 404, đủ 40 tướng, worker chọn host và reload offline với ảnh dùng chung. Không chạy compile trước bước này để phát hiện file sinh ra bị thiếu trong bản đưa lên Git.
+
+Kiểm tra cảm ứng bổ sung dùng sự kiện đa điểm thật của Chromium ở màn hình ngang/dọc và trong trận P2P: giữ xem vùng ngắm chưa bắn, di chuyển + ngắm hai ngón, thả bắn đúng hướng, hủy không bắn, chạm khóa mục tiêu và truyền góc/target tới host. `client/skill-guides.mjs` được sinh từ `tools/skill-guides.mjs` và đưa vào Git cùng các artifact runtime khác.
 
 Môi trường cloud hiện quản lý Chromium để chặn UDP trực tiếp. Có thể kiểm tra đúng chính sách bằng coturn TCP cục bộ:
 

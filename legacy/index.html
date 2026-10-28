@@ -61,7 +61,8 @@
       <p class="help">
         PC: WASD di chuyển · chuột ngắm · Q/E/R/F = A/B/C/D · Space = Nộ · Shift
         = né · Escape tạm dừng offline.<br />Cảm ứng: cần trái di chuyển, giữ
-        nút chiêu rồi kéo để ngắm. Kéo vào ô Hủy để bỏ chiêu.
+        nút chiêu rồi kéo để ngắm; chạm đối thủ để khóa hướng nhìn. Kéo vào ô
+        Hủy để bỏ chiêu.
       </p>
     </main>
     <section id="lobby" class="overlay" hidden>
@@ -82,10 +83,17 @@
       <div class="game-actions">
         <span id="mode-label"></span>
         <span id="peer-status" aria-live="polite"></span
+        ><button
+          id="target-lock"
+          aria-pressed="true"
+          title="Khóa hướng nhìn vào đối thủ; kéo nút chiêu để ngắm tay"
+        >
+          Ngắm: Mục tiêu</button
         ><button id="pause">Tạm dừng</button
         ><button id="quit">Thoát trận</button>
       </div>
       <div id="skill-bar"></div>
+      <div id="aim-hint" role="status" hidden></div>
     </section>
     <div id="stick" aria-label="Cần di chuyển"><i></i></div>
     <div id="cancel-skill">HỦY</div>

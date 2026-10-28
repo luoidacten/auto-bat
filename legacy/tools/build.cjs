@@ -3,6 +3,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
+const { execFileSync } = require("node:child_process");
 const { compile } = require("./compile.cjs");
 
 const ROOT = path.resolve(__dirname, "..");
@@ -105,6 +106,9 @@ function build({ out, assetsRoot }) {
   );
 
   const output = new Map(Object.entries(compile()));
+  execFileSync(process.execPath, [path.join(ROOT, "tools/skill-guides.mjs")], {
+    stdio: "pipe",
+  });
   const localMedia = (text) =>
     text
       .replace(/\.\.\/(img|sound)\//g, "$1/")

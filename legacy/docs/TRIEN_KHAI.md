@@ -7,6 +7,7 @@ Cập nhật 29/10/2026. GitHub Pages tự ghép phòng qua PeerJS Cloud; bản 
 - Tách core, dữ liệu/vũ khí, Fighter, Match và bot ra `engine/`, `content/`, `controllers/`; tách Canvas/sprite/HUD ra client. Module `engine/runtime.mjs` sinh từ nguồn dùng chung, import được trong Node mà không giả lập window, DOM hay Canvas. Module runtime/renderer và manifest offline được đưa vào Git để GitHub Pages phục vụ trực tiếp `legacy/index.html`, không phụ thuộc build trên máy chủ. Bản nguồn dùng chung media qua `../img/`; `dist/` vẫn tự chứa.
 - Dùng fixed step 60Hz và RNG riêng từng session. Host Web Worker, offline và replay dùng cùng engine. Client còn lại dựng hình từ snapshot nhận qua WebRTC.
 - Human slot không tạo Brain. Điều khiển WASD/chuột, A/B/C/D/Nộ/né, joystick và nút cảm ứng, hướng ngắm, giữ/thả tụ lực và biến thể nhấn giữ. Offline có bot; online luôn hai người thật. Vật triệu hồi là cơ chế kỹ năng, không là bot thay người chơi.
+- Điện thoại: giữ nút hiện đường/vùng ngắm của chiêu, kéo để ngắm tay, thả tung hoặc kéo vào Hủy. Có khóa hướng nhìn bằng chạm đối thủ/nút Ngắm, bỏ qua mục tiêu KO/rơi đài/ẩn/không thể nhắm, ngắm tay được ưu tiên. Không tự di chuyển hoặc tự dùng chiêu. Dữ liệu 40 tướng lấy từ các lần cast cơ bản ở bước build; trạng thái/recast chưa có hình học đầy đủ dùng nét đứt với nhãn tham khảo.
 - Offline chạy lại sau khi ngắt mạng nhờ cache riêng, lưu bằng seed/input mỗi hai giây, có tiếp tục và xuất/nhập. Save HLV cũ được giữ nguyên.
 - Trên GitHub Pages, PeerJS Cloud thiết lập kênh lobby P2P; người tạo phòng điều phối metadata, độc lập với host mô phỏng được chọn qua benchmark. Không gọi `/socket` trên Pages. Thư viện PeerJS 1.5.5 và giấy phép MIT được đóng gói sẵn trong `vendor/`.
 - Ở bản Node riêng, server chỉ giữ phòng, token, ready và SDP/ICE; không tạo ArenaSession, không xử lý input/snapshot của trận. Đứt WebSocket ghép phòng không tự xử thua trận P2P đang kết nối.
@@ -41,7 +42,7 @@ Các bộ chiêu là chuyển thể cho Legacy. Không giữ nguyên toàn bộ 
 
 ## Kiểm tra đã chạy
 
-`npm test`: **137 kiểm tra đạt, 0 thất bại, 0 bỏ qua**; engine, input, determinism giữa session xen kẽ, replay offline, ring-out, charge/hold, ma trận 40 tướng, từng cơ chế mới, Luca sao chép 39 tướng, 14 bot offline, signaling hai kết nối, chọn host, RTC framing, phục hồi host, reconnect và build độc lập. Không có test bị skip hoặc vô hiệu hóa.
+`npm test`: **143 kiểm tra đạt, 0 thất bại, 0 bỏ qua**; engine, input, determinism giữa session xen kẽ, replay offline, ring-out, charge/hold, ma trận 40 tướng, từng cơ chế mới, Luca sao chép 39 tướng, 14 bot offline, signaling hai kết nối, chọn host, RTC framing, phục hồi host, reconnect và build độc lập. Không có test bị skip hoặc vô hiệu hóa.
 
 `python3 tools/browser-smoke.py`: năm nhóm chức năng:
 
@@ -56,6 +57,8 @@ Các bộ chiêu là chuyển thể cho Legacy. Không giữ nguyên toàn bộ 
 Kiểm tra PeerJS bổ sung: hai context browser mở đúng đường dẫn Pages từ máy chủ chỉ phục vụ file Git, không có `/socket`; tạo/vào phòng bằng mã, đo chọn host, rematch, reload cả người tạo lẫn người vào, tiếp tục điều khiển/nhận kết quả sau khi dừng PeerServer. Dùng PeerServer chính thức và TURN/TCP cục bộ, không giả lập RTC, không sửa chính sách trình duyệt. Dịch vụ PeerJS Cloud công khai và hai mạng Internet khác NAT chưa được kiểm chứng từ cloud này.
 
 `npm run test:static`: phục vụ chỉ file Git theo dõi ở `/auto-bat/legacy/index.html`; module, icon, worker và đủ 40 tướng chạy không 404. Ngắt mạng/reload và tiếp tục trận offline vẫn tải được ảnh dùng chung ngoài thư mục Legacy.
+
+Kiểm tra cảm ứng bổ sung: đa điểm thật trên Chromium, ngang 900×420 và dọc 390×844; giữ hiện vùng ngắm chưa bắn, kéo ngắm đồng thời di chuyển, thả đúng góc, hủy/mất touch không bắn, chạm chọn đối thủ và hướng nhìn. Trận P2P điện thoại–desktop kiểm tra vùng ngắm trên snapshot và góc/target truyền đúng tới host, cả hai fighter vẫn human. Ba nhóm đạt.
 
 Build kiểm tra tài nguyên cục bộ, manifest SHA-256, tính lặp lại và không ghi đè output bị sửa. Môi trường cloud quản lý Chromium với `WebRtcIPHandling=disable_non_proxied_udp`. Kiểm tra browser đã chạy bằng coturn TCP trên loopback, giữ nguyên chính sách; chưa thử hai mạng Internet khác NAT.
 

@@ -138,7 +138,10 @@ async function main() {
         process.once("SIGTERM", resolve);
       });
     } else {
-      if (!process.argv.includes("--peer-only")) {
+      if (
+        !process.argv.includes("--peer-only") &&
+        !process.argv.includes("--mobile-only")
+      ) {
         const browser = spawn(
           process.env.PYTHON_BIN || "python3",
           ["tools/browser-smoke.py", `http://127.0.0.1:${port}`],
@@ -147,18 +150,30 @@ async function main() {
         const [code] = await once(browser, "exit");
         if (code !== 0) throw new Error("WebRTC browser checks failed");
       }
-      const peerBrowser = spawn(
-        process.execPath,
-        ["tools/peer-test.mjs", ice],
-        {
-          cwd: ROOT,
-          env: process.env,
-          stdio: "inherit",
-        },
-      );
-      const [peerCode] = await once(peerBrowser, "exit");
-      if (peerCode !== 0)
-        throw new Error("Static PeerJS browser checks failed");
+      if (!process.argv.includes("--mobile-only")) {
+        const peerBrowser = spawn(
+          process.execPath,
+          ["tools/peer-test.mjs", ice],
+          {
+            cwd: ROOT,
+            env: process.env,
+            stdio: "inherit",
+          },
+        );
+        const [peerCode] = await once(peerBrowser, "exit");
+        if (peerCode !== 0)
+          throw new Error("Static PeerJS browser checks failed");
+      }
+      if (!process.argv.includes("--peer-only")) {
+        const mobile = spawn(
+          process.env.PYTHON_BIN || "python3",
+          ["tools/mobile-smoke.py", `http://127.0.0.1:${port}`],
+          { cwd: ROOT, stdio: "inherit" },
+        );
+        const [mobileCode] = await once(mobile, "exit");
+        if (mobileCode !== 0)
+          throw new Error("Mobile aiming browser checks failed");
+      }
     }
   } finally {
     await stop(server);

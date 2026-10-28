@@ -243,6 +243,7 @@ header p {
   align-items: center;
   justify-content: center;
   pointer-events: auto;
+  flex-wrap: wrap;
 }
 #mode-label {
   font-size: 12px;
@@ -329,7 +330,7 @@ header p {
 #cancel-skill {
   display: none;
   position: fixed;
-  bottom: 125px;
+  bottom: 160px;
   right: 25px;
   border: 2px solid #ef7c80;
   border-radius: 50%;
@@ -428,4 +429,56 @@ body.touch #skill-bar kbd {
   font-size: 11px;
   color: #a8d3c6;
   max-width: 240px;
+}
+#target-lock {
+  display: none;
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  touch-action: manipulation;
+  flex-shrink: 0;
+}
+body.touch #target-lock {
+  display: inline-block;
+  border-color: #bda064;
+  color: #ffdc98;
+}
+#target-lock[aria-pressed="false"] {
+  border-color: #3a4960;
+  color: #a8bdd4;
+}
+#aim-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 160px;
+  transform: translateX(-50%);
+  max-width: min(360px, 80vw);
+  border-radius: 8px;
+  padding: 6px 10px;
+  text-align: center;
+  font-size: 11px;
+  color: #c4edff;
+  background: #0a172be8;
+  pointer-events: none;
+}
+#aim-hint[data-cancelled="true"] {
+  color: #ffadad;
+}
+#peer-status:empty {
+  display: none;
+}
+@media (max-width: 500px) {
+  .game-actions {
+    padding: 0 10px;
+  }
+  .game-actions button {
+    flex-shrink: 0;
+  }
+  #aim-hint {
+    left: 16px;
+    right: 110px;
+    max-width: none;
+    transform: none;
+  }
 }

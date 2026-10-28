@@ -10,7 +10,7 @@
     "build": "node tools/build.cjs",
     "dev": "node tools/build.cjs && node server/main.mjs",
     "start": "node tools/build.cjs && node server/main.mjs",
-    "test": "node tools/compile.cjs && node --test tests/*.test.mjs tools/build.test.cjs",
+    "test": "node tools/compile.cjs && node tools/skill-guides.mjs && node --test tests/*.test.mjs tools/build.test.cjs",
     "check:roster": "node tools/compare-roster.cjs",
     "test:browser": "node tools/build.cjs && node tools/rtc-test.cjs",
     "test:static": "python3 tools/static-smoke.py"
