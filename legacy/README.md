@@ -12,11 +12,13 @@ npm ci --cache /workspace/.cache/npm --no-audit --no-fund
 npm run dev
 ```
 
-Máy cá nhân có thể dùng `npm ci` với cache mặc định. `npm run dev` hoặc `npm start` build rồi chạy HTTP/WebSocket signaling trên cổng **8002**, bind `127.0.0.1`. `PORT` và `HOST` điều chỉnh nơi lắng nghe. Hai người cần mở cùng dịch vụ ghép phòng; bản hiện tại chưa được triển khai công khai.
+Máy cá nhân có thể dùng `npm ci` với cache mặc định. `npm run dev` hoặc `npm start` build rồi chạy HTTP/WebSocket signaling riêng trên cổng **8002**, bind `127.0.0.1`. `PORT` và `HOST` điều chỉnh nơi lắng nghe. Khi mở bản Node này, hai người dùng cùng dịch vụ ghép phòng.
 
 Chọn tướng → **Tạo phòng** hoặc nhập mã sáu ký tự → cả hai **Sẵn sàng**. Mỗi máy đo hiệu năng, sau đó tự chọn máy host và thiết lập WebRTC. Nhãn trong trận cho biết máy nào làm host. Thiếu người thì chờ; không có bot lấp chỗ online.
 
-GitHub Pages có thể phục vụ trực tiếp `/auto-bat/legacy/index.html` từ repo, không cần chạy build trên máy chủ để mở game/offline. Vì vậy `engine/runtime.mjs`, `client/render.mjs`, `precache.json` và `sw.js` được sinh sẵn và đưa vào Git. Chạy `npm run build` rồi commit các file sinh lại khi sửa nguồn engine, renderer hoặc tài nguyên. Icon và media của bản này dùng đường dẫn `../img/`, `../sound/`; bản `dist/` vẫn tự chứa. Phòng online cần dịch vụ signaling riêng; GitHub Pages chỉ phục vụ file tĩnh.
+GitHub Pages phục vụ trực tiếp `/auto-bat/legacy/index.html` từ repo. Trên tên miền `*.github.io`, online tự dùng **PeerJS Cloud**, không gọi `/socket` trên Pages. Người tạo phòng nhận mã sáu ký tự để gửi bạn chơi. PeerJS thiết lập kênh ghép phòng giữa hai máy; host mô phỏng vẫn được chọn theo hiệu năng, kể cả người vào sau. Khi kênh P2P đã mở, gameplay không phụ thuộc kết nối máy chủ ghép phòng.
+
+`engine/runtime.mjs`, `client/render.mjs`, `precache.json` và `sw.js` được sinh sẵn và đưa vào Git để Pages chạy mà không cần build trên máy chủ. Chạy `npm run build` rồi commit các file sinh lại khi sửa nguồn. Icon và media của bản nguồn dùng `../img/`, `../sound/`; bản `dist/` vẫn tự chứa. PeerJS 1.5.5 được đóng gói trong `vendor/`, có giấy phép MIT kèm theo, không tải thư viện từ CDN khi mở game/offline.
 
 ## Ưu tiên máy mượt hơn làm host
 
@@ -24,11 +26,15 @@ Mỗi lần ready, một Web Worker chạy warmup và đo **512 tick mô phỏng
 
 Host mô phỏng 60Hz trong worker riêng, gửi snapshot 20Hz qua RTC DataChannel. Máy còn lại gửi input qua kênh RTC tin cậy và dựng hình từ snapshot. Việc chọn host dựa trên khả năng mô phỏng đo được, không phải tên CPU hay vị trí chủ phòng; kết nối mạng vẫn ảnh hưởng độ trễ.
 
-Node giữ phòng, token và trao đổi SDP/ICE; **input và snapshot đi giữa hai máy bằng WebRTC**. Trận đang kết nối được tiếp tục khi WebSocket signaling bị ngắt. Tạo trận mới hoặc thiết lập lại kết nối cần signaling hoạt động.
+Ở bản Node, server giữ phòng, token và trao đổi SDP/ICE. Trên Pages, người tạo phòng điều phối lobby/token/ready qua kênh PeerJS DataChannel tin cậy; vai trò này độc lập với máy host mô phỏng. **Input và snapshot đi giữa hai máy bằng WebRTC riêng**, không đi qua máy chủ PeerJS. Mỗi phòng tối đa hai người. Trận đang kết nối được tiếp tục khi broker ngắt; tạo kết nối mới cần dịch vụ ghép phòng hoạt động.
 
 ## Kết nối qua Internet
 
-Mặc định ICE không dùng máy chủ bên ngoài, phù hợp thử cục bộ/LAN. Để hai mạng khác NAT kết nối được, cấp cấu hình `RTCIceServer` qua `RTC_ICE_SERVERS` (JSON array), hoặc qua file:
+**Bản Pages:** mặc định dùng broker `0.peerjs.com` và bộ STUN/TURN công khai do PeerJS 1.5.5 cung cấp. Hai người chỉ cần mở cùng phiên bản trang, tạo/vào phòng rồi sẵn sàng; không cần tự chạy Node. Kết nối phụ thuộc dịch vụ PeerJS/STUN/TURN và điều kiện mạng. Có thể chuyển sang broker/ICE riêng bằng cấu hình `window.LEGACY_ONLINE_CONFIG` trước khi module client chạy: `transport: "peer"`, `peerjs: {host, port, path, secure}`, `iceServers: [...]`. Không đưa credential TURN riêng, dài hạn vào Git.
+
+Trên static host khác, thêm `?rooms=peer` để dùng cùng luồng PeerJS; `?rooms=server` dùng `/socket`. Cấu hình `transport` được ưu tiên hơn query. Cấu hình `signalingURL` cho phép bản server dùng một endpoint WebSocket riêng. Mặc định Pages luôn chọn PeerJS.
+
+**Bản Node riêng:** ICE mặc định không dùng máy chủ bên ngoài, phù hợp thử cục bộ/LAN. Để hai mạng khác NAT kết nối được, cấp cấu hình `RTCIceServer` qua `RTC_ICE_SERVERS` (JSON array), hoặc qua file:
 
 ```sh
 RTC_ICE_SERVERS_FILE=/duong-dan/ice-servers.json npm run dev
@@ -97,7 +103,7 @@ npm run test:browser
 
 Cần `turnserver` từ coturn trên PATH hoặc đặt `TURNSERVER` trỏ binary. Nếu binary được giải nén riêng, `LEGACY_TURN_LIB_DIR` chỉ thư mục thư viện của nó. Fixture tự tạo credential tạm, bind loopback, chạy server ở cổng trống, chạy browser tests rồi tự dọn. Không sửa chính sách trình duyệt. `node tools/rtc-test.cjs --serve` giữ fixture cục bộ chạy trên cổng `PORT` hoặc 8002; fixture loopback chỉ dùng thử trên cùng máy.
 
-Kiểm tra browser gồm offline/PWA, cảm ứng, RTC DataChannel thật, benchmark hai máy, reload guest/host, tiếp tục input/snapshot/kết quả sau khi đóng toàn bộ WebSocket signaling, vẽ đủ 40 tướng và HLV cũ. Đây chưa là bằng chứng hai mạng Internet khác NAT đã được kiểm tra.
+Kiểm tra browser gồm offline/PWA, cảm ứng, RTC DataChannel thật, benchmark hai máy, reload guest/host, tiếp tục input/snapshot/kết quả sau khi đóng toàn bộ WebSocket signaling, vẽ đủ 40 tướng và HLV cũ. Fixture còn chạy PeerServer chính thức cục bộ và phục vụ **chỉ file Git** ở `/auto-bat/legacy/index.html`, không có `/socket`: hai người vào bằng mã, tự chọn host, rematch, reload người tạo/người vào và chơi tiếp/kết thúc sau khi broker dừng. Đây chưa là bằng chứng dịch vụ công khai hoặc hai mạng Internet khác NAT đã được kiểm tra.
 
 ## Build và tách repo
 
@@ -106,6 +112,6 @@ npm run build
 node tools/build.cjs --out /tmp/legacy-arena-release
 ```
 
-Runtime xuất tự chứa code/media. Static host phục vụ offline; online cần endpoint signaling `/socket` và ICE phù hợp. Build dùng kho media chung `../img/`, `../sound/`, `../favicon.ico`, hoặc `--assets-root`; không nhân đôi hơn 100 MiB media vào Git. Giữ ghi công ở `sound/NGUON.txt`. Build kiểm tra SHA-256, không ghi đè output đã bị người dùng sửa. Source vẫn trong repo hiện tại.
+Runtime xuất tự chứa code/media. Static host chơi offline và có thể dùng phòng PeerJS như trên; bản server dùng `/socket` và ICE riêng. Build dùng kho media chung `../img/`, `../sound/`, `../favicon.ico`, hoặc `--assets-root`; không nhân đôi hơn 100 MiB media vào Git. Giữ ghi công ở `sound/NGUON.txt` và `vendor/PEERJS-LICENSE.txt`. Build kiểm tra SHA-256, không ghi đè output đã bị người dùng sửa. Source vẫn trong repo hiện tại.
 
 Xem [thiết kế tướng](docs/DOI_CHIEU_TUONG.md), [kế hoạch ban đầu](docs/KE_HOACH_ONLINE.md) và [báo cáo triển khai](docs/TRIEN_KHAI.md).

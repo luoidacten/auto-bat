@@ -25,8 +25,10 @@
   "client/input.mjs",
   "client/main.mjs",
   "client/p2p-session.mjs",
+  "client/peer-room.mjs",
   "client/presentation.mjs",
   "client/render.mjs",
+  "client/room-transport.mjs",
   "coach.html",
   "content/03-weapons.js",
   "content/03b-weapons2.js",
@@ -63,6 +65,9 @@
   "manifest.webmanifest",
   "offline/session.mjs",
   "protocol/host-selection.mjs",
+  "protocol/peer-room.mjs",
   "protocol/rtc-framing.mjs",
-  "protocol/version.mjs"
+  "protocol/version.mjs",
+  "vendor/PEERJS-LICENSE.txt",
+  "vendor/peerjs.min.js"
 ]

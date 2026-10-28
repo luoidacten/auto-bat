@@ -36,12 +36,13 @@ async function waitPort(port, child) {
   throw new Error("Local fixture startup timed out");
 }
 async function stop(child) {
-  if (!child || child.exitCode !== null) return;
+  if (!child || child.exitCode !== null || child.signalCode !== null) return;
+  const done = once(child, "exit");
   child.kill("SIGTERM");
-  await Promise.race([once(child, "exit"), sleep(2000)]);
-  if (child.exitCode === null) {
+  await Promise.race([done, sleep(2000)]);
+  if (child.exitCode === null && child.signalCode === null) {
     child.kill("SIGKILL");
-    await once(child, "exit");
+    await done;
   }
 }
 async function main() {
@@ -137,13 +138,27 @@ async function main() {
         process.once("SIGTERM", resolve);
       });
     } else {
-      const browser = spawn(
-        process.env.PYTHON_BIN || "python3",
-        ["tools/browser-smoke.py", `http://127.0.0.1:${port}`],
-        { cwd: ROOT, stdio: "inherit" },
+      if (!process.argv.includes("--peer-only")) {
+        const browser = spawn(
+          process.env.PYTHON_BIN || "python3",
+          ["tools/browser-smoke.py", `http://127.0.0.1:${port}`],
+          { cwd: ROOT, stdio: "inherit" },
+        );
+        const [code] = await once(browser, "exit");
+        if (code !== 0) throw new Error("WebRTC browser checks failed");
+      }
+      const peerBrowser = spawn(
+        process.execPath,
+        ["tools/peer-test.mjs", ice],
+        {
+          cwd: ROOT,
+          env: process.env,
+          stdio: "inherit",
+        },
       );
-      const [code] = await once(browser, "exit");
-      if (code !== 0) throw new Error("WebRTC browser checks failed");
+      const [peerCode] = await once(peerBrowser, "exit");
+      if (peerCode !== 0)
+        throw new Error("Static PeerJS browser checks failed");
     }
   } finally {
     await stop(server);

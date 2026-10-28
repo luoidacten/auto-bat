@@ -1,6 +1,6 @@
 # Bản triển khai Legacy Arena — P2P
 
-Ngày 28/10/2026. Online đã chuyển sang WebRTC và chọn host theo hiệu năng đo được trước mỗi trận. Đây là bản chơi được trong workspace; chưa triển khai máy chủ Internet công khai.
+Cập nhật 29/10/2026. GitHub Pages tự ghép phòng qua PeerJS Cloud; bản Node riêng vẫn hỗ trợ `/socket`. Online đã chuyển sang WebRTC và chọn host theo hiệu năng đo được trước mỗi trận. Đây là bản chơi được trong workspace; chưa triển khai máy chủ Internet công khai.
 
 ## Đã thực hiện
 
@@ -8,7 +8,8 @@ Ngày 28/10/2026. Online đã chuyển sang WebRTC và chọn host theo hiệu n
 - Dùng fixed step 60Hz và RNG riêng từng session. Host Web Worker, offline và replay dùng cùng engine. Client còn lại dựng hình từ snapshot nhận qua WebRTC.
 - Human slot không tạo Brain. Điều khiển WASD/chuột, A/B/C/D/Nộ/né, joystick và nút cảm ứng, hướng ngắm, giữ/thả tụ lực và biến thể nhấn giữ. Offline có bot; online luôn hai người thật. Vật triệu hồi là cơ chế kỹ năng, không là bot thay người chơi.
 - Offline chạy lại sau khi ngắt mạng nhờ cache riêng, lưu bằng seed/input mỗi hai giây, có tiếp tục và xuất/nhập. Save HLV cũ được giữ nguyên.
-- Node chỉ giữ phòng, token, ready và SDP/ICE; không tạo ArenaSession, không xử lý input/snapshot của trận. Đứt WebSocket ghép phòng không tự xử thua trận P2P đang kết nối.
+- Trên GitHub Pages, PeerJS Cloud thiết lập kênh lobby P2P; người tạo phòng điều phối metadata, độc lập với host mô phỏng được chọn qua benchmark. Không gọi `/socket` trên Pages. Thư viện PeerJS 1.5.5 và giấy phép MIT được đóng gói sẵn trong `vendor/`.
+- Ở bản Node riêng, server chỉ giữ phòng, token, ready và SDP/ICE; không tạo ArenaSession, không xử lý input/snapshot của trận. Đứt WebSocket ghép phòng không tự xử thua trận P2P đang kết nối.
 - Trước mỗi trận, cả hai worker đo 512 tick sau warmup. Host được chọn theo 80% thời gian tick p95 + 20% trung bình; nếu chênh không quá 5% giữ máy tạo phòng để tránh nhiễu. Host có thể là người vào phòng sau. Rematch đo lại cả hai máy.
 - WebRTC dùng kênh control tin cậy cho input/kết quả và kênh state không chờ truyền lại cho snapshot. Gói lớn được chia 12 KiB, có giới hạn dung lượng và bộ ghép mảnh. Không gửi SDP, ICE, token hoặc credential vào log.
 - Host chạy fixed tick 60Hz trong Web Worker, gửi snapshot 20Hz. Hai fighter đều human; input cũ dừng sau 250ms; mất peer có thời gian nối lại 20 giây. Client dự đoán di chuyển giới hạn và nội suy đối thủ.
@@ -40,7 +41,7 @@ Các bộ chiêu là chuyển thể cho Legacy. Không giữ nguyên toàn bộ 
 
 ## Kiểm tra đã chạy
 
-`npm test`: **130 kiểm tra đạt, 0 thất bại, 0 bỏ qua**; engine, input, determinism giữa session xen kẽ, replay offline, ring-out, charge/hold, ma trận 40 tướng, từng cơ chế mới, Luca sao chép 39 tướng, 14 bot offline, signaling hai kết nối, chọn host, RTC framing, phục hồi host, reconnect và build độc lập. Không có test bị skip hoặc vô hiệu hóa.
+`npm test`: **137 kiểm tra đạt, 0 thất bại, 0 bỏ qua**; engine, input, determinism giữa session xen kẽ, replay offline, ring-out, charge/hold, ma trận 40 tướng, từng cơ chế mới, Luca sao chép 39 tướng, 14 bot offline, signaling hai kết nối, chọn host, RTC framing, phục hồi host, reconnect và build độc lập. Không có test bị skip hoặc vô hiệu hóa.
 
 `python3 tools/browser-smoke.py`: năm nhóm chức năng:
 
@@ -51,6 +52,8 @@ Các bộ chiêu là chuyển thể cho Legacy. Không giữ nguyên toàn bộ 
 5. Mở chế độ HLV cũ và chạy đấu thử AI với roster lịch sử 26 tướng.
 
 `npm run check:roster`: Battleground 40, Legacy 40, chung 40, thiếu 0.
+
+Kiểm tra PeerJS bổ sung: hai context browser mở đúng đường dẫn Pages từ máy chủ chỉ phục vụ file Git, không có `/socket`; tạo/vào phòng bằng mã, đo chọn host, rematch, reload cả người tạo lẫn người vào, tiếp tục điều khiển/nhận kết quả sau khi dừng PeerServer. Dùng PeerServer chính thức và TURN/TCP cục bộ, không giả lập RTC, không sửa chính sách trình duyệt. Dịch vụ PeerJS Cloud công khai và hai mạng Internet khác NAT chưa được kiểm chứng từ cloud này.
 
 `npm run test:static`: phục vụ chỉ file Git theo dõi ở `/auto-bat/legacy/index.html`; module, icon, worker và đủ 40 tướng chạy không 404. Ngắt mạng/reload và tiếp tục trận offline vẫn tải được ảnh dùng chung ngoài thư mục Legacy.
 

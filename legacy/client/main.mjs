@@ -13,6 +13,7 @@ import { LocalSession, OFFLINE_SAVE_KEY } from "../offline/session.mjs";
 import { PROTOCOL_VERSION } from "../protocol/version.mjs";
 import { presentNetwork } from "./presentation.mjs";
 import { PeerSession, measureHost } from "./p2p-session.mjs";
+import { createRoomSocket } from "./room-transport.mjs";
 
 const $ = (selector) => document.querySelector(selector);
 const canvas = $("#arena"),
@@ -385,12 +386,15 @@ function beginPeer(descriptor) {
 }
 function connect(firstMessage) {
   clearTimeout(state.reconnect);
-  const socket = new WebSocket(
-    (location.protocol === "https:" ? "wss:" : "ws:") +
-      "//" +
-      location.host +
-      "/socket",
-  );
+  let resumeTransport;
+  if (firstMessage.type === "resume") {
+    try {
+      resumeTransport = JSON.parse(
+        storageGet(sessionStorage, "legacy_arena_session"),
+      )?.transport;
+    } catch {}
+  }
+  const socket = createRoomSocket(firstMessage, resumeTransport);
   state.socket = socket;
   socket.onopen = () => send(firstMessage);
   socket.onmessage = (event) => {
@@ -409,7 +413,7 @@ function connect(firstMessage) {
       try {
         sessionStorage.setItem(
           "legacy_arena_session",
-          JSON.stringify({ token: message.token }),
+          JSON.stringify({ token: message.token, transport: socket.transport }),
         );
       } catch {}
     }
@@ -448,8 +452,15 @@ function connect(firstMessage) {
     if (
       message.type === "peer-left" &&
       state.peer?.descriptor.id === message.matchId
-    )
+    ) {
       state.peer.peerLeft(message.team);
+      if (socket.transport === "peer" && message.team === 0) {
+        state.room = null;
+        try {
+          sessionStorage.removeItem("legacy_arena_session");
+        } catch {}
+      }
+    }
     if (message.type === "peer-result" && [0, 1].includes(message.winner))
       peerResult(message);
     if (message.type === "error") {
@@ -465,6 +476,7 @@ function connect(firstMessage) {
     if (state.socket !== socket) return;
     state.socket = null;
     if (!state.peer?.opened) input.clear();
+    if (socket.closedByPeer || state.peer?.finished) return;
     const saved = storageGet(sessionStorage, "legacy_arena_session");
     if (saved && state.room) {
       toast(
@@ -482,12 +494,16 @@ function connect(firstMessage) {
         1000,
       );
     } else
-      toast("Không kết nối được máy ghép phòng. Chế độ offline vẫn chơi được.");
+      toast(
+        socket.failureMessage ||
+          "Không kết nối được máy ghép phòng. Chế độ offline vẫn chơi được.",
+      );
   };
   socket.onerror = () => {};
 }
 $("#create-room").onclick = () => {
   disconnect();
+  toast("Đang tạo phòng P2P…");
   connect({
     type: "create",
     hero: $("#hero").value,
@@ -501,6 +517,7 @@ $("#join-room").onclick = () => {
     return;
   }
   disconnect();
+  toast("Đang kết nối phòng…");
   connect({ type: "join", code, hero: $("#hero").value });
 };
 async function ready() {

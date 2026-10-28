@@ -91,6 +91,19 @@ function build({ out, assetsRoot }) {
     throw new Error("Output parent must not contain symlinks");
   checkExisting(out);
 
+  const peerPackage = path.join(ROOT, "node_modules/peerjs");
+  fs.mkdirSync(path.join(ROOT, "vendor"), { recursive: true });
+  fs.writeFileSync(
+    path.join(ROOT, "vendor/peerjs.min.js"),
+    fs
+      .readFileSync(path.join(peerPackage, "dist/peerjs.min.js"), "utf8")
+      .replace(/\n\/\/# sourceMappingURL=.*(?:\n|$)/, "\n"),
+  );
+  fs.copyFileSync(
+    path.join(peerPackage, "LICENSE"),
+    path.join(ROOT, "vendor/PEERJS-LICENSE.txt"),
+  );
+
   const output = new Map(Object.entries(compile()));
   const localMedia = (text) =>
     text
@@ -101,6 +114,7 @@ function build({ out, assetsRoot }) {
   output.set("coach.html", fs.readFileSync(path.join(ROOT, "coach.html")));
   const resources = [
     "manifest.webmanifest",
+    "vendor/PEERJS-LICENSE.txt",
     ...[
       "css",
       "js",
@@ -110,6 +124,7 @@ function build({ out, assetsRoot }) {
       "client",
       "offline",
       "protocol",
+      "vendor",
     ].flatMap((dir) =>
       walk(path.join(ROOT, dir))
         .filter((file) => /\.(?:js|mjs|css)$/.test(file))
@@ -150,7 +165,8 @@ function build({ out, assetsRoot }) {
     ),
   );
   const workerTemplate = fs.readFileSync(
-    path.join(ROOT, "tools/service-worker.js"), "utf8",
+    path.join(ROOT, "tools/service-worker.js"),
+    "utf8",
   );
   const contentVersion = hash(
     Buffer.concat([...output.values(), Buffer.from(workerTemplate)]),
@@ -207,16 +223,22 @@ function build({ out, assetsRoot }) {
   if (assetsRoot === fs.realpathSync(repo)) {
     const sourcePaths = precache
       .filter((file) => file !== "README.txt")
-      .map((file) => media.has(file) ? "../" + file : file)
+      .map((file) => (media.has(file) ? "../" + file : file))
       .sort();
-    const sourceVersion = hash(Buffer.from(JSON.stringify([
-      hash(workerTemplate),
-      ...sourcePaths.map((file) => [
-        file, hash(fs.readFileSync(path.resolve(ROOT, file))),
-      ]),
-    ])));
+    const sourceVersion = hash(
+      Buffer.from(
+        JSON.stringify([
+          hash(workerTemplate),
+          ...sourcePaths.map((file) => [
+            file,
+            hash(fs.readFileSync(path.resolve(ROOT, file))),
+          ]),
+        ]),
+      ),
+    );
     fs.writeFileSync(
-      path.join(ROOT, "precache.json"), JSON.stringify(sourcePaths, null, 2) + "\n",
+      path.join(ROOT, "precache.json"),
+      JSON.stringify(sourcePaths, null, 2) + "\n",
     );
     fs.writeFileSync(
       path.join(ROOT, "sw.js"),

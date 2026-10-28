@@ -1,6 +1,6 @@
 // Generated into sw.js by tools/build.cjs for source and standalone deployments.
 const PREFIX = 'legacy-arena-' + encodeURIComponent(self.registration.scope) + '-';
-const CACHE = PREFIX + '9a596a90f231f396';
+const CACHE = PREFIX + '0289ad5e840fb76a';
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const paths = await fetch(new URL('precache.json', self.registration.scope), { cache: 'no-store' }).then(response => { if (!response.ok) throw new Error('Missing offline manifest'); return response.json(); });
