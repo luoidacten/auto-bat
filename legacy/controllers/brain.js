@@ -52,7 +52,7 @@ class Brain {
     this.setTactic(tactic || 'balanced');
     this.pid = charId || (CHAR_BY_WEAPON[f.weaponId] && CHAR_BY_WEAPON[f.weaponId].id) || null;
     this.thinkT = rand(0, 0.2);
-    this.strafe = Math.random() < 0.5 ? 1 : -1;
+    this.strafe = random() < 0.5 ? 1 : -1;
     this.strafeT = rand(1, 3);
     this.shout = null;
     this.lastSeen = null;
@@ -83,7 +83,7 @@ class Brain {
   // Tín Nhiệm: <40 có thể phớt lờ • <60 chần chừ (tối đa ~1.2s) • ≥80 làm ngay lập tức
   order(id, m) {
     const f = this.f, tr = f.trust ?? 60;
-    if (Math.random() < Math.max(0, (40 - tr) / 100)) { m.text(f.x, f.y - 70, '🙄 Không nghe!', '#ffb030', 15); return false; }
+    if (random() < Math.max(0, (40 - tr) / 100)) { m.text(f.x, f.y - 70, '🙄 Không nghe!', '#ffb030', 15); return false; }
     const lag = Math.max(0, (60 - tr) / 60) * rand(0.7, 1.3) * 1.2;
     if (lag > 0.1) { this.pendOrder = { id, at: m.time + lag }; m.text(f.x, f.y - 70, '…', '#cccccc', 16); return true; }
     return this.exec(id, m);
@@ -104,7 +104,7 @@ class Brain {
       if (id === 'attack') { this.retreatT = 0; this.bait = null; this.seq = null; m.text(this.f.x, this.f.y - 70, '🔥 TẤT TAY!', '#ff6a3a', 16); }
       return true;
     }
-    if (C.disobey && Math.random() < C.disobey) { if (m) m.text(this.f.x, this.f.y - 70, '🎲 Phớt lờ HLV!', '#ffb030', 15); return false; }
+    if (C.disobey && random() < C.disobey) { if (m) m.text(this.f.x, this.f.y - 70, '🎲 Phớt lờ HLV!', '#ffb030', 15); return false; }
     // lệnh combo: tiếp cận rồi tung đúng chuỗi chiêu
     if (C.seq) { this.startSeq(C.seq, m, { anyRange: C.anyRange, full: C.full, label: C.name, wait: 5 }); return true; }
     this.cmd = Object.assign({ id }, C, { t: C.dur || 3 });
@@ -211,7 +211,7 @@ class Brain {
       if (reactOnly && !A.react && id !== ord) continue;
       const d = t ? dist(f, t) : 999;
       // lệnh HLV: dùng ngay (vẫn cần điều kiện tối thiểu để có tác dụng với các món phản xạ)
-      const ok = id === ord ? (!A.react || A.when(f, t, m, d, this) || !['it_anchor', 'it_hourglass'].includes(id)) : (t && A.when(f, t, m, d, this) && Math.random() < 0.55 + this.tech.reflex * 0.04);
+      const ok = id === ord ? (!A.react || A.when(f, t, m, d, this) || !['it_anchor', 'it_hourglass'].includes(id)) : (t && A.when(f, t, m, d, this) && random() < 0.55 + this.tech.reflex * 0.04);
       if (!ok) continue;
       if (!A.react && !id.includes('mercury') && (f.has('stun') || f.has('charm'))) continue;
       f.icd[id] = A.cd;
@@ -297,7 +297,7 @@ class Brain {
         if (reactOnly && !S.react) continue;
         if (!S.react && (f.has('stun') || f.has('charm'))) continue;
         const d = t ? dist(f, t) : 999;
-        if (!S.when(f, t, m, d, this) || Math.random() > 0.5 + this.tech.reflex * 0.04) continue;
+        if (!S.when(f, t, m, d, this) || random() > 0.5 + this.tech.reflex * 0.04) continue;
       }
       if (castSpell(f, m, id, t)) { if (id === ord) this.spellOrder = null; return true; }
     }
@@ -343,7 +343,7 @@ class Brain {
     if (f.has('berserk')) { this.bait = null; return false; }
     // a) Phá tụ lực: đối thủ đang gồng/kéo/tích chiêu → bắn tầm xa hoặc lao vào cắt ngang
     const charging = t.action && t.action.charge && t.action.t < t.action.charge;
-    if (!BRAIN_OFF.charge && charging && tl >= 4 && d > reach * 0.8 && Math.random() < 0.25 + tl * 0.06) {
+    if (!BRAIN_OFF.charge && charging && tl >= 4 && d > reach * 0.8 && random() < 0.25 + tl * 0.06) {
       if (this.tryPoke(m, t, d) || (f.weaponId === 'katana' && this.katanaRanged(m, t, d)) || this.tryGap(m, t, d, true)) {
         m.text(f.x, f.y - 58, '✂️ Phá tụ lực!', '#ffe9a0', 13); return true;
       }
@@ -352,7 +352,7 @@ class Brain {
     const chasing = melee && d > reach + 50;
     this.chaseT = chasing ? (this.chaseT || 0) + this.interval : 0;
     const ordered = this.shout && this.shout.type === 'attack';
-    if (!BRAIN_OFF.gap && chasing && !this.bait && (ordered || this.punishT > m.time || (tl >= 3 && this.chaseT > 1.6 - tl * 0.1 && Math.random() < 0.2 + tl * 0.05))) {
+    if (!BRAIN_OFF.gap && chasing && !this.bait && (ordered || this.punishT > m.time || (tl >= 3 && this.chaseT > 1.6 - tl * 0.1 && random() < 0.2 + tl * 0.05))) {
       if (this.tryGap(m, t, d, ordered)) return true;
     }
     // c) Kẹp góc: theo lệnh, hoặc tự làm khi Tư duy cao và đối thủ đang sát mép
@@ -433,7 +433,7 @@ class Brain {
     if (m.time < (this.baitCd || 0) || this.punishT > m.time || t.weapon.ai.ranged) return;
     if (t.has('stun') || t.has('root') || t.percent > 110 || (this.shout && this.shout.type === 'attack') || this.seq || this.cmd) return;
     const tReach = this.threatReach(t);
-    if (d > reach && d < Math.max(tReach, reach) + 230 && Math.random() < 0.06 + (this.tech.tactic - 5) * 0.03) {
+    if (d > reach && d < Math.max(tReach, reach) + 230 && random() < 0.06 + (this.tech.tactic - 5) * 0.03) {
       this.bait = { until: m.time + rand(1.2, 2.2), dist: Math.max(tReach + 40, reach + 30) };
       m.text(f.x, f.y - 56, '🎣 Dụ đòn', '#9fd3ff', 12);
     }
@@ -517,12 +517,12 @@ class Brain {
     this.updateMood(t);
     // 0) Lật kèo khi bị khống chế (The Hand: Bất Ngờ Chưa)
     const C = f.weapon.skills.C;
-    if (C && C.breakCC && (f.has('stun') || f.has('charm') || f.has('root') || f.hitstun > 0.2) && f.cd.C <= 0 && Math.random() < 0.3 + this.tech.dodge * 0.07) {
+    if (C && C.breakCC && (f.has('stun') || f.has('charm') || f.has('root') || f.hitstun > 0.2) && f.cd.C <= 0 && random() < 0.3 + this.tech.dodge * 0.07) {
       if (this.use(m, 'C', { cast: escapeAngle(f, t, m), keepFacing: true })) return;
     }
     // Thanh Phong: D ở Bão Hòa thanh tẩy khống chế
     const Dk = f.weapon.skills.D;
-    if (Dk && Dk.breakCC && (f.has('stun') || f.has('root') || f.has('charm')) && f.canUse('D', m) && Math.random() < 0.3 + this.tech.dodge * 0.07) { if (this.use(m, 'D')) return; }
+    if (Dk && Dk.breakCC && (f.has('stun') || f.has('root') || f.has('charm')) && f.canUse('D', m) && random() < 0.3 + this.tech.dodge * 0.07) { if (this.use(m, 'D')) return; }
     // Koda hóa điên khi bị dồn quá 120%
     if (this.pid === 'koda' && !f.has('berserk') && f.percent > 120) {
       f.addStatus('berserk', 9999); m.text(f.x, f.y - 70, '🔴 KODA HÓA ĐIÊN!', '#ff3030', 22); m.shake(8);
@@ -530,7 +530,7 @@ class Brain {
     // 0d) Tái kích hoạt chiêu (đòn nối của nội tại): dùng đúng thời điểm
     for (const k of ['A', 'B', 'C', 'D']) {
       const s = f.weapon.skills[k];
-      if (s && s.recast && s.recastAi && s.recast(f) && f.canUse(k, m) && s.recastAi(f, t, m, d) && Math.random() < 0.5 + this.tech.reflex * 0.05) {
+      if (s && s.recast && s.recastAi && s.recast(f) && f.canUse(k, m) && s.recastAi(f, t, m, d) && random() < 0.5 + this.tech.reflex * 0.05) {
         if (this.use(m, k, { keepFacing: k === 'C' && f.weaponId === 'katana' })) return;
       }
     }
@@ -547,7 +547,7 @@ class Brain {
     if (!this.imm && this.profilePre(m, t, d)) return;
     // 0e) Đối thủ đang giơ khiên / thế thủ: đừng đánh vào, lùi ra khỏi tầm phản đòn
     const guard = t.has('block') || (this.tech.tactic >= 3 && (t.has('parry') || (t.has('absorb') && t.weaponId === 'nam_tay')));
-    if (guard && !f.has('berserk') && !this.allIn && Math.random() < 0.6 + this.tech.tactic * 0.04) {
+    if (guard && !f.has('berserk') && !this.allIn && random() < 0.6 + this.tech.tactic * 0.04) {
       const g = t.has('block') || t.has('parry') || t.has('absorb');
       this.retreatT = Math.max(this.retreatT, Math.min(1.2, (g ? g.t : 0.5) + 0.2));
       if (!this._guardSaid || m.time > this._guardSaid) { this._guardSaid = m.time + 3; m.text(f.x, f.y - 56, '✋ Né đòn thủ', '#cfd8e0', 12); }
@@ -563,7 +563,7 @@ class Brain {
       if (this.pid === 'zero') mult *= 1.6;
       if (this.pid === 'valerius' && threat.enemy && threat.enemy.action && (threat.enemy.action.windup || threat.enemy.action.charge)) mult *= 1.8;
       const chance = clamp((0.12 + this.tech.dodge * 0.075) * mult * this.wisK, 0, 0.95);
-      if (Math.random() < chance) {
+      if (random() < chance) {
         for (const k of f.weapon.ai.defend || []) {
           if (!f.canUse(k, m)) continue;
           const sk = f.weapon.skills[k];
@@ -575,7 +575,7 @@ class Brain {
       }
     }
     // 1b) Vũ khí tầm xa bị áp sát: lướt thoát thân
-    if (!this.allIn && f.weapon.ai.ranged && d < (this.pid === 'percy' ? 120 : 90) && Math.random() < (0.15 + this.tech.tactic * 0.05) * this.moodDef) {
+    if (!this.allIn && f.weapon.ai.ranged && d < (this.pid === 'percy' ? 120 : 90) && random() < (0.15 + this.tech.tactic * 0.05) * this.moodDef) {
       for (const k of f.weapon.ai.defend || []) {
         const sk = f.weapon.skills[k];
         if (!sk || !sk.ai || sk.ai.mob !== 'escape' || !f.canUse(k, m)) continue;
@@ -587,7 +587,7 @@ class Brain {
     // 1c) Né kẻ đang bất tử: chỉ dùng chiêu thoát thân khi hắn áp sát
     if (this.imm) {
       const di = dist(f, this.imm);
-      if (di < 170 && Math.random() < 0.3 + this.tech.dodge * 0.06) {
+      if (di < 170 && random() < 0.3 + this.tech.dodge * 0.06) {
         for (const k of ['C', 'E', 'B', 'D']) {
           const sk = f.weapon.skills[k];
           if (!sk || !sk.ai || !isMobility(sk) || !f.canUse(k, m)) continue;
@@ -600,7 +600,7 @@ class Brain {
     // 1d) Trụ sân: sát mép thì dùng chiêu cơ động (C) quay vào giữa
     const eSelf = m.arena.edgeDist(f.x, f.y);
     const tl = this.tech.tactic;
-    if (!this.allIn && (this.flag === 'stand' ? eSelf < 140 : tl >= 6 ? eSelf < 95 && this.danger > 0.6 && !(f.weapon.skills.C && f.weapon.skills.C.breakCC) : eSelf < 70 && this.danger > 0.6) && Math.random() < 0.6) {
+    if (!this.allIn && (this.flag === 'stand' ? eSelf < 140 : tl >= 6 ? eSelf < 95 && this.danger > 0.6 && !(f.weapon.skills.C && f.weapon.skills.C.breakCC) : eSelf < 70 && this.danger > 0.6) && random() < 0.6) {
       const sk = f.weapon.skills.C;
       if (sk && isMobility(sk) && f.canUse('C', m) && this.use(m, 'C', { cast: Math.atan2(-f.y, -f.x), keepFacing: true })) return;
     }
@@ -628,7 +628,7 @@ class Brain {
     if (f.has('immortal')) aggr *= 1.8;
     // chiến thuật Kết Liễu: giữ Nộ tới khi đối thủ đủ điểm văng
     if (this.tacEff.ult === 'finisher') this._holdUlt = t.percent < 85 && f.percent < 140 && !(this.shout && this.shout.type === 'ult');
-    if (Math.random() > clamp(0.5 * aggr + this.tech.reflex * 0.03, 0.15, 0.98)) return;
+    if (random() > clamp(0.5 * aggr + this.tech.reflex * 0.03, 0.15, 0.98)) return;
     const ch = this.choose(m, t, d);
     if (ch === 'wait') return;
     if (ch) { if (this.use(m, ch.k, ch)) return; }
@@ -656,7 +656,7 @@ class Brain {
       if (d < (ai.min || 0) - slop || d > ai.max + slop) continue;
       if (ai.when && !ai.when(f, t, m)) continue;
       if (blocked && ai.type === 'atk' && k !== 'U') continue;
-      if ((t.has('immortal') || t.has('parry') || t.has('absorb')) && ai.type === 'atk' && Math.random() < this.tech.dodge * 0.09) continue;
+      if ((t.has('immortal') || t.has('parry') || t.has('absorb')) && ai.type === 'atk' && random() < this.tech.dodge * 0.09) continue;
       let s = ai.pri * rand(0.6, 1.2) * ((this.tacEff.pref && this.tacEff.pref[k]) || 1) * ((this.cmd && this.cmd.pref && this.cmd.pref[k]) || 1);
       // vai trò: A đánh tích khi đối thủ còn ít điểm văng • B kết liễu khi đối thủ cao điểm / sát mép / bị khống chế
       if (k === 'A') s *= this.finishWindow(m, t) ? 0.8 : 1.35;
@@ -676,10 +676,10 @@ class Brain {
     // hành vi theo chiến thuật riêng của HLV
     switch (this.flag) {
       case 'punisher': // Gideon: gồng mỗi khi đối thủ vung đòn
-        if (atk && d < 230 && f.canUse('C', m) && Math.random() < 0.9) return this.use(m, 'C');
+        if (atk && d < 230 && f.canUse('C', m) && random() < 0.9) return this.use(m, 'C');
         break;
       case 'pain': // Borg: lao vào đòn đối thủ để Gồng
-        if ((atk || d < 110) && f.ws.charge === 0 && f.canUse('C', m) && Math.random() < 0.75) return this.use(m, 'C');
+        if ((atk || d < 110) && f.ws.charge === 0 && f.canUse('C', m) && random() < 0.75) return this.use(m, 'C');
         break;
       case 'phantom': // Vesper: ẩn thân liên tục, chỉ ra tay sau lưng
         if (!f.has('untargetable') && f.canUse('C', m) && d < 380) return this.use(m, 'C');
@@ -690,7 +690,7 @@ class Brain {
         if (f.ws.turret && d < 90 && f.canUse('B', m)) return false;
         break;
       case 'mill': // Death: liềm xoay khóa vùng
-        if (f.canUse('C', m) && d > 90 && d < 250 && (t.percent > 50 || Math.random() < 0.45)) return this.use(m, 'C');
+        if (f.canUse('C', m) && d > 90 && d < 250 && (t.percent > 50 || random() < 0.45)) return this.use(m, 'C');
         break;
       case 'execute': // Zero: chỉ xả băng khi đã khóa hoặc mục tiêu yếu
         if (f.canUse('B', m) && d < 340 && ((t.gunMark && t.gunMark.owner === f) || t.percent > 60)) return this.use(m, 'B');
@@ -698,10 +698,10 @@ class Brain {
     }
     switch (this.pid) {
       case 'elara':
-        if (d < 230 && f.canUse('C', m) && Math.random() < 0.7) return this.use(m, 'C', { cast: escapeAngle(f, t, m) });
+        if (d < 230 && f.canUse('C', m) && random() < 0.7) return this.use(m, 'C', { cast: escapeAngle(f, t, m) });
         break;
       case 'percy':
-        if (t.weaponId === 'cung' && Math.random() < 0.7) return true;
+        if (t.weaponId === 'cung' && random() < 0.7) return true;
         break;
       case 'jack':
         if (f.canUse('D', m) && !(this.cmd && this.cmd.block === 'D')) return this.use(m, 'D');
@@ -709,14 +709,14 @@ class Brain {
       case 'zero':
         if (this.flag !== 'execute' && t.gunMark && t.gunMark.owner === f && f.canUse('B', m) && d < 360) return this.use(m, 'B');
         if (f.ws.ammo === 0 && f.canUse('C', m)) return this.use(m, 'C', { cast: escapeAngle(f, t, m) });
-        if (d < 95 && !t.weapon.ai.ranged && f.canUse('C', m) && Math.random() < 0.5) return this.use(m, 'C', { cast: escapeAngle(f, t, m) });
+        if (d < 95 && !t.weapon.ai.ranged && f.canUse('C', m) && random() < 0.5) return this.use(m, 'C', { cast: escapeAngle(f, t, m) });
         if (!t.gunMark && f.canUse('D', m) && d < 520) return this.use(m, 'D');
         break;
       case 'death':
         if (t.percent > deathLine(f) && d < 186 && f.canUse('B', m)) return this.use(m, 'B');
         break;
       case 'borg':
-        if (t.weaponId === 'voice' && m.time > (this._idleCd || 0) && Math.random() < 0.3) { this._idleCd = m.time + 3; this.idleT = 0.5; m.text(f.x, f.y - 50, '...?', '#cccccc', 14); return true; }
+        if (t.weaponId === 'voice' && m.time > (this._idleCd || 0) && random() < 0.3) { this._idleCd = m.time + 3; this.idleT = 0.5; m.text(f.x, f.y - 50, '...?', '#cccccc', 14); return true; }
         if (t.weaponId === 'cung' && t.action && t.action.atk && f.canUse('C', m)) return this.use(m, 'C');
         break;
       case 'florian':
@@ -729,9 +729,9 @@ class Brain {
           // bị nhìn thẳng mặt: ẩn thân / phi dao áp sát từ phía sau, nếu không được thì rút lui
           if (f.canUse('C', m)) return this.use(m, 'C');
           if (f.canUse('D', m) && d > 50) return this.use(m, 'D');
-          if (Math.random() < 0.45) { this.retreatT = 0.5; return true; }
+          if (random() < 0.45) { this.retreatT = 0.5; return true; }
         }
-        if (f.canUse('C', m) && d > 160 && d < 330 && Math.random() < 0.35) return this.use(m, 'C');
+        if (f.canUse('C', m) && d > 160 && d < 330 && random() < 0.35) return this.use(m, 'C');
         break;
       case 'ignatius':
         if (f.ultReady() && !(m.arena.edgeDist(t.x, t.y) < 230 || t.percent > 90 || (this.shout && this.shout.type === 'ult'))) {
@@ -740,7 +740,7 @@ class Brain {
         } else this._holdUlt = false;
         break;
       case 'gideon':
-        if (t.action && t.action.atk && d < 210 && f.canUse('C', m) && Math.random() < 0.5) return this.use(m, 'C');
+        if (t.action && t.action.atk && d < 210 && f.canUse('C', m) && random() < 0.5) return this.use(m, 'C');
         if (d < 64 && f.canUse('D', m) && !f.T('gideon_6b')) return this.use(m, 'D');
         if (f.T('gideon_6b') && t.action && t.action.atk && d < 200 && f.canUse('D', m)) return this.use(m, 'D');
         break;
@@ -761,7 +761,7 @@ class Brain {
     if (this._holdUlt && f.weapon.skills.U) { /* Ignatius giữ nộ */ }
     // Chrono & Neo: Chuyển Thế ngay trước khi tung Nộ để Liên Hoa nở to gấp đôi
     else if (f.weaponId === 'song_luc' && can('U') && m.time - (f.ws.swapT || -9) > 1.3 && can('D') && d < 420) return { k: 'D' };
-    else if (can('U') && f.weapon.skills.U.ai && d <= (f.weapon.skills.U.ai.max || 400) && (Math.random() < 0.6 || (f.weaponId === 'song_luc' && m.time - (f.ws.swapT || -9) < 1.3))) return { k: 'U' };
+    else if (can('U') && f.weapon.skills.U.ai && d <= (f.weapon.skills.U.ai.max || 400) && (random() < 0.6 || (f.weaponId === 'song_luc' && m.time - (f.ws.swapT || -9) < 1.3))) return { k: 'U' };
     if (f.form === 'mech') {
       if (f.T('roxie_12b') && m.time - (f.ws.cEnd || -9) < 0.7 && can('B') && d < 185) return { k: 'B' };
       if (f.ws.mechHp < 30 && d < 175 && can('D')) return { k: 'D', hold: true };
@@ -798,7 +798,7 @@ class Brain {
         if (battery && room && f.ws.gears >= 2 && d > 90 && d < 420 && can('A')) return { k: 'A', hold: true };
         if (!battery && f.ws.parts < 3 && f.ws.gears >= gc && can('D') && !(f.ws.gears < gc + 2 && !f.ws.cannon && d < 350)) return { k: 'D' };
         if (f.ws.cannon && can('B') && (f.T('roxie_6a') ? d < 140 && f.percent > 40 : dist(f.ws.cannon, t) < 110)) return { k: 'B' };
-        if (room && f.ws.gears >= 2 && d > 110 && d < 360 && can('A') && Math.random() < 0.45) return { k: 'A', hold: true };
+        if (room && f.ws.gears >= 2 && d > 110 && d < 360 && can('A') && random() < 0.45) return { k: 'A', hold: true };
         if (d < 450 && can('A') && !m.arena.blocked(f.x, f.y, t.x, t.y, 4)) return { k: 'A' };
         return 'wait';
       }
@@ -810,7 +810,7 @@ class Brain {
         }
         const b = t.has('bleed');
         if (b && b.n >= bleedCap(f) - (f.has('berserk') ? 2 : 1) && can('B')) return { k: 'B' };
-        if (can('C') && d > 140 && Math.random() < 0.7) return { k: 'C' };
+        if (can('C') && d > 140 && random() < 0.7) return { k: 'C' };
         if (d < 62 && can('A')) return { k: 'A' };
         if (d > 55 && d < 220 && can('D')) return { k: 'D' };
         return null;
@@ -822,7 +822,7 @@ class Brain {
           return 'wait';
         }
         if (can('B') && d < 300 && (this.pinAligned(m, f, t) || (t.percent > 90 && d < 200))) return { k: 'B' };
-        if (can('D') && d < 115 && ((t.action && t.action.atk) || Math.random() < 0.3)) return { k: 'D' };
+        if (can('D') && d < 115 && ((t.action && t.action.atk) || random() < 0.3)) return { k: 'D' };
         if (can('A') && d > 50 && d < 182) return { k: 'A' };
         return null;
       }
@@ -833,7 +833,7 @@ class Brain {
         if (can('D') && d > 120 && d < 285) return { k: 'D' };
         const aR = f.T('death_12b') ? 196 : 142;
         if (can('A') && d > 55 && d < aR) return { k: 'A' };
-        if (can('C') && d > 170 && d < 320 && Math.random() < 0.3) return { k: 'C' };
+        if (can('C') && d > 170 && d < 320 && random() < 0.3) return { k: 'C' };
         if (can('B') && d > 90 && d < 182 && t.percent > 60) return { k: 'B' };
         return null;
       }
@@ -842,7 +842,7 @@ class Brain {
         if (f.ws.charge > 0 && can('B') && d < 104) return { k: 'B' };
         if (can('C') && f.ws.charge === 0 && t.action && t.action.atk && d < 170) return { k: 'C' };
         if (f.T('borg_12a') && f.ws.charge === 0 && can('B') && d > 110 && d < 270) return { k: 'B', hold: true };
-        if (can('D') && d > 30 && d < 170 && (f.T('borg_6a') ? this.pushAligned(m, t) || t.percent > 90 : Math.random() < 0.55)) return { k: 'D' };
+        if (can('D') && d > 30 && d < 170 && (f.T('borg_6a') ? this.pushAligned(m, t) || t.percent > 90 : random() < 0.55)) return { k: 'D' };
         if ((t.has('stun') || t.percent > 80) && can('B') && d < 80) return { k: 'B' };
         if (can('A') && d < 62) return { k: 'A' };
         return null;
@@ -874,13 +874,13 @@ class Brain {
           this.backoff = m.time + 0.35;
           return 'wait';
         }
-        if (can('B') && d > 140 && d < (emp ? 245 : 205) && (this.finishWindow(m, t) || Math.random() < 0.55)) return { k: 'B' };
+        if (can('B') && d > 140 && d < (emp ? 245 : 205) && (this.finishWindow(m, t) || random() < 0.55)) return { k: 'B' };
         if (can('A') && d > (all ? 50 : 88) && d < (emp ? 195 : 162)) return { k: 'A' };
         return 'wait';
       }
       case 'truong': {
         // Ignatius: dịch chuyển áp sát phía trong sân để vụ nổ điểm đến đẩy đối thủ ra mép
-        if (can('C') && d > 150 && d < 300 && this.tech.tactic >= 3 && m.arena.edgeDist(t.x, t.y) < 200 && this.pushAligned(m, t) && Math.random() < 0.5) {
+        if (can('C') && d > 150 && d < 300 && this.tech.tactic >= 3 && m.arena.edgeDist(t.x, t.y) < 200 && this.pushAligned(m, t) && random() < 0.5) {
           f.castDist = d - 70; return { k: 'C', cast: angTo(f, t) };
         }
         if (f.T('ignatius_6a') && can('D') && ((t.weapon.ai.ranged && d < 520) || (d < 230 && !t.weapon.ai.ranged))) return { k: 'D' };
@@ -893,7 +893,7 @@ class Brain {
         const hunt = t.ocaMark && t.ocaMark.owner === f && t.ocaMark.until > m.time;
         if (hunt) return can('B') ? { k: 'B' } : 'wait';
         if (m.arena.blocked(f.x, f.y, t.x, t.y, 4)) return null;
-        if (can('B') && (d > 200 || f.T('raven_12a')) && (this.finishWindow(m, t) || t.percent > 55 || f.T('raven_12a') || Math.random() < 0.45)) return { k: 'B' };
+        if (can('B') && (d > 200 || f.T('raven_12a')) && (this.finishWindow(m, t) || t.percent > 55 || f.T('raven_12a') || random() < 0.45)) return { k: 'B' };
         if (can('A') && d < 460) return { k: 'A' };
         return null;
       }
@@ -920,7 +920,7 @@ class Brain {
         if (t.weaponId === 'nam_tay' && d < 100 && can('C')) { f.ws.holdWant = 3; return { k: 'C', cast: escapeAngle(f, t, m) }; }
         // kiếm sĩ phản đòn đang thủ thế: không đâm B thẳng mặt, nhảy C đánh úp từ trên xuống
         const guarded = (t.weaponId === 'song_kiem' || t.weaponId === 'katana' || t.weaponId === 'rapier') && (t.has('parry') || !(t.moveDir.x || t.moveDir.y));
-        if (guarded && can('C') && d < 200 && Math.random() < 0.5) return { k: 'C', cast: angTo(f, t) };
+        if (guarded && can('C') && d < 200 && random() < 0.5) return { k: 'C', cast: angTo(f, t) };
         const emp = f.ws.focus >= 50 || f.ws.ultT > 0;
         if (can('A') && d < (emp ? 220 : 130)) return { k: 'A' };
         if (can('B') && !guarded && d > 50 && d < (emp ? 300 : 155)) return { k: 'B' };
@@ -931,7 +931,7 @@ class Brain {
         const act = t.action;
         const heavy = act && act.atk && (act.windup || act.charge || act.dur >= 0.4);
         const ryoNext = t.weaponId === 'katana' && t.ws.last && t.ws.lastT < 1.8 && act && act.atk;
-        if (can('D') && d < 190 && (ryoNext || (heavy && Math.random() < 0.5))) return { k: 'D' };
+        if (can('D') && d < 190 && (ryoNext || (heavy && random() < 0.5))) return { k: 'D' };
         const n = kzNeed(f);
         if (can('C') && f.ws.si >= 5 && f.percent > 70 && d < 240) return { k: 'C', hold: true };
         if (f.T('kazuki_12a')) { if (can('C') && d < 200) return { k: 'C', cast: angTo(f, t) }; return can('A') && d < 96 ? { k: 'A' } : null; }
@@ -939,7 +939,7 @@ class Brain {
         const want = t.weapon.ai.ranged || d > 170 ? 'BB' : t.percent > 80 ? (m.arena.edgeDist(t.x, t.y) < 220 ? 'AB' : 'BB') : crowd ? 'AA' : 'BA';
         const form = kzForm(f, m);
         if (can('C') && form === want && d < (want === 'BB' ? 210 : 130)) return { k: 'C', cast: angTo(f, t) };
-        if (can('C') && form && d < 120 && Math.random() < 0.3) return { k: 'C', cast: angTo(f, t) };
+        if (can('C') && form && d < 120 && random() < 0.3) return { k: 'C', cast: angTo(f, t) };
         if (!can('C') && f.cd.C > 1.2) return can('A') && d < 92 ? { k: 'A' } : can('B') && d < 106 ? { k: 'B' } : null;
         const win = f.T('kazuki_1b') ? 2.5 : 1.5, last = m.time - (f.ws.lastT || -9) <= win ? f.ws.seq[f.ws.seq.length - 1] : null;
         const next = last === want[0] && form !== want ? want[1] : want[0];
@@ -978,7 +978,7 @@ class Brain {
       case 'bai': {
         // Joker: rút bài liên tục • tay trắng → C tráo • cầm Bích + đối thủ sát mép → ném • cầm Joker → chờ địch sát mép rồi đổi chỗ
         const card = f.ws.card, edgeT = m.arena.edgeDist(t.x, t.y);
-        if (t.weaponId === 'luc_xoay' && t.ws.rr && can('C') && d < 500) return { k: 'C', cast: angTo(f, t) + Math.PI / 2 * (Math.random() < 0.5 ? 1 : -1) };
+        if (t.weaponId === 'luc_xoay' && t.ws.rr && can('C') && d < 500) return { k: 'C', cast: angTo(f, t) + Math.PI / 2 * (random() < 0.5 ? 1 : -1) };
         if (f.ws.stolen && can('D') && d < 380) return { k: 'D' };
         if (f.ultReady() && can('U') && ((f.percent > 85 && t.percent < 40) || t.percent > 95 || f.T('joker_12b') && t.percent > 70)) return { k: 'U' };
         if (!card && can('B')) return { k: 'B' };
@@ -1009,10 +1009,10 @@ class Brain {
           if (st !== 'nghich' && can('D')) return { k: 'D' };
           if (st === 'nghich' && can('B')) return { k: 'B' };
         }
-        if (st === 'nghich' && can('B') && d < 300 && Math.random() < 0.5) return { k: 'B' };
+        if (st === 'nghich' && can('B') && d < 300 && random() < 0.5) return { k: 'B' };
         if (can('A') && d < 380) return { k: 'A' };
         if (st !== 'nghich' && can('B') && d < 100) return { k: 'B' };
-        if (can('D') && Math.random() < 0.12) return { k: 'D' };
+        if (can('D') && random() < 0.12) return { k: 'D' };
         return null;
       }
       case 'binh_doc': {
@@ -1037,7 +1037,7 @@ class Brain {
         // đang chơi Cò Quay Nga: chỉ còn cách bóp cò
         if (f.ws.rr) return can('A') && d < 600 && !m.arena.blocked(f.x, f.y, t.x, t.y, 6) ? { k: 'A' } : 'wait';
         if (f.ultReady() && can('U')) return { k: 'U' };
-        if (f.T('jack_6b') && f.ws.cyl >= 3 && d < 230 && can('A') && Math.random() < 0.5) return { k: 'A', hold: true };
+        if (f.T('jack_6b') && f.ws.cyl >= 3 && d < 230 && can('A') && random() < 0.5) return { k: 'A', hold: true };
         return null;
       }
     }
@@ -1108,7 +1108,7 @@ class Brain {
     const f = this.f, W = f.weapon, A = m.arena;
     if (f.ws.turret && !f.T('percy_12c:gatling') && !(f.T('percy_12c:overheat') && f.ws.turret.t > 5 && dist(f, t) > turretRange(f))) {
       const d = dist(f, t);
-      if (d > 85 || Math.random() < 0.6) { f.moveDir = { x: 0, y: 0 }; return; }
+      if (d > 85 || random() < 0.6) { f.moveDir = { x: 0, y: 0 }; return; }
     }
     if (f.ws.cling) { f.moveDir = { x: 0, y: 0 }; return; }
     const look = this.lastSeen || t;
@@ -1281,7 +1281,7 @@ class Brain {
       const a = t.facing; return { x: t.x + Math.cos(a) * 140, y: t.y + Math.sin(a) * 140 };
     }
     // Dao găm: vòng ra sau lưng đối thủ
-    if (id === 'dao' && this.tech.tactic >= 2 && Math.random() < 0.9) {
+    if (id === 'dao' && this.tech.tactic >= 2 && random() < 0.9) {
       const back = t.facing + Math.PI;
       const cur = angTo(t, f);
       const step = clamp(angDiff(cur, back), -0.8, 0.8);

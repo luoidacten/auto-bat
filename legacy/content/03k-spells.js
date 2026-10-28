@@ -161,7 +161,7 @@ function castSpell(f, m, id, t) {
 // HLV máy chọn phép theo đối thủ ("đổi giữa hiệp khi...")
 function coachPickSpells(me, opp, n) {
   const oc = opp && opp.charId;
-  const score = (id) => (SPELLS[id].counters.includes(oc) ? 3 : 0) + Math.random() * 1.5
+  const score = (id) => (SPELLS[id].counters.includes(oc) ? 3 : 0) + random() * 1.5
     + (id === 'flash' ? 1 : 0) + (id === 'purge' ? 0.6 : 0)
     + (id === 'grapple' && !isRanged(me) ? 0.6 : 0) + (id === 'overclock' && ['ryoma', 'kazuki', 'wukong'].includes(me.charId) ? 1 : 0);
   return SPELL_IDS.slice().sort((a, b) => score(b) - score(a)).slice(0, n);

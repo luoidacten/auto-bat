@@ -203,6 +203,6 @@ const ITEM_FX = Object.fromEntries(ITEMS.filter((e) => e.fx).map((e) => [e.id, e
 function randomItems(level) {
   const eq = [];
   const maxT = level >= 9 ? 3 : level >= 4 ? 2 : level >= 1.5 ? 1 : 0;
-  for (let tier = 1; tier <= maxT; tier++) if (Math.random() < 0.85) eq.push(pick(ITEMS.filter((e) => e.tier === tier && e.id !== 'it_magnet' && e.id !== 'it_lifecrystal')).id);
+  for (let tier = 1; tier <= maxT; tier++) if (random() < 0.85) eq.push(pick(ITEMS.filter((e) => e.tier === tier && e.id !== 'it_magnet' && e.id !== 'it_lifecrystal')).id);
   return eq;
 }

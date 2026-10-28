@@ -332,7 +332,7 @@ Object.assign(WEAPONS, {
     // Thoát Hiểm Ảo Ảnh: cứu 1 lần rơi đài (ngẫu nhiên ở 1 trong 2 mạng)
     onFall(f, m) {
       if (f._cheatUsed) return true;
-      if (!f._cheatRolled) { f._cheatRolled = true; if (Math.random() < 0.5 && f.stocks > 1) return true; }
+      if (!f._cheatRolled) { f._cheatRolled = true; if (random() < 0.5 && f.stocks > 1) return true; }
       f._cheatUsed = true;
       const p = m.arena.clamp({ x: 0, y: 0 }, f.r + 4);
       f.x = p.x; f.y = p.y; f.vx = f.vy = 0; f.vz = 0; f.z = 0; f.hitstun = 0; f.action = null; f.cancelDash();
@@ -512,7 +512,7 @@ Object.assign(WEAPONS, {
       if (d.ws.still) { d.moveDir = { x: 0, y: 0 }; if (e) d.facing = angTo(d, e); return; }
       if (d.ws.scatter) {
         if (edge < 80) d.ws.dir = toC + rand(-0.6, 0.6);
-        if (Math.random() < dt * 0.8) d.ws.dir += rand(-1.2, 1.2);
+        if (random() < dt * 0.8) d.ws.dir += rand(-1.2, 1.2);
         d.moveDir = { x: Math.cos(d.ws.dir), y: Math.sin(d.ws.dir) }; d.facing = d.ws.dir;
         return;
       }

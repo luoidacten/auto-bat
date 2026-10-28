@@ -9,10 +9,12 @@ function shoot(f, m, angle, o) {
   return m.proj(Object.assign({ owner: f, x: f.x + off.x, y: f.y + off.y, angle }, o));
 }
 function aimOr(f, m, range, speed) {
+  if (f.human) return f.castAngle;
   const t = m.autoTarget(f, range);
   return t ? m.aimAngle(f, t, speed) : f.facing;
 }
 function escapeAngle(f, t, m) {
+  if (f.human) return f.castAngle;
   // chạy ra xa đối thủ nhưng hướng về giữa sân
   const away = t ? angTo(t, f) : f.facing + Math.PI;
   const toC = Math.atan2(-f.y, -f.x);
@@ -200,7 +202,7 @@ const WEAPONS = {
             m.fx({ type: 'telegraph', x: c.x, y: c.y, r: 150, color: '#9fe8ff', life: 0.35 });
             m.later(0.3, () => m.zone({ owner: f, x: c.x, y: c.y, r: 150, life: 2.5, every: 0.25, kind: 'ice', color: 'rgba(160,230,255,0.22)',
               tick: (mm, z) => {
-                for (const e of mm.enemiesOf(f)) if (Math.hypot(e.x - z.x, e.y - z.y) < z.r + e.r) { e.addStatus('slow', 0.4, 0.6); if (Math.random() < 0.35) mm.applyHit(f, e, { dmg: 0.8, noKnock: true, tag: 'C', quiet: true }); }
+                for (const e of mm.enemiesOf(f)) if (Math.hypot(e.x - z.x, e.y - z.y) < z.r + e.r) { e.addStatus('slow', 0.4, 0.6); if (random() < 0.35) mm.applyHit(f, e, { dmg: 0.8, noKnock: true, tag: 'C', quiet: true }); }
                 for (let i = 0; i < 3; i++) mm.particle(z.x + rand(-z.r, z.r) * 0.8, z.y + rand(-z.r, z.r) * 0.8, { color: '#cff6ff', life: 0.35, size: 3, vx: 0, vy: 140 });
               } }));
             return;
@@ -214,7 +216,7 @@ const WEAPONS = {
       B: { name: 'Kéo Căng Dây', cd: 4.5, hold: 1.5, desc: 'Kết liễu: giữ để kéo dây cung — càng lâu mũi tên càng mạnh, càng nhanh, có thể xuyên thấu (tối đa 1.5s).',
         ai: { type: 'atk', min: 140, max: 560, pri: 2.6 },
         use(f, m) {
-          const hold = f.brain ? f.brain.holdTime(1.5, f) : 1.2;
+          const hold = f.human ? Math.min(1.5, f.manualHold || .05) : (f.brain ? f.brain.holdTime(1.5, f) : 1.2);
           const foc = f.ws.focusT >= 5;
           const xp = f.T('elara_3b');
           f.act(hold + 0.12, { move: f.T('elara_9a') || f.T('elara_6c') ? 1 : 0.4, anim: 'draw', atk: true, charge: hold }, [[hold, () => {
@@ -318,7 +320,7 @@ const WEAPONS = {
       B: { name: 'Đại Hỏa Cầu', cd: 3.4, hold: 1.6, desc: 'Kết liễu: giữ để tích một quả cầu lửa lớn (tối đa 1.6s); thả ra bay tới mục tiêu và nổ rất to.',
         ai: { type: 'atk', min: 120, max: 470, pri: 2.7 },
         use(f, m) {
-          const hold = f.brain ? f.brain.holdTime(1.6, f) : 1.2;
+          const hold = f.human ? Math.min(1.6, f.manualHold || .05) : (f.brain ? f.brain.holdTime(1.6, f) : 1.2);
           f.act(hold + 0.15, { move: 0.5, anim: 'cast', atk: true, charge: hold }, [[hold, () => {
             const p = hold / 1.6, t = m.autoTarget(f, 520);
             const a = t ? m.aimAngle(f, t, 480) : f.facing;
@@ -626,7 +628,7 @@ const WEAPONS = {
         use(f, m) {
           // Kiếm Cư Hợp: tra kiếm tụ lực rồi lướt chém xuyên sàn
           if (f.T('ryoma_12b')) {
-            const hold = f.brain ? f.brain.holdTime(1, f) : 0.7, p = hold / 1, hit = new Set();
+            const hold = f.human ? Math.min(1, f.manualHold || .05) : (f.brain ? f.brain.holdTime(1, f) : 0.7), p = hold / 1, hit = new Set();
             f.act(hold + 0.22, { move: 0.15, anim: 'guard', atk: true, charge: hold }, [[hold, () => {
               const a = f.facing;
               f.startDash({ angle: a, dist: lerp(230, 380, p), dur: 0.1, invuln: true, trail: true, through: true, onContact: (e) => {
@@ -741,7 +743,7 @@ const WEAPONS = {
     },
     skills: {
       A: { name: 'Quét Ngang', cd: 1.1, desc: 'Đánh tích: vung kiếm 180° phía trước (gồng 0.3s trước khi chém). Kiểm soát hai bên hông.',
-        ai: { type: 'atk', min: 50, max: 160, pri: 2.4, when: (f, t) => f.ws.emp > 0 || dist(f, t) > 95 || Math.random() < 0.35 },
+        ai: { type: 'atk', min: 50, max: 160, pri: 2.4, when: (f, t) => f.ws.emp > 0 || dist(f, t) > 95 || random() < 0.35 },
         // Quét Ngược Trừng Phạt: vung ngược lại kéo địch vào gần
         recast(f) { return f.T('gideon_6a') && f.ws.backA > 0; },
         recastAi: (f, t, m, d) => d > 120 && d < 175,
@@ -801,7 +803,7 @@ const WEAPONS = {
           m.text(f.x, f.y - 56, '🗡️ XUNG TRẬN!', '#ffd24a', 16);
         },
         use(f, m) {
-          const hold = f.brain ? f.brain.holdTime(2, f) : 1;
+          const hold = f.human ? Math.min(2, f.manualHold || .05) : (f.brain ? f.brain.holdTime(2, f) : 1);
           f.addStatus('stance', hold); f.addStatus('ironbody', hold); f.addStatus('unstoppable', hold);
           f.act(hold, { move: 0.15, anim: 'guard', super: true, charge: hold, onEnd: () => { f.removeStatus('stance'); f.removeStatus('ironbody'); f.removeStatus('unstoppable'); f.ws.emp = 3; } });
         } },
@@ -982,7 +984,7 @@ const WEAPONS = {
             if (m.arena.edgeDist(nx, ny) > 34 || m.arena.edgeDist(nx, ny) > m.arena.edgeDist(f.x, f.y)) { f.x = nx; f.y = ny; }
           }
         }
-        if (oh && tu.t > 3 && Math.random() < dt * 4) m.particle(f.x, f.y - 10, { color: '#ff8a3a', life: 0.4, size: 4, vx: rand(-30, 30), vy: -60 });
+        if (oh && tu.t > 3 && random() < dt * 4) m.particle(f.x, f.y - 10, { color: '#ff8a3a', life: 0.4, size: 4, vx: rand(-30, 30), vy: -60 });
       }
     },
     onDeal(f, t, hit, info) { info.mult *= 1 + 0.2 * f.ws.stacks; },
@@ -1188,7 +1190,7 @@ function lureEnemies(owner, lures, m, dur) {
   for (const e of m.fighters) {
     if (e.team === owner.team || !e.alive) continue;
     const tl = e.brain ? e.brain.tech.tactic : 3;
-    if (Math.random() < clamp(0.85 - tl * 0.055, 0.3, 0.8)) e.focus = { by: pick(lures), until: m.time + dur };
+    if (random() < clamp(0.85 - tl * 0.055, 0.3, 0.8)) e.focus = { by: pick(lures), until: m.time + dur };
   }
 }
 // Ảo Ảnh Phân Thân (Vesper Lv12): 2 phân thân chạy 2 hướng

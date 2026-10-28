@@ -21,7 +21,7 @@ function envStrike(m, x, y, r, delay, color, onHit, kind) {
 }
 function nearFighterPoint(m, spread) {
   const live = m.fighters.filter((f) => f.alive);
-  const base = live.length && Math.random() < 0.75 ? pick(live) : { x: rand(-m.arena.hx, m.arena.hx) * 0.7, y: rand(-m.arena.hy, m.arena.hy) * 0.7 };
+  const base = live.length && random() < 0.75 ? pick(live) : { x: rand(-m.arena.hx, m.arena.hx) * 0.7, y: rand(-m.arena.hy, m.arena.hy) * 0.7 };
   const a = rand(0, TAU), d = rand(0, spread);
   return m.arena.clamp({ x: base.x + Math.cos(a) * d + (base.vx || 0) * 0.3, y: base.y + Math.sin(a) * d + (base.vy || 0) * 0.3 }, 30);
 }
@@ -39,25 +39,14 @@ const HAZARDS = {
           const k = 300 / f.weight * (f.superArmor ? 0.4 : 1);
           f.vx += Math.cos(h.dir) * k * dt; f.vy += Math.sin(h.dir) * k * dt;
         }
-        if (Math.random() < 0.8) m.particle(rand(-m.arena.hx, m.arena.hx), rand(-m.arena.hy, m.arena.hy), { color: pick(['#d8f0c0', '#a0d080', '#ffffff']), life: 0.8, size: 4, vx: Math.cos(h.dir) * 600, vy: Math.sin(h.dir) * 600 });
+        if (random() < 0.8) m.particle(rand(-m.arena.hx, m.arena.hx), rand(-m.arena.hy, m.arena.hy), { color: pick(['#d8f0c0', '#a0d080', '#ffffff']), life: 0.8, size: 4, vx: Math.cos(h.dir) * 600, vy: Math.sin(h.dir) * 600 });
         return;
       }
       h.t -= dt;
       if (h.t <= 1.3 && !h.warn) { h.warn = 1; h.dir = rand(0, TAU); m.text(0, -m.arena.hy - 20, `🍃 GIÓ GIẬT ${arrowOf(h.dir)}`, '#d8f0c0', 22); m.sfx('spin', { vol: 0.6, rate: 0.6 }); }
       if (h.t <= 0) { h.gust = 2.4; h.t = rand(6.5, 9); h.warn = 0; }
     },
-    drawUnder(ctx, m) {
-      const h = m.hz; if (!(h.warn || h.gust > 0)) return;
-      ctx.save(); ctx.globalAlpha = h.gust > 0 ? 0.35 : 0.2 + 0.15 * Math.sin(m.time * 12);
-      ctx.strokeStyle = '#e8ffd0'; ctx.lineWidth = 6;
-      for (let i = -2; i <= 2; i++) for (let j = -1; j <= 1; j++) {
-        const cx = i * 170 + j * 60, cy = j * 150;
-        ctx.save(); ctx.translate(cx, cy); ctx.rotate(h.dir);
-        ctx.beginPath(); ctx.moveTo(-30, 0); ctx.lineTo(30, 0); ctx.lineTo(16, -12); ctx.moveTo(30, 0); ctx.lineTo(16, 12); ctx.stroke();
-        ctx.restore();
-      }
-      ctx.restore();
-    },
+
   },
   // 🪨 Đá lở
   rocks: {
@@ -65,7 +54,7 @@ const HAZARDS = {
     update(m, dt) {
       const h = m.hz; h.t -= dt; if (h.t > 0) return;
       h.t = rand(2, 3);
-      const n = Math.random() < 0.35 ? 2 : 1;
+      const n = random() < 0.35 ? 2 : 1;
       for (let i = 0; i < n; i++) {
         const p = nearFighterPoint(m, 110);
         envStrike(m, p.x, p.y, 62, 1.15, '#c9b89a', (f, s) => envHit(m, f, { dmg: 7, kb: 170, kg: 3, stun: 0.4, src: s }), () => {
@@ -89,16 +78,7 @@ const HAZARDS = {
       h.t -= dt;
       if (h.t <= 0) { h.storm = 3.5; h.t = rand(9, 12); m.text(0, -m.arena.hy - 20, '❄️ BÃO TUYẾT!', '#d0f0ff', 22); m.sfx('spin', { vol: 0.7, rate: 0.5 }); }
     },
-    drawOver(ctx, m) {
-      const h = m.hz; if (h.storm <= 0) return;
-      ctx.save(); ctx.fillStyle = '#ffffff'; ctx.globalAlpha = Math.min(1, h.storm) * 0.8;
-      for (const s of h.flakes) {
-        const x = s.x * m.arena.hx * 1.2 + Math.sin(m.time * 2 + s.y * 5) * 30, y = ((s.y + 1 + m.time * 0.35 * s.s / 3) % 2 - 1) * m.arena.hy * 1.3;
-        ctx.fillRect(x, y, s.s, s.s);
-      }
-      ctx.globalAlpha = Math.min(1, h.storm) * 0.12; ctx.fillRect(-m.arena.hx * 1.3, -m.arena.hy * 1.4, m.arena.hx * 2.6, m.arena.hy * 2.8);
-      ctx.restore();
-    },
+
   },
   // 🌋 Phun trào dung nham + mép nóng
   eruption: {
@@ -108,7 +88,7 @@ const HAZARDS = {
       h.heat -= dt;
       if (h.heat <= 0) {
         h.heat = 0.5;
-        for (const f of m.bodies) if (f.alive && f.z <= 0 && m.arena.edgeDist(f.x, f.y) < 45) { f.addStatus('burn', 1, 1.6); if (Math.random() < 0.3) m.text(f.x, f.y - 40, '🔥 nóng!', '#ff8a3a', 12); }
+        for (const f of m.bodies) if (f.alive && f.z <= 0 && m.arena.edgeDist(f.x, f.y) < 45) { f.addStatus('burn', 1, 1.6); if (random() < 0.3) m.text(f.x, f.y - 40, '🔥 nóng!', '#ff8a3a', 12); }
       }
       h.t -= dt; if (h.t > 0) return;
       h.t = rand(1.6, 2.4);
@@ -136,15 +116,7 @@ const HAZARDS = {
         m.text(f.x, f.y - 40, '☁️ BẬT!', '#ffffff', 15); m.sfx('spin', { rate: 1.3, vol: 0.6 });
       }
     },
-    drawUnder(ctx, m) {
-      for (const p of m.hz.pads) {
-        ctx.save(); ctx.globalAlpha = 0.85; ctx.fillStyle = '#ffffff';
-        for (let i = 0; i < 5; i++) { const a = i * TAU / 5 + m.time * 0.5; ctx.beginPath(); ctx.arc(p.x + Math.cos(a) * 14, p.y + Math.sin(a) * 9, 16, 0, TAU); ctx.fill(); }
-        ctx.strokeStyle = '#9fd3ff'; ctx.lineWidth = 3; ctx.globalAlpha = 0.5 + 0.3 * Math.sin(m.time * 4);
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r + 6, 0, TAU); ctx.stroke();
-        ctx.restore();
-      }
-    },
+
   },
   // ✴️ Ấn Võ Thần: chiếm ấn để được cường hóa
   runes: {
@@ -172,14 +144,7 @@ const HAZARDS = {
         m.text(p.x, p.y - 40, '✴️ Ấn xuất hiện!', '#ffd76a', 15);
       }
     },
-    drawUnder(ctx, m) {
-      const r = m.rune; if (!r) return;
-      ctx.save(); ctx.translate(r.x, r.y); ctx.rotate(m.time * 1.5);
-      ctx.strokeStyle = '#ffd76a'; ctx.lineWidth = 4; ctx.globalAlpha = 0.6 + 0.3 * Math.sin(m.time * 6);
-      ctx.beginPath(); ctx.arc(0, 0, r.r, 0, TAU); ctx.stroke();
-      ctx.beginPath(); for (let i = 0; i < 5; i++) { const q = fromAng(i * TAU * 2 / 5, r.r * 0.85); i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); } ctx.closePath(); ctx.stroke();
-      ctx.restore();
-    },
+
   },
   // 🌿 Bụi rậm che thân
   bushes: {
@@ -192,18 +157,7 @@ const HAZARDS = {
         if (f.inBush && !(f.action && f.action.atk)) f.addStatus('untargetable', 0.15);
       }
     },
-    drawOver(ctx, m) {
-      for (const b of m.hz.list) {
-        ctx.save(); ctx.globalAlpha = 0.82;
-        for (let i = 0; i < 9; i++) {
-          const a = i * TAU / 9, rr = b.r * (i % 2 ? 0.55 : 0.75);
-          ctx.fillStyle = i % 3 ? '#2f6a2a' : '#3f8a35';
-          ctx.beginPath(); ctx.arc(b.x + Math.cos(a) * rr * 0.6, b.y + Math.sin(a) * rr * 0.5, b.r * 0.42, 0, TAU); ctx.fill();
-        }
-        ctx.fillStyle = '#4f9a40'; ctx.beginPath(); ctx.arc(b.x, b.y, b.r * 0.45, 0, TAU); ctx.fill();
-        ctx.restore();
-      }
-    },
+
   },
   // 🌊 Sóng tràn quét ngang
   waves: {
@@ -220,26 +174,15 @@ const HAZARDS = {
           if (!f.superArmor) { f.action = null; f.cancelDash(); }
           m.text(f.x, f.y - 40, '🌊', '#9fe0ff', 18);
         }
-        if (Math.random() < 0.9) m.particle(h.front, rand(-A.hy, A.hy), { color: pick(['#ffffff', '#9fe0ff']), life: 0.5, size: 5, vx: h.dir * 300, vy: rand(-60, 60) });
+        if (random() < 0.9) m.particle(h.front, rand(-A.hy, A.hy), { color: pick(['#ffffff', '#9fe0ff']), life: 0.5, size: 5, vx: h.dir * 300, vy: rand(-60, 60) });
         if (h.dir * h.front > A.hx + 100) h.front = null;
         return;
       }
       h.t -= dt;
-      if (h.t <= 1.6 && !h.warn) { h.warn = 1; h.dir = Math.random() < 0.5 ? 1 : -1; m.text(0, -A.hy - 20, `🌊 SÓNG TRÀN ${h.dir > 0 ? '→' : '←'}`, '#9fe0ff', 22); m.sfx('splat', { rate: 0.5, vol: 0.8 }); }
+      if (h.t <= 1.6 && !h.warn) { h.warn = 1; h.dir = random() < 0.5 ? 1 : -1; m.text(0, -A.hy - 20, `🌊 SÓNG TRÀN ${h.dir > 0 ? '→' : '←'}`, '#9fe0ff', 22); m.sfx('splat', { rate: 0.5, vol: 0.8 }); }
       if (h.t <= 0) { h.front = -h.dir * (A.hx + 80); h.t = rand(8, 11); h.warn = 0; h.hitSet = new Set(); }
     },
-    drawOver(ctx, m) {
-      const h = m.hz, A = m.arena;
-      if (h.warn) {
-        ctx.save(); ctx.globalAlpha = 0.25 + 0.2 * Math.sin(m.time * 14); ctx.fillStyle = '#4ab0ff';
-        const x0 = h.dir > 0 ? -A.hx : A.hx - 60; ctx.fillRect(x0, -A.hy, 60, 2 * A.hy); ctx.restore();
-      }
-      if (h.front !== null) {
-        ctx.save(); const g = ctx.createLinearGradient(h.front - h.dir * 120, 0, h.front, 0);
-        g.addColorStop(0, 'rgba(60,160,255,0)'); g.addColorStop(1, 'rgba(180,230,255,0.75)');
-        ctx.fillStyle = g; ctx.fillRect(Math.min(h.front, h.front - h.dir * 120), -A.hy - 20, 120, 2 * A.hy + 40); ctx.restore();
-      }
-    },
+
   },
   // ⚡ Sét đánh
   lightning: {
@@ -269,19 +212,10 @@ const HAZARDS = {
         f.addStatus('slow', 0.2, 0.4);
         const a = Math.atan2(p.y - f.y, p.x - f.x), k = (1 - d / p.r) * 220 + 60;
         f.vx += Math.cos(a) * k * dt; f.vy += Math.sin(a) * k * dt;
-        if (d < 35) { f.percent += 3 * dt * f.takenMult; if (Math.random() < 0.03) m.text(f.x, f.y - 40, 'lún...', '#d8b874', 12); }
+        if (d < 35) { f.percent += 3 * dt * f.takenMult; if (random() < 0.03) m.text(f.x, f.y - 40, 'lún...', '#d8b874', 12); }
       }
     },
-    drawUnder(ctx, m) {
-      for (const p of m.hz.pits) {
-        ctx.save(); ctx.translate(p.x, p.y);
-        const g = ctx.createRadialGradient(0, 0, 4, 0, 0, p.r); g.addColorStop(0, '#6a4a20'); g.addColorStop(1, 'rgba(160,120,60,0.25)');
-        ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(0, 0, p.r, p.r * 0.8, 0, 0, TAU); ctx.fill();
-        ctx.strokeStyle = 'rgba(90,60,25,0.6)'; ctx.lineWidth = 3; ctx.rotate(m.time * 1.2);
-        for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.arc(0, 0, p.r * (0.3 + i * 0.22), i, i + 3.5); ctx.stroke(); }
-        ctx.restore();
-      }
-    },
+
   },
   // 🌀 Cột xoay quanh tâm
   orbit: {
@@ -290,12 +224,7 @@ const HAZARDS = {
       const h = m.hz; h.ang += 0.38 * dt;
       m.arena.pillars.forEach((p, i) => { const b = h.base[i]; p.x = Math.cos(b.a + h.ang) * b.r; p.y = Math.sin(b.a + h.ang) * b.r; });
     },
-    drawUnder(ctx, m) {
-      const c = m.arena.c;
-      ctx.save(); ctx.strokeStyle = 'rgba(138,240,255,0.25)'; ctx.lineWidth = 3; ctx.setLineDash([10, 12]);
-      ctx.beginPath(); ctx.arc(0, 0, m.hz.base[0].r, 0, TAU); ctx.stroke(); ctx.setLineDash([]); ctx.restore();
-      for (const p of m.arena.pillars) drawPillar(ctx, p, c);
-    },
+
   },
 };
 function arrowOf(a) { return ['→', '↘', '↓', '↙', '←', '↖', '↑', '↗'][((Math.round(a / (Math.PI / 4)) % 8) + 8) % 8]; }

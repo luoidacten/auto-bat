@@ -1,47 +1,104 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#0b1018">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Đấu Trường Huấn Luyện Viên</title>
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-  <canvas id="cv"></canvas>
-  <div id="ui"></div>
-  <div id="match-ui" class="hidden"></div>
-  <div id="modal"></div>
-  <div id="toast"></div>
-  <div id="audio-ctl"><button id="btn-music" title="Bật/tắt nhạc nền" onclick="Sound.toggleMusic();audioBtns()">🎵</button><button id="btn-sfx" title="Bật/tắt hiệu ứng âm thanh" onclick="Sound.toggleSfx();audioBtns()">🔊</button><button class="mob-only" title="Toàn màn hình" onclick="goFullscreen()">⛶</button></div>
-  <div id="rotate" onclick="this.classList.add('gone')">📱🔄 Xoay ngang điện thoại để xem trận rõ hơn<small>(chạm để ẩn)</small></div>
-
-  <script src="js/01-core.js"></script>
-  <script src="js/01b-audio.js"></script>
-  <script src="js/02-data.js"></script>
-  <script src="js/03-weapons.js"></script>
-  <script src="js/03b-weapons2.js"></script>
-  <script src="js/03h-newchars.js"></script>
-  <script src="js/03i-east.js"></script>
-  <script src="js/03j-heroes.js"></script>
-  <script src="js/03c-roster.js"></script>
-  <script src="js/03d-talents.js"></script>
-  <script src="js/03g-items.js"></script>
-  <script src="js/03e-commands.js"></script>
-  <script src="js/03f-mods.js"></script>
-  <script src="js/03k-spells.js"></script>
-  <script src="js/04-fighter.js"></script>
-  <script src="js/05-ai.js"></script>
-  <script src="js/06-match.js"></script>
-  <script src="js/06b-hazards.js"></script>
-  <script src="js/06c-slash.js"></script>
-  <script src="js/06f-vfx.js"></script>
-  <script src="js/07-career.js"></script>
-  <script src="js/08-ui.js"></script>
-  <script src="js/08b-teams.js"></script>
-  <script src="js/09-main.js"></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#111827" />
+    <title>Legacy Arena — Đấu trường người chơi</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="favicon.ico" />
+    <link rel="stylesheet" href="client/app.css" />
+  </head>
+  <body>
+    <canvas id="arena" aria-label="Sàn đấu Legacy"></canvas>
+    <main id="menu">
+      <header>
+        <span class="eyebrow">LEGACY ARENA</span>
+        <h1>Tự tay bước vào đấu trường.</h1>
+        <p>Điều khiển đấu sĩ, tích điểm văng và đánh đối thủ rơi đài.</p>
+      </header>
+      <div class="menu-grid">
+        <section class="panel">
+          <h2>Chọn đấu sĩ</h2>
+          <label for="hero">Tướng của bạn</label
+          ><select id="hero"></select>
+          <div id="hero-info"></div>
+          <div id="skills-info"></div>
+        </section>
+        <section class="panel">
+          <h2>Chọn trận đấu</h2>
+          <label for="arena-pick">Sàn đấu</label
+          ><select id="arena-pick"></select
+          ><label for="bot-hero">Đối thủ offline</label
+          ><select id="bot-hero"></select
+          ><button id="offline" class="primary">Chơi offline · đấu bot</button
+          ><button id="resume-offline" hidden>Tiếp tục trận offline</button>
+          <div class="divider">ONLINE P2P 1V1 · HAI NGƯỜI THẬT</div>
+          <button id="create-room">Tạo phòng</button>
+          <div class="join">
+            <input
+              id="room-code"
+              aria-label="Mã phòng"
+              maxlength="6"
+              placeholder="Mã phòng"
+            /><button id="join-room">Vào phòng</button>
+          </div>
+          <div class="save-actions">
+            <button id="export-save">Xuất lưu offline</button
+            ><label class="file-btn"
+              >Nhập bản lưu<input
+                id="import-save"
+                type="file"
+                accept="application/json"
+            /></label>
+          </div>
+          <a href="coach.html">Mở chế độ HLV cũ</a>
+        </section>
+      </div>
+      <p class="help">
+        PC: WASD di chuyển · chuột ngắm · Q/E/R/F = A/B/C/D · Space = Nộ · Shift
+        = né · Escape tạm dừng offline.<br />Cảm ứng: cần trái di chuyển, giữ
+        nút chiêu rồi kéo để ngắm. Kéo vào ô Hủy để bỏ chiêu.
+      </p>
+    </main>
+    <section id="lobby" class="overlay" hidden>
+      <div class="panel">
+        <span class="eyebrow">PHÒNG RIÊNG</span>
+        <h2 id="lobby-code"></h2>
+        <p id="lobby-players"></p>
+        <button id="ready" class="primary">Sẵn sàng</button
+        ><button id="leave-room">Rời phòng</button>
+      </div>
+    </section>
+    <section id="game-hud" hidden>
+      <div class="scoreboard">
+        <div id="player-score"></div>
+        <div id="clock"></div>
+        <div id="opponent-score"></div>
+      </div>
+      <div class="game-actions">
+        <span id="mode-label"></span>
+        <span id="peer-status" aria-live="polite"></span
+        ><button id="pause">Tạm dừng</button
+        ><button id="quit">Thoát trận</button>
+      </div>
+      <div id="skill-bar"></div>
+    </section>
+    <div id="stick" aria-label="Cần di chuyển"><i></i></div>
+    <div id="cancel-skill">HỦY</div>
+    <section id="result" class="overlay" hidden>
+      <div class="panel">
+        <h2 id="result-title"></h2>
+        <p id="result-description"></p>
+        <button id="play-again" class="primary">Đấu lại</button
+        ><button id="back-menu">Về menu</button>
+      </div>
+    </section>
+    <div id="status" role="status" aria-live="polite"></div>
+    <p id="offline-status">Đang chuẩn bị bản chơi không cần mạng…</p>
+    <script type="module" src="client/main.mjs"></script>
+  </body>
 </html>

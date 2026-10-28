@@ -69,13 +69,13 @@ const JK_LOW = ['borg', 'koda', 'clint'], JK_DISC = ['gideon', 'valerius', 'ryom
 const JK_ICON = { spade: '♠️ BÍCH', club: '♣️ TÉP', diamond: '♦️ RÔ', heart: '♥️ CƠ', joker: '🃏 JOKER' };
 const JK_COL = { blank: '#f0f0f0', spade: '#5a6aff', club: '#7ae07a', diamond: '#ff5a6a', heart: '#ff8ad0', joker: '#ffd24a' };
 function jkLuck(f) { return Math.min(20, f._luck || 0) / 100; }
-function jkX2(f, k) { const base = k === 'A' ? (f.T('joker_9c') ? 0.5 : 0.35) : (f.T('joker_9c') ? 0.25 : 0.15); return Math.random() < base + jkLuck(f); }
+function jkX2(f, k) { const base = k === 'A' ? (f.T('joker_9c') ? 0.5 : 0.35) : (f.T('joker_9c') ? 0.25 : 0.15); return random() < base + jkLuck(f); }
 function jkDraw(f, m, fromC) {
   const w = fromC ? { spade: 18, club: 18, diamond: 17, heart: 17, joker: 15 } : { blank: 25, spade: 18, club: 18, diamond: 17, heart: 17, joker: 5 };
   if (f.T('joker_9b')) delete w.blank;
   if (f.T('joker_12a')) { delete w.heart; w.joker = 25; }
   if (w.blank) w.blank *= 1 - jkLuck(f) * 2;
-  let r = Math.random() * Object.values(w).reduce((a, b) => a + b, 0), card = 'blank';
+  let r = random() * Object.values(w).reduce((a, b) => a + b, 0), card = 'blank';
   for (const k in w) { r -= w[k]; if (r <= 0) { card = k; break; } }
   f.ws.card = card === 'blank' ? null : card; f.ws.uses = 1; f.ws.drawT = m.time;
   m.text(f.x, f.y - 64, card === 'blank' ? '🂠 RÚT HỤT!' : JK_ICON[card], JK_COL[card], 16);
@@ -104,10 +104,10 @@ function jkEffect(f, m, t, suit) {
   const mk = jkMarks(t, m), sun = mk && mk.sun, moon = mk && mk.moon;
   if (suit === 'club') {
     const k = moon ? 2 : 1, got = [];
-    if (Math.random() < 0.55) { t.addStatus('stun', 0.75 * k); got.push('💫'); }
-    if (Math.random() < 0.55) { t.addStatus('slow', 2 * k, 0.5); got.push('🐌'); }
-    if (Math.random() < 0.55) { t.addStatus('silence', (f.T('joker_3b') ? 2 : 1) * k); got.push('🔇'); }
-    if (Math.random() < 0.55) { t.addStatus('burn', 3, 2); got.push('🔥'); }
+    if (random() < 0.55) { t.addStatus('stun', 0.75 * k); got.push('💫'); }
+    if (random() < 0.55) { t.addStatus('slow', 2 * k, 0.5); got.push('🐌'); }
+    if (random() < 0.55) { t.addStatus('silence', (f.T('joker_3b') ? 2 : 1) * k); got.push('🔇'); }
+    if (random() < 0.55) { t.addStatus('burn', 3, 2); got.push('🔥'); }
     m.text(t.x, t.y - 56, got.length ? '♣️ ' + got.join('') : '♣️ ...chẳng có gì', '#7ae07a', 14);
   } else if (suit === 'diamond') {
     m.hitCircle(f, { x: t.x, y: t.y, r: 65, dmg: sun ? 10 : 5, kb: 120, kg: 3, tag: 'A' });
@@ -120,7 +120,7 @@ function jkEffect(f, m, t, suit) {
   } else if (suit === 'joker') {
     jkSwap(f, t, m);
     const mk2 = jkMarks(t, m) || { sun: false, moon: false };
-    if (Math.random() < 0.5) mk2.sun = true; else mk2.moon = true;
+    if (random() < 0.5) mk2.sun = true; else mk2.moon = true;
     mk2.until = m.time + 8; t.jkMark = mk2;
     m.text(t.x, t.y - 70, mk2.sun && mk2.moon ? '☯ NHẬT NGUYỆT ĐỒNG TÊ!' : mk2.sun ? '☀️ ẤN MẶT TRỜI' : '🌙 ẤN MẶT TRĂNG', '#ffd24a', 15);
     if (mk2.sun && mk2.moon) {
@@ -450,7 +450,7 @@ Object.assign(WEAPONS, {
       const cid = o.charId;
       let ch = JK_FEM.has(cid) ? 0.05 : JK_LOW.includes(cid) ? 0.45 : JK_DISC.includes(cid) ? 0.15 : 0.25;
       if (!JK_FEM.has(cid) && f.T('joker_3c')) ch += 0.15;
-      if (Math.random() >= ch) return true;
+      if (random() >= ch) return true;
       m.text(f.x, f.y - 56, JK_FEM.has(cid) ? '😏 NÉ!' : '😉 ẤY~ NÉ!', '#ffd24a', 14);
       return false;
     },
@@ -476,7 +476,7 @@ Object.assign(WEAPONS, {
         use(f, m) {
           const old = { x: f.x, y: f.y };
           f.startDash({ angle: f.castAngle, dist: 60, dur: 0.14, invuln: true, trail: true });
-          const ok = f.ws.sureC || f.T('joker_9b') || Math.random() >= 0.25;
+          const ok = f.ws.sureC || f.T('joker_9b') || random() >= 0.25;
           f.ws.sureC = false;
           if (ok) jkDraw(f, m, true); else { f.ws.cFail = m.time; m.text(f.x, f.y - 60, '😣 KẸT TAY ÁO!', '#ff9a6a', 14); }
           if (jkX2(f, 'C')) { f.ws.sureC = true; m.later(0.16, () => { if (f.alive) f.startDash({ angle: f.castAngle, dist: 60, dur: 0.14, invuln: true, trail: true }); }); m.text(f.x, f.y - 76, 'x2!', '#ffd24a', 13); }
@@ -515,7 +515,7 @@ Object.assign(WEAPONS, {
           let br;
           if (f.T('joker_12b')) br = f.percent - t.percent > 40 ? 'swap' : 'super';
           else {
-            const r = Math.random(), ex = f.T('joker_12c') && f.percent >= 100 ? 0.05 : 0.002;
+            const r = random(), ex = f.T('joker_12c') && f.percent >= 100 ? 0.05 : 0.002;
             br = r < ex ? 'exec' : r < ex + 0.25 ? 'swap' : r < ex + 0.75 ? 'super' : r < ex + 0.95 ? 'cannon' : 'night';
           }
           f.act(0.4, { move: 0, anim: 'raise' });
@@ -567,7 +567,7 @@ Object.assign(WEAPONS, {
           else p.dead = true;
         }
         if (f.ws.shAcc >= 0.3) { f.ws.shAcc = 0; for (const e of m.enemiesOf(f)) if (dist(e, f) < f.r + e.r + 26) m.applyHit(f, e, { dmg: 1.2, kb: 60, kg: 0.5, tag: 'B', quiet: true }); }
-        if (Math.random() < 0.5) m.particle(f.x + rand(-40, 40), f.y + rand(-40, 40), { color: '#bff0e0', life: 0.35, size: 3, vx: rand(-60, 60), vy: rand(-60, 60) });
+        if (random() < 0.5) m.particle(f.x + rand(-40, 40), f.y + rand(-40, 40), { color: '#bff0e0', life: 0.35, size: 3, vx: rand(-60, 60), vy: rand(-60, 60) });
       }
     },
     onDeal(f, t, hit, info, m) {
@@ -691,7 +691,7 @@ Object.assign(WEAPONS, {
           const s = tpState(f);
           if (s === 'thuan') tpWind(f, m, 30);
           else if (s === 'nghich') tpWind(f, m, -30);
-          else { f.ws.wind = Math.random() < 0.5 ? 15 : 85; f.cleanse(); m.text(f.x, f.y - 70, f.ws.wind > 50 ? '🌪️ NGHỊCH PHONG!' : '🍃 THUẬN PHONG!', '#bff0e0', 15); m.fx({ type: 'ring', x: f.x, y: f.y, r: 60, color: '#bff0e0', life: 0.35, w: 6 }); }
+          else { f.ws.wind = random() < 0.5 ? 15 : 85; f.cleanse(); m.text(f.x, f.y - 70, f.ws.wind > 50 ? '🌪️ NGHỊCH PHONG!' : '🍃 THUẬN PHONG!', '#bff0e0', 15); m.fx({ type: 'ring', x: f.x, y: f.y, r: 60, color: '#bff0e0', life: 0.35, w: 6 }); }
           if (f.T('thanhphong_6c')) f.percent = Math.max(0, f.percent - 10);
         } },
       U: { name: 'Cơn Gió Đưa Giấc', desc: 'Cắm quạt xuống sàn mở Vùng Bão Tố Mê Hoặc 6s: kẻ địch bên trong chịu sát thương lưỡi gió và chậm 60%; đứng trong vùng quá 2.5s → NGỦ SAY 2s. Đòn đầu tiên đánh thức: x2 lực văng.',
@@ -833,7 +833,7 @@ Object.assign(WEAPONS, {
             if (t) {
               const a = angTo(f, t), d0 = dist(f, t);
               // Tư duy 20: 30% lao quá đà theo nạn nhân đứng sát mép
-              const overshoot = !f.T('galo_12a') && m.arena.edgeDist(t.x, t.y) < 70 && Math.random() < 0.3;
+              const overshoot = !f.T('galo_12a') && m.arena.edgeDist(t.x, t.y) < 70 && random() < 0.3;
               const L = Math.min(160, Math.max(0, d0 - 20)) + (overshoot ? 130 : 0);
               const hitSet = new Set();
               f.startDash({ angle: a, dist: L, dur: 0.24, trail: true, stopAtEdge: !overshoot, onContact: (e) => {

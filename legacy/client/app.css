@@ -1,0 +1,431 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #0c1321;
+  color: #e5edf8;
+  font:
+    15px/1.5 system-ui,
+    sans-serif;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button,
+.file-btn {
+  border: 1px solid #3a4960;
+  border-radius: 10px;
+  padding: 11px 16px;
+  background: #1c2a40;
+  color: #edf3fc;
+  cursor: pointer;
+}
+button:hover {
+  background: #293c59;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+button.primary {
+  background: #dc8d43;
+  color: #151923;
+  border-color: #f1ac69;
+  font-weight: 750;
+}
+input,
+select {
+  display: block;
+  width: 100%;
+  background: #0f1b2d;
+  border: 1px solid #384961;
+  border-radius: 9px;
+  color: #e5edf8;
+  padding: 11px;
+  margin: 6px 0 15px;
+}
+label {
+  color: #adbdd1;
+}
+a {
+  color: #e5af78;
+}
+h1 {
+  font-size: clamp(28px, 5vw, 52px);
+  line-height: 1.15;
+  margin: 12px 0;
+}
+h2 {
+  font-size: 21px;
+  margin: 0 0 14px;
+}
+.eyebrow {
+  letter-spacing: 0.24em;
+  font-size: 12px;
+  color: #dda46a;
+}
+#arena {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  z-index: 0;
+}
+#menu {
+  position: relative;
+  max-width: 1140px;
+  margin: auto;
+  padding: 42px 28px 80px;
+}
+header p {
+  color: #9eb0c7;
+  margin: 0 0 26px;
+}
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.panel {
+  padding: 26px;
+  background: #142137f5;
+  border: 1px solid #2c3b53;
+  border-radius: 18px;
+  box-shadow: 0 20px 70px #0004;
+}
+.panel button {
+  margin: 5px 4px 5px 0;
+}
+.panel > .primary,
+.panel > #create-room {
+  width: 100%;
+}
+.divider {
+  margin: 20px 0 10px;
+  color: #a7b7ce;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+}
+.join {
+  display: flex;
+  gap: 10px;
+}
+.join input {
+  margin: 5px 0;
+  text-transform: uppercase;
+}
+.join button {
+  white-space: nowrap;
+}
+.save-actions {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+}
+.file-btn {
+  display: inline-block;
+  color: #edf3fc;
+  margin: 5px 0;
+}
+.file-btn input {
+  display: none;
+}
+#hero-info {
+  color: #c4d2e7;
+  min-height: 45px;
+}
+#skills-info {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  font-size: 13px;
+}
+#skills-info div {
+  padding: 8px 10px;
+  background: #0f1b2d;
+  border-radius: 7px;
+}
+#skills-info b {
+  color: #e4af79;
+  display: inline-block;
+  min-width: 24px;
+}
+.help {
+  color: #a1b0c8;
+  font-size: 13px;
+}
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  background: #060d1dbb;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.overlay .panel {
+  width: min(500px, 100%);
+  text-align: center;
+}
+#lobby-code {
+  font-size: 38px;
+  letter-spacing: 0.16em;
+  color: #f5b574;
+}
+#lobby-players {
+  white-space: pre-line;
+  min-height: 70px;
+}
+#status {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #243652;
+  padding: 12px 20px;
+  border-radius: 10px;
+  z-index: 10;
+  display: none;
+  max-width: 90%;
+  text-align: center;
+}
+#status.show {
+  display: block;
+}
+#offline-status {
+  position: fixed;
+  bottom: 0;
+  right: 15px;
+  color: #7f98b3;
+  font-size: 11px;
+  pointer-events: none;
+}
+#game-hud {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.scoreboard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: linear-gradient(#08101eec, transparent);
+  gap: 12px;
+}
+.scoreboard > div {
+  background: #101d31db;
+  border: 1px solid #31415c;
+  padding: 9px 14px;
+  border-radius: 10px;
+  min-width: 130px;
+}
+#clock {
+  text-align: center;
+  min-width: 70px;
+}
+#opponent-score {
+  text-align: right;
+}
+.scoreboard strong {
+  font-size: 23px;
+  color: #f6b569;
+}
+.game-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+#mode-label {
+  font-size: 12px;
+  background: #0e1a2d;
+  padding: 5px 9px;
+  border-radius: 6px;
+}
+.game-actions button {
+  font-size: 12px;
+  padding: 5px 12px;
+}
+#skill-bar {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+}
+#skill-bar button {
+  width: 86px;
+  height: 76px;
+  padding: 6px;
+  border-radius: 13px;
+  touch-action: none;
+  position: relative;
+  background: #14243cf0;
+}
+#skill-bar b {
+  font-size: 20px;
+  display: block;
+  color: #f5b877;
+}
+#skill-bar small {
+  display: block;
+  font-size: 9px;
+  max-height: 24px;
+  overflow: hidden;
+}
+#skill-bar kbd {
+  position: absolute;
+  right: 7px;
+  top: 3px;
+  color: #7f94b5;
+  font-size: 10px;
+}
+#skill-bar .cooldown {
+  position: absolute;
+  inset: 0;
+  background: #050a1788;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  font-weight: bold;
+}
+.charging {
+  outline: 3px solid #efba75;
+}
+#stick {
+  display: none;
+  position: fixed;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  left: 28px;
+  bottom: 26px;
+  border: 2px solid #8cabc688;
+  background: #1a2c4266;
+  z-index: 3;
+  touch-action: none;
+}
+#stick i {
+  display: block;
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  left: 37px;
+  top: 37px;
+  border-radius: 50%;
+  background: #9bb8d8aa;
+}
+#cancel-skill {
+  display: none;
+  position: fixed;
+  bottom: 125px;
+  right: 25px;
+  border: 2px solid #ef7c80;
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  text-align: center;
+  padding-top: 22px;
+  color: #ffadad;
+  background: #3a1729c9;
+  z-index: 4;
+  pointer-events: none;
+}
+body.playing #offline-status {
+  display: none;
+}
+body.touch.playing #stick {
+  display: block;
+}
+body.touch #skill-bar {
+  left: auto;
+  right: 15px;
+  bottom: 20px;
+  transform: none;
+  display: grid;
+  grid-template-columns: repeat(3, 64px);
+  gap: 6px;
+}
+body.touch #skill-bar button {
+  width: 64px;
+  height: 60px;
+}
+body.touch #skill-bar small {
+  font-size: 8px;
+}
+body.touch #skill-bar b {
+  font-size: 17px;
+}
+body.touch #skill-bar kbd {
+  display: none;
+}
+[hidden] {
+  display: none !important;
+}
+@media (max-width: 700px) {
+  #menu {
+    padding: 26px 16px 65px;
+  }
+  .menu-grid {
+    grid-template-columns: 1fr;
+  }
+  .panel {
+    padding: 18px;
+  }
+  .scoreboard {
+    padding: 6px 10px;
+  }
+  .scoreboard > div {
+    min-width: 95px;
+    padding: 4px 9px;
+    font-size: 11px;
+  }
+  .scoreboard strong {
+    font-size: 19px;
+  }
+}
+@media (max-height: 500px) {
+  #menu {
+    padding-top: 18px;
+  }
+  .game-actions {
+    position: absolute;
+    top: 65px;
+    left: 20px;
+  }
+  .scoreboard > div {
+    padding: 4px 10px;
+  }
+  #stick {
+    width: 100px;
+    height: 100px;
+    bottom: 20px;
+  }
+  #stick i {
+    left: 27px;
+    top: 27px;
+  }
+  #skill-bar {
+    bottom: 12px;
+  }
+  #skill-bar button {
+    height: 60px;
+  }
+}
+
+#peer-status {
+  font-size: 11px;
+  color: #a8d3c6;
+  max-width: 240px;
+}

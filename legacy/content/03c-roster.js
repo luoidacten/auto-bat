@@ -87,6 +87,7 @@ const FAMILY_WEAPONS = ['cung', 'voice', 'vuot'];
 function isFamilyPair(wa, wb) { return wa !== wb && FAMILY_WEAPONS.includes(wa) && FAMILY_WEAPONS.includes(wb); }
 // Ngoại lệ cốt truyện: The Voice không thể bị Cung và Găng Vuốt tấn công
 function storyProtected(att, t) {
+  if (att && (att.competitive || (att.owner && att.owner.competitive))) return false;
   const a = att && (att.owner || att);
   if (!a || !t) return false;
   const tw = (t.owner || t).weaponId, aw = a.weaponId;

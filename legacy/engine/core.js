@@ -3,9 +3,9 @@
 const TAU = Math.PI * 2;
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;
-const rand = (a, b) => a + Math.random() * (b - a);
+const rand = (a, b) => a + random() * (b - a);
 const randi = (a, b) => Math.floor(rand(a, b + 1));
-const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const pick = (arr) => arr[Math.floor(random() * arr.length)];
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const angTo = (a, b) => Math.atan2(b.y - a.y, b.x - a.x);
 const angDiff = (a, b) => {
@@ -17,7 +17,7 @@ const angDiff = (a, b) => {
 const fromAng = (a, l = 1) => ({ x: Math.cos(a) * l, y: Math.sin(a) * l });
 function shuffle(a) {
   for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(random() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
@@ -33,8 +33,8 @@ const CD_SCALE = 0.85;   // hồi chiêu toàn cục (nhịp nhanh)
 const LEDGE = 34;        // khoảng chênh vênh ngoài mép vẫn bám được
 
 // ===== Điện thoại =====
-const IS_MOBILE = (window.matchMedia && matchMedia('(pointer: coarse)').matches) || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-const PART_CAP = IS_MOBILE ? 180 : 500;   // giới hạn hạt hiệu ứng (đỡ nặng máy)
+let IS_MOBILE = false;
+const PART_CAP = 500;   // giới hạn hạt hiệu ứng (đỡ nặng máy)
 // tỉ lệ HUD theo cả chiều rộng lẫn chiều cao (màn ngang điện thoại thấp)
 function hudScale(W, H) { return clamp(Math.min(W / 860, H / 560), 0.42, 1); }
 
@@ -120,15 +120,5 @@ class Arena {
     if (L > rdir - margin) { const k = Math.max(0, rdir - margin) / L; p.x *= k; p.y *= k; }
     return p;
   }
-  path(ctx, dy = 0, grow = 0) {
-    ctx.beginPath();
-    if (this.poly) {
-      // phóng to nhẹ theo tâm để vẽ viền
-      const k = grow ? 1 + grow / Math.max(this.hx, this.hy) : 1;
-      this.poly.forEach((p, i) => (i ? ctx.lineTo(p[0] * k, p[1] * k + dy) : ctx.moveTo(p[0] * k, p[1] * k + dy)));
-      ctx.closePath();
-    } else {
-      ctx.ellipse(0, dy, this.a + grow, this.b + grow, 0, 0, TAU);
-    }
-  }
+
 }

@@ -162,7 +162,7 @@ Object.assign(WEAPONS, {
       if (p) {
         p.t += dt;
         f.moveDir = { x: 0, y: 0 }; f.invulnT = Math.max(f.invulnT, 0.1); f.addStatus('untargetable', 0.15);
-        if (Math.random() < dt * 6) m.particle(f.x, f.y - 30, { color: '#ffe9a0', life: 0.5, size: 4, vx: rand(-40, 40), vy: -60 });
+        if (random() < dt * 6) m.particle(f.x, f.y - 30, { color: '#ffe9a0', life: 0.5, size: 4, vx: rand(-40, 40), vy: -60 });
         if (p.t >= p.hold || f.has('stun') || !f.alive) {
           f.ws.pole = null; f.removeStatus('untargetable');
           // Đẩu Vân Đạp Tuyết: lướt thêm 1 nhịp trên không về phía mục tiêu
@@ -262,7 +262,7 @@ Object.assign(WEAPONS, {
             return;
           }
           // đứng trên đỉnh côn: thời gian gồng do AI quyết (tối đa 3s)
-          const hold = f.ws.holdWant || (f.brain ? f.brain.holdTime(3, f) : 1.5);
+          const hold = f.ws.holdWant || (f.human ? Math.min(3, f.manualHold || .05) : (f.brain ? f.brain.holdTime(3, f) : 1.5));
           f.ws.holdWant = 0;
           f.ws.pole = { t: 0, hold: clamp(hold, 0.4, 3), tier };
           f.act(clamp(hold, 0.4, 3) + 0.05, { move: 0, anim: 'raise', charge: clamp(hold, 0.4, 3) });
@@ -486,7 +486,7 @@ Object.assign(WEAPONS, {
                 mm.applyHit(f, e, { dmg: 1.4, kb: 25, kg: 0.6, tag: 'U', quiet: true, angle: Math.atan2(z.y - e.y, z.x - e.x) });
                 e.addStatus('nodash', 0.35); if (f.T('kazuki_9a')) e.addStatus('silence', 0.35);
                 if (d > 20 && !e.superArmor) { const q = Math.atan2(z.y - e.y, z.x - e.x); e.vx += Math.cos(q) * 70; e.vy += Math.sin(q) * 70; }
-                if (Math.random() < 0.5) mm.fx({ type: 'slash', x: e.x, y: e.y, a: rand(0, TAU), r: 36, color: '#cfe8ff', life: 0.15 });
+                if (random() < 0.5) mm.fx({ type: 'slash', x: e.x, y: e.y, a: rand(0, TAU), r: 36, color: '#cfe8ff', life: 0.15 });
               }
             } });
           m.text(f.x, f.y - 70, '🌌 VẠN CẢNH TRẢM VỰC', '#cfe8ff', 19);

@@ -565,7 +565,7 @@ const TALENT_FX = {
   jack_1b: { update(f) { if (f.ws.cyl <= 0 && !f.ws.rr) f.frameSpeed *= 1.35; } },
   jack_9b: { setup(f) { f.rageNeed = 67; } },
   jack_9c: { onDeal(f, t, hit, info, m) {
-    if (hit.tag === 'A' && f.percent > 100 && Math.random() < 0.5) { info.kbMult *= 2; m.text(t.x, t.y - 58, 'TẤT TAY!', '#ff5a3a', 17); }
+    if (hit.tag === 'A' && f.percent > 100 && random() < 0.5) { info.kbMult *= 2; m.text(t.x, t.y - 58, 'TẤT TAY!', '#ff5a3a', 17); }
   } },
 
   death_1b: { update(f, m) { if (towardEnemy(f, m, (t) => t.percent > 70)) f.frameSpeed *= 1.2; } },
@@ -637,7 +637,7 @@ const TALENT_FX = {
     // Kích Nổ Adrenaline: bị đánh văng cực nhanh → bấm C phanh cứng
     if (f.hitstun <= 0 || f.cd.C > 0 || Math.hypot(f.vx, f.vy) < 560 || f.falling > 0) return;
     const r = f.brain ? f.brain.tech.reflex : 5;
-    if (Math.random() > 0.05 + r * 0.012) return;
+    if (random() > 0.05 + r * 0.012) return;
     f.vx *= 0.1; f.vy *= 0.1; f.hitstun = 0; f.cd.C = f.cdOf('C');
     m.fx({ type: 'ring', x: f.x, y: f.y, r: 40, color: '#ff9a6a', life: 0.35, w: 6 }); m.text(f.x, f.y - 50, '🛑 PHANH!', '#ff9a6a', 17);
   } },

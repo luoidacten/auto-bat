@@ -67,12 +67,12 @@ Object.assign(WEAPONS, {
       C: { name: 'Gồng Mình', cd: 3, hold: 1.5, desc: 'Đứng yên gồng tối đa 1.5s: Trụ Vững (không bị đẩy) + Bất Biến (không tăng điểm văng). Sát thương nhận vào chuyển thành năng lượng cho Trả Đòn (B). Vẫn dính Choáng/Trói.',
         ai: { type: 'def', max: 160 },
         use(f, m) {
-          const hold = f.brain ? f.brain.holdTime(1.5, f) : 1;
+          const hold = f.human ? Math.min(1.5, f.manualHold || .05) : (f.brain ? f.brain.holdTime(1.5, f) : 1);
           f.addStatus('absorb', hold);
           f.act(hold, { move: 0, anim: 'guard', super: true, charge: hold, onEnd: () => f.removeStatus('absorb') });
         } },
       B: { name: 'Trả Đòn', cd: 4.5, desc: 'Kết liễu: cú đấm toàn lực. Sau khi Gồng hấp thụ sát thương: tầm rộng hơn và lực đẩy cực đại (Finisher).',
-        ai: { type: 'atk', max: 78, pri: 2.8, when: (f, t) => f.ws.charge > 0 || t.percent > 60 || Math.random() < 0.4 },
+        ai: { type: 'atk', max: 78, pri: 2.8, when: (f, t) => f.ws.charge > 0 || t.percent > 60 || random() < 0.4 },
         use(f, m) {
           const ch = f.ws.charge, emp = ch > 0;
           // Cú Húc Xuyên Giáp: giữ B khi chưa tích năng lượng → lao tới như xe bọc thép
@@ -395,7 +395,7 @@ Object.assign(WEAPONS, {
     update(f, m, dt) {
       if (f.ws.shades > 0) {
         f.ws.shades -= dt;
-        for (const s of scytheShades(f, m)) if (Math.random() < 0.5) m.fx({ type: 'ghost', x: s.x, y: s.y, r: 18, color: '#6a5a8a', life: 0.2 });
+        for (const s of scytheShades(f, m)) if (random() < 0.5) m.fx({ type: 'ghost', x: s.x, y: s.y, r: 18, color: '#6a5a8a', life: 0.2 });
       }
       // Hơi Thở Tử Thần: làm chậm kẻ địch đứng gần
       if (f.T('death_6c')) for (const e of m.enemiesOf(f)) if (dist(e, f) < 120 + e.r) e.addStatus('slow', 0.25, 0.2);
@@ -505,7 +505,7 @@ Object.assign(WEAPONS, {
           f.act(0.2, { move: 0.5, anim: 'swing' });
         } },
       B: { name: 'Phán Quyết', cd: 4.5, desc: 'Kết liễu: bổ liềm thẳng từ trên xuống (nhanh hơn Kiếm Dài) và phóng ra Cầu Hắc Ám bay xa (lực đẩy x1.25). Địch trên 100% điểm văng: lực đẩy x1.8; nếu đứng gần mép sàn: x3 — Tử Vong.',
-        ai: { type: 'atk', min: 60, max: 330, pri: 2.4, when: (f, t) => t.percent > 70 || Math.random() < 0.4 },
+        ai: { type: 'atk', min: 60, max: 330, pri: 2.4, when: (f, t) => t.percent > 70 || random() < 0.4 },
         can(f) { return !f.ws.thrown; },
         use(f, m) {
           const chain = f.T('death_12b'), L = chain ? 266 : 190;
@@ -612,7 +612,7 @@ Object.assign(WEAPONS, {
           for (let i = 0; i < 32; i++) m.later(0.3 + i * 0.12, () => {
             const t = m.nearestEnemy(f);
             let p;
-            if (t && Math.random() < 0.55) p = { x: t.x + rand(-90, 90) + t.moveDir.x * 60, y: t.y + rand(-90, 90) + t.moveDir.y * 60 };
+            if (t && random() < 0.55) p = { x: t.x + rand(-90, 90) + t.moveDir.x * 60, y: t.y + rand(-90, 90) + t.moveDir.y * 60 };
             else { const a = rand(0, TAU), r = rand(0, 1) * Math.min(m.arena.hx, m.arena.hy); p = { x: Math.cos(a) * r, y: Math.sin(a) * r }; }
             m.fx({ type: 'telegraph', x: p.x, y: p.y, r: 42, color: '#ffe9a0', life: 0.5 });
             m.later(0.5, () => {
@@ -804,7 +804,7 @@ Object.assign(WEAPONS, {
           f.act(0.18, { move: 0.8, anim: 'aim', atk: true }, [[0.04, () => shoot(f, m, aimOr(f, m, 460, 950), { speed: 950, r: 4, range: 460, kind: 'bullet', color: '#ffd27a', hit: { dmg: 3.8, kb: 50, kg: 2.6, tag: 'A' } })]]);
         } },
       B: { name: 'Khai Tâm', cd: 2, desc: 'Kích nổ Ụ Pháo hiện tại: nổ quanh ụ, nhận lại 2 bánh răng và tăng mạnh tốc chạy + sát thương trong 4s.',
-        ai: { type: 'buff', max: 9999, pri: 2, when: (f, t) => dist(f.ws.cannon, t) < 110 || Math.random() < 0.15 },
+        ai: { type: 'buff', max: 9999, pri: 2, when: (f, t) => dist(f.ws.cannon, t) < 110 || random() < 0.15 },
         can(f) { return !!f.ws.cannon; },
         use(f, m) {
           const c = f.ws.cannon;
@@ -920,7 +920,7 @@ Object.assign(WEAPONS, {
         },
         use(f, m) {
           f.ws.cyl = 0; f.ws.rl = 0;
-          f.ws.rr = { live: Math.random() < 0.4 ? Math.min(randi(0, 5), randi(0, 5)) : randi(0, 5), pos: 0 };
+          f.ws.rr = { live: random() < 0.4 ? Math.min(randi(0, 5), randi(0, 5)) : randi(0, 5), pos: 0 };
           f.act(0.5, { move: 0, anim: 'cast' });
           m.text(f.x, f.y - 60, '🎰 Tháo hết đạn... còn 1 viên', '#ffd27a', 16);
         } },
@@ -1419,7 +1419,7 @@ function voiceSong(f, m, notes) {
     });
   };
   const songB = () => {
-    const id = Math.random(), ch = f.T('aria_3a') ? 2.6 : 1.8;
+    const id = random(), ch = f.T('aria_3a') ? 2.6 : 1.8;
     for (let i = 0; i < 3; i++) m.later(0.3 + i * 0.16, () => {
       if (!f.alive) return;
       shoot(f, m, aimOr(f, m, 480, 620), { speed: 620, r: 16, range: 480, kind: 'note', color: '#6ab0ff', hit: { dmg: 1.5, kb: 20, kg: 0.5, tag: 'B' },
@@ -1451,9 +1451,9 @@ function voiceSong(f, m, notes) {
 }
 // xúc xắc của Jack (đã chỉnh tỉ lệ có lợi: ⚀ 8%, ⚅ 24%)
 const JACK_DICE_W = [0.08, 0.14, 0.17, 0.18, 0.19, 0.24];
-function jackDie() { let r = Math.random(); for (let i = 0; i < 6; i++) { r -= JACK_DICE_W[i]; if (r < 0) return i + 1; } return 6; }
+function jackDie() { let r = random(); for (let i = 0; i < 6; i++) { r -= JACK_DICE_W[i]; if (r < 0) return i + 1; } return 6; }
 function revDice(f, m) {
-  let n = f.T('jack_12b') ? (Math.random() < 0.3 ? 6 : randi(3, 5)) : f.T('jack_3a') ? Math.min(6, jackDie() + (Math.random() < 0.17 ? 1 : 0)) : jackDie();
+  let n = f.T('jack_12b') ? (random() < 0.3 ? 6 : randi(3, 5)) : f.T('jack_3a') ? Math.min(6, jackDie() + (random() < 0.17 ? 1 : 0)) : jackDie();
   // Tẩy Bài Cờ Bạc: ra ⚀ được gieo lại 1 lần
   if (n === 1 && f.T('jack_6c')) { m.text(f.x, f.y - 70, '🃏 Tẩy bài — gieo lại!', '#ffe9c0', 13); n = jackDie(); }
   f.ws.dice = n;
