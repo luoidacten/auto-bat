@@ -1,7 +1,7 @@
 # GDD — ĐẤU TRƯỜNG LUÂN HỒI (tên tạm)
 
 > Tài liệu thiết kế game (Game Design Document) cho bản Unity.
-> Đi kèm: `NHAN_VAT.md` (số liệu đầy đủ 40 nhân vật, trang bị, vật phẩm, công thức) và `CLAUDE.md` (hướng dẫn cho AI viết code).
+> Đi kèm: `TUONG_DAU_TIEN.md` (đặc tả chi tiết 8 tướng làm đầu tiên), `NHAN_VAT.md` (số liệu đầy đủ 40 nhân vật, trang bị, vật phẩm, công thức) và `CLAUDE.md` (hướng dẫn cho AI viết code).
 > Quy ước trong tài liệu: **[CỐ ĐỊNH]** = quyết định thiết kế, đừng đổi khi chưa bàn; **[CHỈNH ĐƯỢC]** = con số khởi điểm, sẽ cân bằng lại khi chơi thử.
 
 ---
@@ -104,7 +104,9 @@ Mang tiền vĩnh viễn về → mở tướng, mở trang bị vào danh sách
 - Luật cộng điểm giữ như bản web: S1–S3 tối đa 5, không vượt ⌈cấp/2⌉; S4 tối đa 3, mở ở cấp 4/8/12; skill phụ tự lên theo cấp.
 - Lên cấp **dừng nhẹ trận đấu** (0.3s chậm) và hiện bảng cộng điểm ở góc — không mở menu chặn màn hình.
 
-### 5.3. 6 tướng cho bản thử đầu (MVP)
+### 5.3. 8 tướng cho bản thử đầu (MVP)
+
+> Đặc tả đầy đủ, chính xác từng con số của 8 tướng: **`TUONG_DAU_TIEN.md`**.
 
 | Tướng | Vai trò | Vì sao chọn | Điểm nhấn |
 |---|---|---|---|
@@ -114,8 +116,10 @@ Mang tiền vĩnh viễn về → mở tướng, mở trang bị vào danh sách
 | **Alice** | Sát thủ ảo ảnh | Thử hệ triệu hồi ảo ảnh và tàng hình | Thanh Náo Nhiệt, ảo ảnh phát nổ, S4 3 biến thể |
 | **Valerius** | Đỡ đòn | Lối chơi trâu, phản đòn | Khiên Chắn, Chiến Thần Bất Tử |
 | **Diệp Thanh Phong** | Pháp sư điều khiển | Thử hệ trạng thái (thanh gió 3 dạng) | Mỗi chiêu đổi theo trạng thái gió |
+| **Death** | Đấu sĩ phép, kết liễu | Thử móc kéo, dùng lại chiêu, lặp sát thương | Lưỡi Hái Đoạt Mệnh, Phán Quyết, Gọi Hồn |
+| **Victoria** | Hỗ trợ chỉ huy | Thử lính triệu hồi có AI, 3 thế đánh | 3 Lính Tinh Nhuệ, thế Cờ / AR / Lục |
 
-Thứ tự làm: Elara → Borg → Ignatius → Valerius → Alice → Thanh Phong (từ đơn giản tới phức tạp).
+Thứ tự làm: Elara → Borg → Valerius → Ignatius → Death → Victoria → Alice → Thanh Phong (từ đơn giản tới phức tạp).
 
 ### 5.4. Mở khóa tướng
 - Lượt đầu chỉ có **Elara** và **Borg**.
@@ -213,7 +217,9 @@ Chiêu **không chỉ** là `gốc + x% SMVL` hoặc `gốc + x% SMPT`. Mỗi ch
 5. Sát thương **lai**: một chiêu có thể gồm hai phần khác loại (ví dụ 60% vật lý + 40% phép); ghi rõ từng phần.
 6. Mô tả chiêu trong game hiện **số đã tính** theo chỉ số hiện tại; giữ Alt hiện công thức với màu theo bảng trên (như tooltip LMHT).
 
-### 6.7. Hệ số đề xuất cho 6 tướng MVP [CHỈNH ĐƯỢC]
+### 6.7. Hệ số đề xuất cho các tướng MVP [CHỈNH ĐƯỢC]
+
+> Death và Victoria: bảng hệ số nằm trong `TUONG_DAU_TIEN.md` mục 5 và 6.
 "Gốc" lấy từ `NHAN_VAT.md` (theo cấp chiêu). Cột "Bản web" là công thức cũ để đối chiếu. Phần in đậm là hệ số mới.
 
 **Elara — Xạ thủ (SMVL tổng, tốc đánh, chí mạng)**
@@ -521,7 +527,7 @@ Mỗi tướng có 10 cấp thành thạo (kinh nghiệm theo số phòng qua v�
 ## 15. Phạm vi & lộ trình
 
 ### 15.1. Bản thử đầu (MVP) — mục tiêu: "đánh 1 màn thấy vui"
-- 6 tướng (mục 5.3), mỗi tướng đủ S1–S4, skill phụ, 15 Thiên Phú.
+- 8 tướng (mục 5.3), mỗi tướng đủ S1–S4, skill phụ, 15 Thiên Phú.
 - 1 màn (Rừng Thông): 8 mẫu phòng, 6 loại quái, 2 tinh anh, 1 tướng AI tinh anh, Boss Tân Thế.
 - 30 Ân Huệ chung, 20 trang bị, 10 mảnh hồn, 3 loại bình.
 - Thương nhân, phòng nghỉ, 3 sự kiện.
@@ -535,7 +541,7 @@ Mỗi tướng có 10 cấp thành thạo (kinh nghiệm theo số phòng qua v�
 | M1 — Một tướng | Elara đủ bộ chiêu, hệ trạng thái, vùng cảnh báo, 3 loại quái | Đánh 1 phòng với Elara thấy vui |
 | M2 — Vòng phòng | Sinh màn, cửa, phần thưởng, Thiên Phú, trang bị, thương nhân | Chơi hết 1 màn không lỗi |
 | M3 — Boss & tinh anh | Boss Tân Thế, boss nhỏ, tướng AI tinh anh | Boss khó mà công bằng |
-| M4 — Đủ MVP | 6 tướng, meta, lưu game | Người khác chơi thử muốn chơi lại |
+| M4 — Đủ MVP | 8 tướng, meta, lưu game | Người khác chơi thử muốn chơi lại |
 | M5 — Mở rộng | Màn 2–3, thêm tướng, bậc thử thách, cốt truyện | — |
 
 ---

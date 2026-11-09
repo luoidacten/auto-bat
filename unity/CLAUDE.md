@@ -1,7 +1,7 @@
 # CLAUDE.md — Hướng dẫn cho AI viết code dự án "Đấu Trường Luân Hồi" (Unity)
 
 > Đặt tệp này ở **gốc dự án Unity**. Claude Code tự đọc `CLAUDE.md`; nếu dùng công cụ AI khác, chép nội dung này vào `AGENTS.md` hoặc phần "rules" của công cụ đó.
-> Cùng thư mục cần có: `Docs/GDD.md` (thiết kế) và `Docs/NHAN_VAT.md` (số liệu nhân vật).
+> Cùng thư mục cần có: `Docs/GDD.md` (thiết kế), `Docs/TUONG_DAU_TIEN.md` (đặc tả chi tiết 8 tướng đầu tiên) và `Docs/NHAN_VAT.md` (số liệu 40 nhân vật).
 
 ---
 
@@ -206,6 +206,7 @@ Giữ đúng tên với bản web để dịch dễ:
 ## 9. Dịch một tướng từ mã web sang Unity
 
 ### 9.1. Nguồn
+- **8 tướng đầu tiên:** `Docs/TUONG_DAU_TIEN.md` là nguồn chính — hành vi từng bước, mọi con số, chỗ mô tả lệch mã (⚠), hệ số roguelite, ca kiểm thử. Ưu tiên tài liệu này hơn `NHAN_VAT.md`.
 - Hồ sơ tướng trong `Docs/NHAN_VAT.md`: chỉ số, mô tả chiêu, **công thức trong mã**, dòng mã nguồn.
 - Mã gốc (nếu có trong máy): `auto-bat/src/data/heroes/<id>.js`.
 
@@ -262,6 +263,6 @@ Lưu ý: bản web dùng mặt phẳng `(x, y)`; Unity dùng `(x, z)` với `y` 
 
 ## 11. Mẫu yêu cầu người dùng có thể giao cho AI
 - "Làm mốc M0 trong GDD mục 15.2: di chuyển WASD, camera Cinemachine, lướt né chung, đánh thường cận chiến, 1 quái bù nhìn. Kèm test EditMode cho StatBlock và DamageSystem."
-- "Dịch tướng Elara theo CLAUDE.md mục 9.3. Số liệu trong Docs/NHAN_VAT.md mục Elara."
+- "Dịch tướng Elara theo CLAUDE.md mục 9.3. Đặc tả trong Docs/TUONG_DAU_TIEN.md mục 1; viết test cho các 'Ca kiểm thử' ở mục 1.9."
 - "Làm hệ Thiên Phú và màn chọn 3 lựa chọn theo GDD 8.2–8.4."
 - "Làm Boss Tân Thế theo GDD 10.4, dùng TelegraphSystem, có giai đoạn 2."
