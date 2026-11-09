@@ -144,7 +144,36 @@ Giữ đúng tên với bản web để dịch dễ:
 - `RewardService` rút lựa chọn theo luật GDD 8.4 (trọng số nhãn, độ hiếm theo màn).
 - Lưu: JSON có `version`; có lớp nâng cấp dữ liệu lưu cũ.
 
-### 5.11. Pool & hiệu năng
+### 5.11. Hệ số chiêu (Scaling) — xem GDD 6.5–6.7
+- `StatBlock` phải giữ **giá trị gốc theo cấp** riêng để tính "cộng thêm": `Bonus(stat) = Total(stat) − BaseFromLevel(stat)` (SMVL, Máu, Giáp, KP, Tốc đánh). SMPT gốc = 0.
+- Không viết cứng hệ số trong `SkillBehaviour`. Mỗi lượng sát thương / hồi máu / lá chắn là một `ScaledValue` trong dữ liệu chiêu:
+  ```csharp
+  public enum ScalingSource {
+      AttackDamageTotal, AttackDamageBonus, AbilityPower,
+      MaxHealth, BonusHealth, ArmorBonus, MagicResistBonus,
+      TargetMaxHealth, TargetMissingHealth, TargetCurrentHealth,
+      BonusAttackSpeed, CritChance, HeroLevel, Stacks, Resource, Custom
+  }
+  [Serializable] public struct ScalingTerm {
+      public ScalingSource Source; public float[] RatioByRank;   // 1 phần tử = mọi cấp như nhau
+      public string CustomKey;                                    // cho Stacks / Resource / Custom (ví dụ "ignatius.burn_stacks")
+  }
+  [Serializable] public class ScaledValue {
+      public string Id;                    // "s2.damage", "s3.shield"…
+      public float[] BaseByRank; public float PerHeroLevel;
+      public List<ScalingTerm> Terms;
+      public DamageType Type;              // Physical / Magic / True (bỏ qua nếu là hồi máu, lá chắn)
+      public bool CapVsMonsters;           // áp giới hạn GDD 6.6 cho hệ số % máu mục tiêu
+      public float Evaluate(Unit caster, Unit target, int rank, IScalingContext ctx);
+  }
+  ```
+- `SkillDefinition` có `List<ScaledValue> Values`; behaviour gọi `ctx.Value("s2.damage", target)` — không tự nhân chỉ số.
+- Hệ số % máu mục tiêu tính **theo từng mục tiêu** lúc trúng, không tính trước khi tung chiêu.
+- Tooltip sinh tự động từ `ScaledValue`: số đã tính theo chỉ số hiện tại; giữ Alt hiện từng hệ số với màu theo bảng GDD 6.6.
+- Test EditMode: mỗi `ScalingSource` một test; một test cho giới hạn % máu với boss.
+- **Chuyển công thức bản web:** bản web chỉ có `H.amt(u, gốc, hsSMVL, hsSMPT)` dùng **SMVL tổng**. Khi chuyển tướng, dùng bảng hệ số mới trong GDD 6.7 nếu tướng đã có; nếu chưa, giữ công thức web (AttackDamageTotal + AbilityPower) và ghi `// TODO(hệ số): chờ thiết kế theo GDD 6.6`.
+
+### 5.12. Pool & hiệu năng
 - Pool cho đạn, hiệu ứng, số sát thương, quái.
 - Mục tiêu: 60 FPS PC, 30–60 FPS điện thoại tầm trung với 40 quái + 100 đạn trên màn.
 
@@ -193,7 +222,7 @@ Giữ đúng tên với bản web để dịch dễ:
 | `u.ws.xxx` | Trạng thái riêng của tướng | Trường trong lớp nội tại (`AlicePassive.Hype`) |
 | `u.st.ad` / `u.st.ap` / `u.st.maxHp` | Chỉ số hiện tại | `unit.Stats[StatType.AttackDamage]`… |
 | `u.level` | Cấp tướng | `unit.Level` |
-| `H.amt(u, gốc, hsAD, hsAP)` | gốc + hsAD×SMVL + hsAP×SMPT | `Dmg.Scale(unit, base, adRatio, apRatio)` |
+| `H.amt(u, gốc, hsAD, hsAP)` | gốc + hsAD×SMVL tổng + hsAP×SMPT | `ScaledValue` trong dữ liệu chiêu (mục 5.11) — ưu tiên hệ số mới ở GDD 6.7 |
 | `H.T(u, '3b')` | Đã có nhánh 3b | `unit.Upgrades.Has("elara.3b")` |
 | `m.damage(u, e, amt, 'phys'/'magic'/'true', {tag})` | Gây sát thương | `DamageSystem.Apply(...)` |
 | `m.heal(u, t, amt)` / `m.shield(t, amt, dur)` | Hồi máu / lá chắn | `HealSystem` / `ShieldSystem` |
@@ -219,7 +248,7 @@ Lưu ý: bản web dùng mặt phẳng `(x, y)`; Unity dùng `(x, z)` với `y` 
 ### 9.3. Quy trình dịch một tướng
 1. Tạo `HeroDefinition` + 5 `SkillDefinition` từ `NHAN_VAT.md` (dùng công cụ nhập dữ liệu nếu đã có).
 2. Viết lớp nội tại (`XxxPassive`) — trạng thái riêng, hook.
-3. Viết từng `SkillBehaviour`: đúng công thức trong mã, đúng thứ tự hiệu ứng trong mã gốc.
+3. Viết từng `SkillBehaviour`: đúng thứ tự hiệu ứng trong mã gốc; lượng sát thương/hồi/khiên khai báo bằng `ScaledValue` theo bảng hệ số GDD 6.7 (chưa có bảng thì dùng công thức web và ghi TODO).
 4. Viết 15 Thiên Phú của tướng (cây tiến hóa) dạng `TalentDefinition` + hook/điều kiện `Has("id.3b")`.
 5. Chiêu thiết kế cho đấu tướng (chỉ nhắm tướng, `heroOnly`) → đổi sang nhắm mọi kẻ địch, hoặc ghi chú để người dùng quyết định.
 6. Thêm khóa dịch cho tên, mô tả.

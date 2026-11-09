@@ -130,7 +130,7 @@ Thứ tự làm: Elara → Borg → Ignatius → Valerius → Alice → Thanh Ph
 Giữ cách tính của bản web (chi tiết ở `NHAN_VAT.md` mục 1.5), bỏ phần PvP:
 
 ```
-sát_thương_gốc = gốc + hệ_số_SMVL × SMVL + hệ_số_SMPT × SMPT       (theo công thức trong mã của chiêu)
+sát_thương_gốc = gốc_theo_cấp_chiêu + Σ (hệ_số × giá_trị_nguồn)    (nguồn: SMVL, SMVL cộng thêm, SMPT, máu, giáp, máu mục tiêu… — mục 6.5–6.6)
 × hook nội tại / trang bị / nâng cấp (onDeal của người đánh, onTake của người nhận)
 × 1.4 nếu là chiêu cuối
 × (1 + khuếch đại sát thương của người đánh) × (1 + Công Vật Lý % hoặc Công Phép %)
@@ -163,6 +163,125 @@ Giữ đủ danh sách bản web: choáng, ngủ, hất tung, trói chân, làm 
 | Boss màn 1 / 2 / 3 | 60–90 / 90–120 / 120–180 giây |
 | Người chơi chết nếu đứng im giữa phòng màn 1 | Khoảng 15 giây |
 | Đòn lớn của boss | 25–40% máu người chơi |
+
+### 6.5. Chỉ số tấn công: SMVL & SMPT [CỐ ĐỊNH]
+
+| Viết tắt | Tên đầy đủ | Tương đương LMHT | Nguồn |
+|---|---|---|---|
+| **SMVL** | Sức Mạnh Vật Lý | AD | **SMVL gốc** (từ cấp tướng: `gốc + tăng × (cấp−1)`) + **SMVL cộng thêm** (trang bị, Thiên Phú, mảnh hồn, hiệu ứng) |
+| **SMPT** | Sức Mạnh Phép Thuật | AP | Tướng có SMPT gốc = 0 → **toàn bộ SMPT là cộng thêm** |
+| Máu tối đa / Máu cộng thêm | | Max HP / Bonus HP | Máu cộng thêm = máu tối đa − máu gốc theo cấp |
+| Giáp / KP (Kháng Phép) cộng thêm | | Bonus Armor / MR | Tương tự |
+| Tốc đánh cộng thêm | | Bonus AS | % tốc đánh ngoài tốc đánh gốc |
+
+- **SMVL tổng** = SMVL gốc + SMVL cộng thêm. Mọi mô tả chiêu phải ghi rõ "SMVL" (tổng) hay "SMVL cộng thêm" — không được ghi mập mờ.
+- Bản web chỉ dùng **SMVL tổng** và SMPT trong công thức (cột "Công thức trong mã" của `NHAN_VAT.md`). Bản Unity **tách SMVL gốc / cộng thêm** để hệ số có ý nghĩa: hệ số trên SMVL cộng thêm thưởng cho người mua đồ, hệ số trên SMVL tổng mạnh sẵn từ đầu.
+- Đánh thường luôn là **100% SMVL tổng** (tướng đánh thường gây sát thương phép như Alice, Ignatius ghi rõ hệ số riêng).
+
+### 6.6. Hệ số chiêu đa dạng [CỐ ĐỊNH về hệ thống, CHỈNH ĐƯỢC về con số]
+Chiêu **không chỉ** là `gốc + x% SMVL` hoặc `gốc + x% SMPT`. Mỗi chiêu có thể cộng nhiều **hệ số** từ các nguồn sau:
+
+| Nguồn hệ số | Ký hiệu trong mô tả | Màu tooltip | Dùng cho |
+|---|---|---|---|
+| SMVL tổng | (+60% SMVL) | Cam | Xạ thủ, đòn gần với đánh thường |
+| SMVL cộng thêm | (+80% SMVL cộng thêm) | Cam đậm | Đấu sĩ, sát thủ vật lý — thưởng cho build đồ công |
+| SMPT | (+70% SMPT) | Tím | Pháp sư, hồi máu, lá chắn |
+| Máu tối đa của bản thân | (+6% Máu tối đa) | Xanh lá | Đỡ đòn, đấu sĩ trâu |
+| Máu cộng thêm của bản thân | (+10% Máu cộng thêm) | Xanh lá đậm | Đỡ đòn — thưởng cho build máu |
+| Giáp / KP (cộng thêm) | (+40% Giáp cộng thêm) | Vàng / Xanh dương | Đỡ đòn phản sát thương |
+| Máu tối đa của mục tiêu | (+4% Máu tối đa mục tiêu) | Đỏ | Chống trâu — **giới hạn với quái/boss** |
+| Máu đã mất của mục tiêu | (+10% Máu đã mất mục tiêu) | Đỏ | Kết liễu |
+| Máu hiện tại của mục tiêu | (+8% Máu hiện tại mục tiêu) | Đỏ | Mở giao tranh, dồn đầu |
+| Tốc đánh cộng thêm | (+0.5 mỗi 1% Tốc đánh cộng thêm) | Vàng nhạt | Xạ thủ tốc đánh |
+| Tỉ lệ chí mạng | (×(1 + 0.5 × Chí mạng)) | Cam nhạt | Chiêu mang tính "chí mạng" |
+| Cấp tướng | (+8 mỗi cấp) | Trắng | Chiêu nội tại, chiêu phụ không có cấp chiêu |
+| Tầng / tài nguyên riêng | (+5 mỗi tầng Hỏa Ấn), (+1% mỗi 10 Náo Nhiệt) | Màu tài nguyên | Cơ chế riêng của tướng |
+| Thời gian tích / quãng bay | (50% → 100% theo thời gian tích) | Trắng | Chiêu tích lực, chiêu tầm xa |
+| Sát thương vừa nhận / đã hấp thụ | (+40% sát thương đã hấp thụ) | Trắng | Phản đòn |
+
+**Luật thiết kế hệ số:**
+1. Mỗi chiêu **1–3 hệ số** (gốc theo cấp chiêu luôn có, không tính vào giới hạn).
+2. Mỗi tướng dùng **ít nhất 2 nguồn hệ số khác nhau** trong cả bộ chiêu → mở được ít nhất 2 lối build.
+3. Hệ số theo vai trò (gợi ý):
+   - Xạ thủ: SMVL tổng, tốc đánh cộng thêm, chí mạng, máu đã mất mục tiêu (chiêu cuối).
+   - Đấu sĩ: SMVL cộng thêm + máu cộng thêm (lai công/thủ).
+   - Đỡ đòn: máu tối đa, giáp/KP cộng thêm, máu tối đa mục tiêu.
+   - Pháp sư: SMPT, máu tối đa mục tiêu (dồn phép), tầng cộng dồn.
+   - Sát thủ: SMVL cộng thêm hoặc SMPT, máu đã mất mục tiêu.
+   - Hồi máu / lá chắn: SMPT hoặc máu tối đa của bản thân.
+4. Hệ số theo **% máu mục tiêu** với quái thường, tinh anh, boss: tối đa **100 / 250 / 400** sát thương mỗi lần trúng [CHỈNH ĐƯỢC] — tránh xóa boss.
+5. Sát thương **lai**: một chiêu có thể gồm hai phần khác loại (ví dụ 60% vật lý + 40% phép); ghi rõ từng phần.
+6. Mô tả chiêu trong game hiện **số đã tính** theo chỉ số hiện tại; giữ Alt hiện công thức với màu theo bảng trên (như tooltip LMHT).
+
+### 6.7. Hệ số đề xuất cho 6 tướng MVP [CHỈNH ĐƯỢC]
+"Gốc" lấy từ `NHAN_VAT.md` (theo cấp chiêu). Cột "Bản web" là công thức cũ để đối chiếu. Phần in đậm là hệ số mới.
+
+**Elara — Xạ thủ (SMVL tổng, tốc đánh, chí mạng)**
+
+| Chiêu | Bản web | Bản roguelite |
+|---|---|---|
+| Nội tại — Tập Trung | +25% sát thương | +25% sát thương **+ 20 (+4 mỗi cấp) (+25% SMVL cộng thêm)** |
+| S1 Liên Xạ (3 mũi) | mỗi mũi 50% đánh thường + 15–55 | mỗi mũi 15/25/35/45/55 **(+50% SMVL)**, chí mạng được, kích hoạt hiệu ứng đòn đánh |
+| S2 Kéo Căng Dây | 80–260 + 0.9×SMVL | 80/125/170/215/260 **(+100% SMVL cộng thêm)**, 50%→100% theo thời gian tích, **×(1 + 0.5 × Chí mạng)** |
+| S3 Sao Băng Lùi | 30–110 + 0.3×SMVL | mỗi sao băng 30/50/70/90/110 **(+30% SMVL cộng thêm)**; làm chậm 40% **(+1% mỗi 5% Tốc đánh cộng thêm, tối đa 60%)** |
+| S4 Thần Tiễn Phá Không | 200–400 + 1.0×SMVL | 200/300/400 **(+100% SMVL cộng thêm) (+10/15/20% Máu đã mất mục tiêu)** |
+| Phụ — Tên Hình Nón | 30 + 6×cấp + 0.35×SMVL | giữ: 30 (+6 mỗi cấp) **(+35% SMVL)** |
+
+**Borg — Đấu sĩ (SMVL cộng thêm, máu cộng thêm)**
+
+| Chiêu | Bản web | Bản roguelite |
+|---|---|---|
+| Nội tại — Huyết Chiến | thiêu khi dưới 30% máu | thiêu **10 (+2 mỗi cấp) (+1% Máu tối đa của Borg)** mỗi giây trong 2s |
+| S1 Chộp & Quật | 60–200 + 0.6×SMVL | 60/95/130/165/200 **(+60% SMVL cộng thêm) (+5% Máu cộng thêm)** |
+| S2 Trả Đòn | 70–230 + 0.9×SMVL, +40% đã hấp thụ | 70/110/150/190/230 **(+90% SMVL cộng thêm) (+40% sát thương đã hấp thụ)** |
+| S3 Gồng Mình | giảm 50% sát thương | giảm 50% + lá chắn **40/60/80/100/120 (+8% Máu cộng thêm)** |
+| S4 Đấu Trường La Mã | võ đài, giảm 25% sát thương | như cũ + **+20/30/40 (+15% Giáp cộng thêm) Giáp và KP**; địch đập vào tường võ đài nhận **100/150/200 (+4% Máu tối đa mục tiêu)** |
+
+**Ignatius — Pháp sư lửa (SMPT, tầng Hỏa Ấn, máu tối đa mục tiêu)**
+
+| Chiêu | Bản web | Bản roguelite |
+|---|---|---|
+| Nội tại — thiêu Hỏa Ấn | (7 +2/cấp +0.5×tầng)/giây | 7 (+2 mỗi cấp) **(+0.5 mỗi tầng) (+4% SMPT)** mỗi giây |
+| Nội tại — Hỏa Bạo (mỗi 6 tầng) | 60 + 18×cấp + 0.6×SMPT | 60 (+18 mỗi cấp) **(+60% SMPT) (+3% Máu tối đa mục tiêu)** |
+| S1 Cầu Lửa | 65–205 + 0.6×SMPT | giữ: 65/100/135/170/205 **(+60% SMPT)** |
+| S2 Đại Hỏa Cầu | 60–180 × (0.6→1.0 theo tích) + 200–300% SMPT, +25% dưới 30% máu | 60/90/120/150/180 **(+100% SMPT)** × (0.6→1.0 theo tích) **(+0→30% theo Máu đã mất mục tiêu)** |
+| S3 Dịch Chuyển | 40–120 + 0.3×SMPT | giữ |
+| S4 Thiên Thạch | 150–300 + 125/150/200% SMPT | 150/220/300 **(+90% SMPT) (+6/8/10% Máu tối đa mục tiêu)** |
+| Phụ — Vòng Lửa | 30 + 8×cấp + 0.3×SMPT | giữ |
+
+**Alice — Sát thủ ảo ảnh (SMPT, máu đã mất mục tiêu, Náo Nhiệt)**
+
+| Chiêu | Bản web | Bản roguelite |
+|---|---|---|
+| Đánh thường (phép) | SMVL + 0.3×SMPT | giữ: **100% SMVL (+30% SMPT)** sát thương phép |
+| Nội tại — ảo ảnh nổ | 40 + 8×cấp + 0.35×SMPT | 40 (+8 mỗi cấp) **(+35% SMPT) (+1% mỗi 10 Náo Nhiệt)** |
+| S1 Phi Dao | 70–230 + 0.65×SMPT | giữ: 70/110/150/190/230 **(+65% SMPT)** |
+| S2 Lướt Đâm | 80–240 + 0.55×SMPT, sau lưng ×2 | 80/120/160/200/240 **(+55% SMPT)**; đâm sau lưng ×2 **(+8% Máu đã mất mục tiêu)** |
+| S4 Rực Rỡ | 150–350 + 0.7×SMPT | 150/250/350 **(+70% SMPT)**; Mạo Hiểm trả lại **200% sát thương vừa nhận** (tối đa gấp 2 sát thương gốc) |
+
+**Valerius — Đỡ đòn (máu tối đa, giáp/KP, máu đã mất mục tiêu)**
+
+| Chiêu | Bản web | Bản roguelite |
+|---|---|---|
+| Nội tại — Phản Kích | +12 (+2/cấp) mỗi tầng | +12 (+2 mỗi cấp) **(+1.5% Máu tối đa)** mỗi tầng |
+| S1 Chém Vòng Cung | 60–200 + 0.7×SMVL | 60/95/130/165/200 **(+40% SMVL cộng thêm) (+4% Máu tối đa)** |
+| S2 Đâm Thẳng | 70–230 + 0.8×SMVL, +8% máu đã mất | 70/110/150/190/230 **(+80% SMVL cộng thêm) (+8% Máu đã mất mục tiêu)** |
+| S3 Khiên Chắn (cú húc) | 50–170 + 0.5×SMVL | 50/80/110/140/170 **(+30% Giáp cộng thêm) (+30% KP cộng thêm)** |
+| S4 Chiến Thần Bất Tử | không sát thương | như cũ + hết 4s **hồi 20/25/30% sát thương đã nhận** trong thời gian đó |
+| Phụ — Cuồng Phong | 40 + 8×cấp + 0.4×SMVL | 40 (+8 mỗi cấp) **(+40% SMVL) (+2% Máu tối đa)** |
+
+**Diệp Thanh Phong — Pháp sư lai (SMPT, SMVL theo trạng thái gió)**
+
+| Chiêu | Bản web | Bản roguelite |
+|---|---|---|
+| Nội tại — Đột Kích (Nghịch) | 50 + 14×cấp + 0.3×SMVL + 0.7×SMPT | giữ (đã lai) |
+| S1 Toàn Phong Quy | 60–200 + 0.6×SMPT | 60/95/130/165/200 **(+60% SMPT)**; dạng Nghịch chém bồi thêm **(+40% SMVL cộng thêm)** |
+| S2 Bát Diện Phong Trận | 55–175 + 0.5×SMPT | 55/85/115/145/175 **(+50% SMPT)**; dạng Nghịch đâm **×(1.5 + 0.5 × Chí mạng)** |
+| S3 Mê Tung Phong Vực | 50–170 + 0.5×SMPT; độc 10 + 3×cấp + 0.1×SMPT | giữ |
+| S4 Cơn Gió Đưa Giấc | 25–55 + 0.15×SMPT mỗi nhịp | giữ; đòn đánh thức **×1.5 (+4% Máu tối đa mục tiêu)** |
+| Phụ — Nghịch Chuyển | 60 + 14×cấp + 0.6×SMPT | giữ; khiên Nghịch→Thuận **80 (+10 mỗi cấp) (+50% SMPT) (+5% Máu tối đa)** |
+
+Khi chuyển các tướng còn lại, áp cùng luật 6.6 và ghi bảng tương tự vào dữ liệu tướng.
 
 ---
 

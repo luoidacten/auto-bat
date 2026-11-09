@@ -21,7 +21,10 @@ Tổng số nhân vật: **40** (trong đó 1 chưa phát hành: Lyra).
 - Khoảng cách: **đv** (đơn vị) ≈ 1 mét → nên map 1 đv = 1 Unity unit. Bản đồ 612×612 đv.
 - Thời gian: giây. Mô phỏng chạy nhịp cố định 0.05s/bước (tất định theo hạt giống) — trong Unity nên đặt logic vào FixedUpdate với cùng bước.
 - Tốc chạy: đv/giây. Tốc đánh: số đòn/giây. Tốc đạn: đv/giây.
-- "SMVL" = Sức mạnh vật lý (AD), "SMPT" = Sức mạnh phép thuật (AP), "KP" = Kháng phép (MR).
+- **SMVL** = Sức Mạnh Vật Lý (AD) = SMVL gốc theo cấp tướng + SMVL cộng thêm (trang bị, nhánh, mảnh hồn, hiệu ứng).
+- **SMPT** = Sức Mạnh Phép Thuật (AP). SMPT gốc của mọi tướng = 0, toàn bộ đến từ trang bị / nhánh / mảnh hồn / hiệu ứng.
+- **KP** = Kháng Phép (MR). **Hộ Giáp** = thanh giáp phụ gánh sát thương trước máu.
+- Trong mọi công thức của tài liệu này, **"SMVL" là SMVL tổng** (bản web không tách gốc / cộng thêm). Bản Unity tách hai loại và dùng hệ số đa dạng hơn — xem `GDD.md` mục 6.5–6.7.
 
 ### 1.2. Cấp & điểm chiêu
 - Cấp tối đa **18**. Kinh nghiệm cần để từ cấp L lên L+1: `200 + 90 * (L - 1)` (cấp 1→2: 200, cấp 17→18: 1640).
